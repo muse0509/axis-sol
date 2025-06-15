@@ -233,7 +233,7 @@ const Home: NextPage<Props> = ({
             <p className={styles.aboutIntro}>
               Thank you for visiting. My name is Muse, the creator of this project. 
               <br />
-              I'm a <a href="https://superteam.fun/jp" target="_blank" rel="noopener noreferrer">SolanaSuperTeamJapan</a> Contributor based in Tokyo, Japan.
+              I'm a SolanaSuperTeamJapan Contributor based in Tokyo, Japan. 🇯🇵
             </p>
             <h3>Motivation</h3>
             <p>
