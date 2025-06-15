@@ -4,7 +4,7 @@
   background-color: #000000;
   color: #ffffff;
   min-height: 100vh;
-  overflow: hidden; /* For particles background */
+  overflow-x: hidden;
   position: relative;
 }
 
@@ -38,17 +38,60 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  margin-bottom: 1rem;
 }
 
 .description {
-  margin: 1rem 0 3rem;
+  margin: 1rem 0 2rem;
   line-height: 1.6;
   font-size: 1.25rem;
   color: #a0a0a0;
   text-align: center;
   max-width: 600px;
 }
+
+/* --- Call to Action Buttons --- */
+.callToActionContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.primaryButton, .secondaryButton {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.primaryButton:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.4);
+}
+
+.secondaryButton {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.secondaryButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 
 /* --- Index Display --- */
 .indexDisplay {
@@ -81,9 +124,13 @@
 .indexValue {
   font-size: 5rem;
   font-weight: 700;
-  color: #ffffff;
   line-height: 1;
-  text-shadow: 0 0 15px rgba(136, 132, 216, 0.5);
+  background: linear-gradient(45deg, #ffffff, #c0c0c0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
 }
 
 .positiveChange,
@@ -136,6 +183,14 @@
   margin: 0.5rem auto 0;
 }
 
+.constituentDisclaimer {
+  color: #888;
+  font-size: 0.85rem;
+  max-width: 450px;
+  margin: 1rem auto 0;
+  font-style: italic;
+}
+
 .constituentGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -170,9 +225,9 @@
 .assetWeight {
   font-size: 0.8rem;
   font-weight: 500;
-  color: #8884d8;
+  color: #cccccc;
   margin-top: 1rem;
-  background: rgba(136, 132, 216, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   display: inline-block;
@@ -209,6 +264,7 @@
   border-radius: 8px;
   padding: 1.5rem 2rem;
   margin-bottom: 1.5rem;
+  overflow-x: auto;
 }
 
 .formulaText {
@@ -239,7 +295,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2rem 2rem 1.5rem 1rem;
+  padding: 2rem 1.5rem 1.5rem 0.5rem;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   margin-bottom: 3rem;
@@ -275,10 +331,10 @@
 .aboutContent h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #8884d8;
+  color: #ffffff;
   margin-top: 2rem;
   margin-bottom: 0.5rem;
-  border-left: 3px solid #8884d8;
+  border-left: 3px solid #ffffff;
   padding-left: 0.75rem;
 }
 
@@ -293,7 +349,7 @@
 }
 
 .aboutIntro a {
-  color: #8884d8;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 600;
 }
@@ -330,4 +386,95 @@
   border: 1px solid #ff4d4f;
   padding: 2rem;
   border-radius: 12px;
+}
+
+/* --- Responsive Styles --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+
+  .main {
+    padding: 2rem 0;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    gap: 1rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .callToActionContainer {
+    margin-bottom: 2rem;
+  }
+
+  .indexDisplay {
+    padding: 1.5rem;
+  }
+  
+  .indexValue {
+    font-size: 3.5rem;
+  }
+
+  .positiveChange,
+  .negativeChange {
+    font-size: 1.25rem;
+  }
+  
+  .constituentGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .assetCard {
+    padding: 1rem;
+  }
+
+  .assetSymbol {
+    font-size: 1.2rem;
+  }
+  
+  .assetPrice {
+    font-size: 1rem;
+  }
+
+  .methodologyContainer,
+  .aboutContainer {
+    padding: 1.5rem;
+  }
+  
+  .aboutContainer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .aboutContent h3 {
+    padding-left: 0;
+    border-left: none;
+    text-align: center;
+  }
+
+  .aboutSocials {
+    justify-content: center;
+  }
+
+  .formulaText {
+    font-size: 1.1rem;
+  }
+
+  .formulaLegend {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .chartContainer {
+    padding: 1rem 0.5rem 0.5rem 0;
+  }
 }

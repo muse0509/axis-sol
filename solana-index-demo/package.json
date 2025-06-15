@@ -11,8 +11,10 @@
   "dependencies": {
     "@pythnetwork/hermes-client": "^2.0.0",
     "@supabase/supabase-js": "^2.50.0",
+    "framer-motion": "^12.18.1",
     "next": "15.3.3",
     "react": "^19.0.0",
+    "react-countup": "^6.5.3",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-tsparticles": "^2.12.2",
