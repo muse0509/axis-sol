@@ -459,6 +459,87 @@
 .aboutSocials a:hover {
   color: #ffffff;
 }
+/* --- Timeline & Events --- */
+.timelineContainer {
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 3rem;
+}
+
+.timelineTitle {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid #fff;
+  padding-left: 1rem;
+}
+
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.eventItem {
+  display: flex;
+  gap: 1.5rem;
+  border-left: 2px solid #555;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+/* タイムラインの丸い点 */
+.eventItem::before {
+  content: '';
+  position: absolute;
+  left: -7px; 
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background-color: #00E5FF;; /* 黄色い点 */
+  border-radius: 50%;
+  border: 2px solid #000;
+}
+
+.eventDate {
+  font-weight: 600;
+  color: #a0a0a0;
+  min-width: 130px;
+  padding-top: 3px;
+}
+
+.eventDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.eventTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.eventDescription {
+  font-size: 1rem;
+  color: #a0a0a0;
+  line-height: 1.6;
+}
+
+/* --- レスポンシブ対応 (スマホ用) --- */
+@media (max-width: 768px) {
+  .timelineContainer {
+    margin-top: 2rem;
+  }
+
+  .eventItem { 
+    flex-direction: column; 
+    gap: 0.5rem; 
+    padding-left: 1.25rem;
+  }
+  .eventItem::before {
+    left: -7px;
+  }
+}
 
 /* --- Error Text --- */
 .errorText {

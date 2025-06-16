@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import type { GetServerSideProps, NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useCallback, useState, useEffect, useRef } from 'react';
 import {
   LineChart,
@@ -12,6 +13,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceDot,
 } from 'recharts';
 import Particles from 'react-tsparticles';
 import type { Engine } from 'tsparticles-engine';
@@ -22,6 +24,7 @@ import CountUp from 'react-countup';
 import { motion, Variants } from 'framer-motion';
 import styles from '../styles/Home.module.css';
 import { particlesOptions } from '../utils/particles';
+import { marketEvents } from '../lib/market-events';
 
 // --- 型定義 ---
 type BreakdownAsset = {
@@ -41,15 +44,22 @@ type LatestEntry = {
   };
 };
 
-type IndexData = {
-  created_at: string;
+type DailyData = {
+  day: string;
   index_value: number;
+};
+
+type MarketEvent = {
+  event_date: string;
+  title: string;
+  description: string;
 };
 
 type Props = {
   initialLatestEntry: LatestEntry | null;
-  initialIndexHistory: IndexData[];
+  initialNormalizedHistory: DailyData[];
   initialDailyChange: number | null;
+  events: MarketEvent[];
   error?: string;
 };
 
@@ -69,12 +79,13 @@ const sectionVariants: Variants = {
 // --- UIコンポーネント ---
 const Home: NextPage<Props> = ({ 
   initialLatestEntry, 
-  initialIndexHistory, 
+  initialNormalizedHistory, 
   initialDailyChange, 
+  events,
   error 
 }) => {
   const [latestEntry, setLatestEntry] = useState(initialLatestEntry);
-  const [indexHistory, setIndexHistory] = useState(initialIndexHistory);
+  const [normalizedHistory, setNormalizedHistory] = useState(initialNormalizedHistory);
   const [dailyChange, setDailyChange] = useState(initialDailyChange);
   const [pageError, setPageError] = useState(error);
   const [animationTrigger, setAnimationTrigger] = useState(0);
@@ -83,9 +94,9 @@ const Home: NextPage<Props> = ({
   const prevDailyChange = useRef(0);
 
   useEffect(() => {
-    prevIndexValue.current = latestEntry?.index_value || 0;
+    prevIndexValue.current = normalizedHistory.length > 0 ? normalizedHistory[normalizedHistory.length - 1].index_value : 0;
     prevDailyChange.current = dailyChange || 0;
-  }, [latestEntry, dailyChange]);
+  }, [normalizedHistory, dailyChange]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,7 +107,7 @@ const Home: NextPage<Props> = ({
         if (data.error) { console.error("API Error:", data.error); return; }
         
         setLatestEntry(data.latestEntry);
-        setIndexHistory(data.indexHistory);
+        setNormalizedHistory(data.normalizedHistory);
         setDailyChange(data.dailyChange);
         setPageError(undefined);
         setAnimationTrigger(prev => prev + 1);
@@ -113,7 +124,7 @@ const Home: NextPage<Props> = ({
     await loadSlim(engine);
   }, []);
 
-  if (pageError || !latestEntry) {
+  if (pageError || !latestEntry || normalizedHistory.length === 0) {
     return (
       <div className={styles.container}>
         <main className={styles.main}>
@@ -124,15 +135,17 @@ const Home: NextPage<Props> = ({
     );
   }
 
-  const { index_value: latestIndexValue, calculation_breakdown: breakdown } = latestEntry;
+  // ★★★ 表示用データの準備（変数をここで正しく定義） ★★★
+  const latestNormalizedValue = normalizedHistory[normalizedHistory.length - 1].index_value;
+  const { calculation_breakdown: breakdown } = latestEntry;
   const { sumOfRatios, assets: constituentAssets } = breakdown || { sumOfRatios: 0, assets: [] };
 
-  const chartData = indexHistory.map(item => ({
-    full_date: new Date(item.created_at),
+  const chartData = normalizedHistory.map(item => ({
+    date: new Date(item.day).getTime(),
     value: item.index_value,
   }));
   
-  const formatXAxis = (tickItem: Date) => tickItem.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const formatDateTick = (timestamp: number) => new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -140,11 +153,19 @@ const Home: NextPage<Props> = ({
       return (
         <div style={{ background: 'rgba(0,0,0,0.8)', padding: '10px', border: '1px solid #555', borderRadius: '8px' }}>
           <p style={{ margin: 0, color: '#fff' }}>{`Value: ${Number(payload[0].value).toFixed(2)}`}</p>
-          <p style={{ margin: 0, color: '#aaa', fontSize: '0.8rem' }}>{date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+          <p style={{ margin: 0, color: '#aaa', fontSize: '0.8rem' }}>{date.toLocaleDateString('en-US', { dateStyle: 'medium' })}</p>
         </div>
       );
     }
     return null;
+  };
+
+  const formatLargeNumber = (num: number) => {
+    if (num >= 1e12) return `${(num / 1e12).toFixed(2)}T`;
+    if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
+    if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
+    if (num >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
+    return num.toString();
   };
 
   return (
@@ -176,10 +197,10 @@ const Home: NextPage<Props> = ({
         </motion.div>
         
         <motion.div className={styles.indexDisplay} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
-          <p className={styles.indexLabel}>Current Index Value</p>
+          <p className={styles.indexLabel}>Current Index Value (Base: First day = 100)</p>
           <div className={styles.indexValueContainer}>
             <div className={styles.indexValue}>
-              <CountUp key={`index-${animationTrigger}`} start={prevIndexValue.current} end={latestIndexValue} decimals={2} duration={3} separator="," />
+              <CountUp key={`index-${animationTrigger}`} start={prevIndexValue.current} end={latestNormalizedValue} decimals={2} duration={3} separator="," />
             </div>
             {dailyChange !== null && (
               <div className={`${styles.changeContainer} ${dailyChange >= 0 ? styles.positiveChange : styles.negativeChange}`}>
@@ -190,14 +211,12 @@ const Home: NextPage<Props> = ({
             )}
           </div>
         </motion.div>
-        
+
         <motion.div className={styles.constituentContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
           <div className={styles.constituentHeader}>
             <h2 className={styles.constituentTitle}>Index Constituents</h2>
             <p className={styles.constituentDescription}>Each asset is equally weighted at 10% to ensure a balanced market representation.</p>
-            <p className={styles.constituentDisclaimer}>
-              Note: This index updates hourly. The constituent assets are fixed during the beta period.
-            </p>
+            <p className={styles.constituentDisclaimer}>Note: This index updates hourly. The constituent assets are fixed during the beta period.</p>
           </div>
           <div className={styles.constituentGrid}>
             {constituentAssets.map(asset => (
@@ -206,14 +225,56 @@ const Home: NextPage<Props> = ({
                   <span className={styles.assetSymbol}>{asset.symbol}</span>
                   <span className={styles.assetWeight}>10%</span>
                 </div>
-                <div className={styles.assetPriceContainer}>
-                    <span className={styles.assetPrice}>${asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    {asset.change24h !== null && (
-                        <span className={`${styles.changeContainerSmall} ${asset.change24h >= 0 ? styles.positiveChangeSmall : styles.negativeChangeSmall}`}>
-                        {asset.change24h >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
-                        {Math.abs(asset.change24h).toFixed(2)}%
-                        </span>
-                    )}
+                <div className={styles.assetPrice}>
+                  <CountUp key={`${asset.symbol}-price-${animationTrigger}`} start={0} end={asset.currentPrice} decimals={2} duration={2.5} separator="," prefix="$" />
+                </div>
+                <div className={styles.assetStats}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>24H Change</span>
+                    <span className={`${styles.statValue} ${asset.change24h && asset.change24h >= 0 ? styles.positiveChangeSmall : styles.negativeChangeSmall}`}>
+                      {asset.change24h !== null ? (
+                        <>
+                          {asset.change24h >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
+                          {Math.abs(asset.change24h).toFixed(2)}%
+                        </>
+                      ) : ('N/A')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        
+        <motion.div className={styles.chartContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+              <XAxis dataKey="date" tickFormatter={formatDateTick} stroke="#888" type="number" scale="time" domain={['dataMin', 'dataMax']} />
+              <YAxis stroke="#888" domain={['auto', 'auto']} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend verticalAlign="top" height={36}/>
+              <Line type="monotone" dataKey="value" stroke="#FFFFFF" strokeWidth={2} dot={false} name="Index Value" />
+              {events.map(event => {
+                  const eventDate = new Date(event.event_date);
+                  const dataPoint = chartData.find(d => new Date(d.date).toDateString() === eventDate.toDateString());
+                  if (!dataPoint) return null;
+
+                  return ( <ReferenceDot key={event.title} x={dataPoint.date} y={dataPoint.value} r={6} fill="#00E5FF" stroke="#000" /> );
+              })}
+            </LineChart>
+          </ResponsiveContainer>
+        </motion.div>
+        
+        <motion.div className={styles.timelineContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+          <h2 className={styles.timelineTitle}>Event Timeline</h2>
+          <div className={styles.eventList}>
+            {events.map(event => (
+              <div key={event.title} className={styles.eventItem}>
+                <div className={styles.eventDate}>{new Date(event.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                <div className={styles.eventDetails}>
+                  <h3 className={styles.eventTitle}>{event.title}</h3>
+                  <p className={styles.eventDescription}>{event.description}</p>
                 </div>
               </div>
             ))}
@@ -225,7 +286,7 @@ const Home: NextPage<Props> = ({
           <div className={styles.methodologyContent}>
              <div className={styles.formulaBox}>
               <span className={styles.formulaText}>
-                {Number(latestIndexValue).toFixed(2)} = 100 × {Number(sumOfRatios).toFixed(2)} / {constituentAssets.length}
+                {Number(latestNormalizedValue).toFixed(2)} = 100 × ( {Number(sumOfRatios).toFixed(2)} / {constituentAssets.length} )
               </span>
             </div>
             <table className={styles.breakdownTable}>
@@ -233,7 +294,7 @@ const Home: NextPage<Props> = ({
                 <tr>
                   <th>Asset</th>
                   <th>Current Price</th>
-                  <th>Base Price</th>
+                  <th>Base Price (1y ago)</th>
                   <th>Ratio</th>
                 </tr>
               </thead>
@@ -248,27 +309,7 @@ const Home: NextPage<Props> = ({
                 ))}
               </tbody>
             </table>
-            <div className={styles.formulaLegend}>
-              <span><b>P_current</b>: Current price of an asset</span>
-              {/* ★★★ Base Price の定義を明記 ★★★ */}
-              <span><b>P_base</b>: Price of the asset one year ago</span>
-              <span><b>N</b>: Number of constituent assets</span>
-              <span><b>&sum;</b>: Summation across all assets</span>
-            </div>
           </div>
-        </motion.div>
-
-        <motion.div className={styles.chartContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="full_date" tickFormatter={formatXAxis} stroke="#888" />
-              <YAxis stroke="#888" domain={['dataMin - 5', 'auto']} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Line type="monotone" dataKey="value" stroke="#FFFFFF" strokeWidth={2} dot={false} name="Index Value" isAnimationActive={false} />
-            </LineChart>
-          </ResponsiveContainer>
         </motion.div>
 
         <motion.div className={styles.aboutContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
@@ -307,67 +348,47 @@ const Home: NextPage<Props> = ({
   );
 };
 
+
 // --- サーバーサイドでの初回データ取得 ---
 export const getServerSideProps: GetServerSideProps = async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
-    const { data: latestEntry, error: latestEntryError } = await supabase
-      .from('index_history')
-      .select('created_at, index_value, calculation_breakdown')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    const { data: firstEntry, error: firstEntryError } = await supabase.from('index_history').select('index_value').order('created_at', { ascending: true }).limit(1).single();
+    if (firstEntryError) throw firstEntryError;
 
-    // ★★★ データが1件もない場合のみエラーとする ★★★
-    if (latestEntryError) {
-      if (latestEntryError.code === 'PGRST116') { // The query returned no rows
-        return { 
-          props: { 
-            initialLatestEntry: null,
-            initialIndexHistory: [],
-            initialDailyChange: null,
-            error: "No index data found. Please run the calculation API first." 
-          } 
-        };
-      }
-      throw latestEntryError;
-    }
-    
-    const now = new Date();
-    const today_0_jst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const yesterday_0_jst = new Date(today_0_jst);
-    yesterday_0_jst.setDate(yesterday_0_jst.getDate() - 1);
-    
-    const { data: historyData, error: historyError } = await supabase
-      .from('index_history')
-      .select('created_at, index_value')
-      .order('created_at', { ascending: true })
-      .gte('created_at', yesterday_0_jst.toISOString());
+    const baseIndexValue = Number(firstEntry.index_value);
+    if (baseIndexValue === 0) throw new Error("Base index value is zero.");
 
-    if (historyError) throw historyError;
+    const { data: latestEntry, error: latestEntryError } = await supabase.from('index_history').select('created_at, index_value, calculation_breakdown').order('created_at', { ascending: false }).limit(1).single();
+    if (latestEntryError) throw latestEntryError;
+    
+    const { data: dailyHistory, error: dailyHistoryError } = await supabase.rpc('get_daily_index_history');
+    if (dailyHistoryError) throw dailyHistoryError;
+    if (!dailyHistory) throw new Error("Daily history data is null.");
+    
+    const normalizedHistory = dailyHistory.map((item: any) => ({
+      day: item.day,
+      index_value: (Number(item.index_value) / baseIndexValue) * 100,
+    }));
 
     let dailyChange: number | null = null;
-    // ★★★ データが2件未満でもエラーにせず、dailyChangeをnullのままにする ★★★
-    if (historyData && historyData.length >= 2) {
-      const previousDayData = historyData.filter(d => new Date(d.created_at) < today_0_jst).pop();
-      if (previousDayData) {
-        const latestValue = Number(latestEntry.index_value);
-        const previousValue = Number(previousDayData.index_value);
-        if (isFinite(latestValue) && isFinite(previousValue) && previousValue > 0) {
-          dailyChange = ((latestValue - previousValue) / previousValue) * 100;
-        }
+    if (normalizedHistory.length >= 2) {
+      const latestValue = normalizedHistory[normalizedHistory.length - 1].index_value;
+      const previousValue = normalizedHistory[normalizedHistory.length - 2].index_value;
+      if (isFinite(latestValue) && isFinite(previousValue) && previousValue > 0) {
+        dailyChange = ((latestValue - previousValue) / previousValue) * 100;
       }
     }
 
     return {
       props: {
         initialLatestEntry: latestEntry,
-        initialIndexHistory: historyData ? historyData.slice(-100) : [],
+        initialNormalizedHistory: normalizedHistory,
         initialDailyChange: dailyChange,
+        events: marketEvents,
       },
     };
   } catch (err: any) {
@@ -375,8 +396,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return {
       props: {
         initialLatestEntry: null,
-        initialIndexHistory: [],
+        initialNormalizedHistory: [],
         initialDailyChange: null,
+        events: marketEvents,
         error: err.message || "Failed to fetch initial data.",
       },
     };
