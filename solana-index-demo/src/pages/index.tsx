@@ -17,6 +17,7 @@ import Particles from 'react-tsparticles';
 import type { Engine } from 'tsparticles-engine';
 import { loadSlim } from 'tsparticles-slim';
 import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
+import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 import CountUp from 'react-countup';
 import { motion, Variants } from 'framer-motion';
 import styles from '../styles/Home.module.css';
@@ -26,6 +27,9 @@ import { particlesOptions } from '../utils/particles';
 type AssetPrice = {
   symbol: string;
   price: number;
+  change: number | null;
+  marketCap: number;
+  volume24h: number;
 };
 
 type IndexData = {
@@ -47,8 +51,8 @@ const sectionVariants: Variants = {
     opacity: 1, 
     y: 0,
     transition: {
-      duration: 2,
-      ease: "easeInOut" 
+      duration: 0.8,
+      ease: "easeInOut"
     }
   }
 };
@@ -64,6 +68,7 @@ const Home: NextPage<Props> = ({
   const [constituentPrices, setConstituentPrices] = useState(initialConstituentPrices);
   const [dailyChange, setDailyChange] = useState(initialDailyChange);
   const [pageError, setPageError] = useState(error);
+  const [animationTrigger, setAnimationTrigger] = useState(0);
 
   const prevIndexValue = useRef(0);
   const prevDailyChange = useRef(0);
@@ -86,6 +91,7 @@ const Home: NextPage<Props> = ({
         setConstituentPrices(data.constituentPrices);
         setDailyChange(data.dailyChange);
         setPageError(undefined);
+        setAnimationTrigger(prev => prev + 1);
       } catch (err) {
         console.error("An error occurred while fetching data:", err);
       }
@@ -133,6 +139,14 @@ const Home: NextPage<Props> = ({
     return null;
   };
 
+  const formatLargeNumber = (num: number) => {
+    if (num >= 1e12) return `${(num / 1e12).toFixed(2)}T`;
+    if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
+    if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
+    if (num >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
+    return num.toString();
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -165,12 +179,13 @@ const Home: NextPage<Props> = ({
           <p className={styles.indexLabel}>Current Index Value</p>
           <div className={styles.indexValueContainer}>
             <div className={styles.indexValue}>
-              <CountUp start={prevIndexValue.current} end={latestIndexValue} decimals={2} duration={2.5} separator="," />
+              <CountUp key={`index-${animationTrigger}`} start={prevIndexValue.current} end={latestIndexValue} decimals={2} duration={3} separator="," />
             </div>
             {dailyChange !== null && (
-              <div className={dailyChange >= 0 ? styles.positiveChange : styles.negativeChange}>
-                <CountUp start={prevDailyChange.current} end={dailyChange} decimals={2} duration={2.7} prefix={dailyChange >= 0 ? '▲ ' : '▼ '} suffix="%" />
-                <span> (24H)</span>
+              <div className={`${styles.changeContainer} ${dailyChange >= 0 ? styles.positiveChange : styles.negativeChange}`}>
+                {dailyChange >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
+                <CountUp key={`change-${animationTrigger}`} start={prevDailyChange.current} end={dailyChange} decimals={2} duration={3} suffix="%" />
+                <span>(24H)</span>
               </div>
             )}
           </div>
@@ -185,11 +200,36 @@ const Home: NextPage<Props> = ({
           <div className={styles.constituentGrid}>
             {constituentPrices.map(asset => (
               <div key={asset.symbol} className={styles.assetCard}>
-                <div className={styles.assetSymbol}>{asset.symbol}</div>
-                <div className={styles.assetPrice}>$
-                  <CountUp start={0} end={asset.price} decimals={2} duration={3.5} separator="," />
+                <div className={styles.assetHeader}>
+                  <span className={styles.assetSymbol}>{asset.symbol}</span>
+                  <span className={styles.assetWeight}>10%</span>
                 </div>
-                <div className={styles.assetWeight}>10% Weight</div>
+                <div className={styles.assetPrice}>
+                  <CountUp key={`${asset.symbol}-price-${animationTrigger}`} start={0} end={asset.price} decimals={2} duration={2.5} separator="," prefix="$" />
+                </div>
+                <div className={styles.assetStats}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>1H Change</span>
+                    <span className={`${styles.statValue} ${asset.change && asset.change >= 0 ? styles.positiveChangeSmall : styles.negativeChangeSmall}`}>
+                      {asset.change !== null ? (
+                        <>
+                          {asset.change >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
+                          {Math.abs(asset.change).toFixed(2)}%
+                        </>
+                      ) : (
+                        'N/A'
+                      )}
+                    </span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Market Cap</span>
+                    <span className={styles.statValue}>${formatLargeNumber(asset.marketCap)}</span>
+                  </div>
+                   <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Volume (24H)</span>
+                    <span className={styles.statValue}>${formatLargeNumber(asset.volume24h)}</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -233,7 +273,7 @@ const Home: NextPage<Props> = ({
             <p className={styles.aboutIntro}>
               Thank you for visiting. My name is Muse, the creator of this project. 
               <br />
-              I'm a SolanaSuperTeamJapan Contributor based in Tokyo, Japan. 🇯🇵
+              I'm a <a href="https://superteam.fun/jp" target="_blank" rel="noopener noreferrer">SolanaSuperTeamJapan</a> Contributor based in Tokyo, Japan.
             </p>
             <h3>Motivation</h3>
             <p>
@@ -260,7 +300,7 @@ const Home: NextPage<Props> = ({
   );
 };
 
-// --- サーバーサイドでの初回データ取得 (省略なしの完全版) ---
+// --- サーバーサイドでの初回データ取得 ---
 export const getServerSideProps: GetServerSideProps = async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -278,10 +318,26 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
+  const CONSTITUENT_SYMBOLS = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'DOGE', 'TRX', 'ADA', 'SUI', 'AVAX'];
 
   try {
-    const CONSTITUENT_SYMBOLS = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'DOGE', 'TRX', 'ADA', 'SUI', 'AVAX'];
+    // --- `pricemultifull`で全データを一括取得 ---
+    const fullPriceResponse = await fetch(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${CONSTITUENT_SYMBOLS.join(',')}&tsyms=USD&api_key=${apiKey}`);
+    if (!fullPriceResponse.ok) throw new Error('Failed to fetch full constituent data for SSR.');
+    const fullPriceData = await fullPriceResponse.json();
 
+    const constituentPrices = CONSTITUENT_SYMBOLS.map(symbol => {
+      const data = fullPriceData.RAW?.[symbol]?.USD;
+      return {
+        symbol: symbol,
+        price: data?.PRICE || 0,
+        change: data?.CHANGEPCTHOUR || null,
+        marketCap: data?.MKTCAP || 0,
+        volume24h: data?.TOTALVOLUME24H || 0,
+      };
+    });
+
+    // --- インデックス履歴と前日比の取得 ---
     const now = new Date();
     const today_0_jst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
     const yesterday_0_jst = new Date(today_0_jst);
@@ -293,51 +349,22 @@ export const getServerSideProps: GetServerSideProps = async () => {
       .order('created_at', { ascending: true })
       .gte('created_at', yesterday_0_jst.toISOString());
 
-    if (historyError) {
-        throw new Error(historyError.message);
-    }
-
-    if (!historyData || historyData.length < 2) {
-      // 履歴が不十分な場合でも、価格は取得して表示を試みる
-      const priceResponse = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${CONSTITUENT_SYMBOLS.join(',')}&tsyms=USD&api_key=${apiKey}`);
-      const priceData = await priceResponse.json();
-      const constituentPrices = CONSTITUENT_SYMBOLS.map(symbol => ({
-        symbol,
-        price: priceData[symbol]?.USD || 0,
-      }));
-
-      return { 
-        props: { 
-          initialIndexHistory: historyData || [],
-          initialConstituentPrices: constituentPrices,
-          initialDailyChange: null,
-          error: "Not enough index data to compare. Please wait for more data." 
-        }
-      };
-    }
-
-    const latestData = historyData[historyData.length - 1];
-    const previousDayData = historyData.filter(d => new Date(d.created_at) < today_0_jst).pop(); 
-
+    if (historyError) throw new Error(historyError.message);
+    
     let dailyChange: number | null = null;
-    if (latestData && previousDayData) {
-      const latestValue = latestData.index_value;
-      const previousValue = previousDayData.index_value;
-      if (previousValue > 0) {
-        dailyChange = ((latestValue - previousValue) / previousValue) * 100;
+    if (historyData && historyData.length >= 2) {
+      const latestData = historyData[historyData.length - 1];
+      const previousDayData = historyData.filter(d => new Date(d.created_at) < today_0_jst).pop();
+      if (latestData && previousDayData) {
+        const latestValue = Number(latestData.index_value);
+        const previousValue = Number(previousDayData.index_value);
+        if (previousValue > 0 && isFinite(latestValue) && isFinite(previousValue)) {
+          dailyChange = ((latestValue - previousValue) / previousValue) * 100;
+        }
       }
     }
-
-    const priceResponse = await fetch(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${CONSTITUENT_SYMBOLS.join(',')}&tsyms=USD&api_key=${apiKey}`);
-    if (!priceResponse.ok) throw new Error('Failed to fetch constituent prices.');
-    const priceData = await priceResponse.json();
-
-    const constituentPrices = CONSTITUENT_SYMBOLS.map(symbol => ({
-      symbol,
-      price: priceData[symbol]?.USD || 0,
-    }));
-
-    const limitedHistory = historyData.slice(-100);
+    
+    const limitedHistory = historyData ? historyData.slice(-100) : [];
 
     return {
       props: {
