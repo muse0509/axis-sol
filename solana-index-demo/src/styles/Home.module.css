@@ -150,11 +150,11 @@
 }
 
 .positiveChange {
-  color: #4caf50; /* Green */
+  color: #4caf50;
 }
 
 .negativeChange {
-  color: #f44336; /* Red */
+  color: #f44336;
 }
 
 
@@ -279,14 +279,14 @@
   color: #f44336;
 }
 
-/* --- Methodology Section --- */
+
 .methodologyContainer {
   width: 100%;
   max-width: 1000px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 2.5rem;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   margin-bottom: 3rem;
@@ -296,20 +296,21 @@
 .methodologyTitle {
   font-size: 1.75rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.methodologyContent p {
-  color: #a0a0a0;
-  max-width: 600px;
-  margin: 0 auto 1.5rem auto;
+.methodologyContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .formulaBox {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 1.5rem 2rem;
-  margin-bottom: 1.5rem;
+  width: 100%;
   overflow-x: auto;
 }
 
@@ -321,12 +322,47 @@
   white-space: nowrap;
 }
 
+.breakdownTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.breakdownTable th, .breakdownTable td {
+  padding: 0.75rem 1rem;
+  text-align: right;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.breakdownTable th {
+  color: #a0a0a0;
+  font-weight: 500;
+  text-align: left;
+}
+
+.breakdownTable td {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.breakdownTable tr:last-child td {
+  border-bottom: none;
+}
+
+.breakdownTable .symbol {
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+}
+
 .formulaLegend {
   display: flex;
   justify-content: center;
   gap: 2rem;
   flex-wrap: wrap;
   color: #a0a0a0;
+  margin-top: 1rem;
 }
 
 .formulaLegend span {
@@ -476,15 +512,23 @@
   }
 
   .assetCard {
-    padding: 1rem;
+    padding: 1.25rem;
+  }
+
+  .assetHeader {
+    margin-bottom: 0.5rem;
   }
 
   .assetSymbol {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
   
   .assetPrice {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  .assetStats {
+    gap: 0.75rem;
   }
 
   .statLabel {
@@ -518,7 +562,7 @@
   }
 
   .formulaText {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
   }
 
   .formulaLegend {

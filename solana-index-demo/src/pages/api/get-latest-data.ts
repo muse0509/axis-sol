@@ -1,37 +1,33 @@
 import { createClient } from '@supabase/supabase-js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+export const revalidate = 0;
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-  const apiKey = process.env.CRYPTOCOMPARE_API_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey || !apiKey) {
+  if (!supabaseUrl || !supabaseServiceKey) {
     return res.status(500).json({ error: "Server environment variables are not configured correctly." });
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const CONSTITUENT_SYMBOLS = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'DOGE', 'TRX', 'ADA', 'SUI', 'AVAX'];
 
   try {
-    // --- 1. pricemultifullエンドポイントで全データを一括取得 ---
-    const fullPriceResponse = await fetch(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${CONSTITUENT_SYMBOLS.join(',')}&tsyms=USD&api_key=${apiKey}`);
-    if (!fullPriceResponse.ok) throw new Error('Failed to fetch full constituent data.');
-    const fullPriceData = await fullPriceResponse.json();
+    const { data: latestEntry, error: latestEntryError } = await supabase
+      .from('index_history')
+      .select('created_at, index_value, calculation_breakdown')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    // APIのRAWデータから必要な情報だけを抽出・整形
-    const constituentPrices = CONSTITUENT_SYMBOLS.map(symbol => {
-      const data = fullPriceData.RAW?.[symbol]?.USD;
-      return {
-        symbol: symbol,
-        price: data?.PRICE || 0,
-        change: data?.CHANGEPCTHOUR || 0, // 1時間ごとの変動率をAPIから直接取得
-        marketCap: data?.MKTCAP || 0,
-        volume24h: data?.TOTALVOLUME24HTO || 0,
-      };
-    });
-
-    // --- 2. インデックス履歴と前日比の取得（変更なし） ---
+    if (latestEntryError) {
+      if (latestEntryError.code === 'PGRST116') {
+        return res.status(404).json({ error: "No index data found in DB." });
+      }
+      throw new Error(`Failed to fetch latest entry: ${latestEntryError.message}`);
+    }
+    
     const now = new Date();
     const today_0_jst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
     const yesterday_0_jst = new Date(today_0_jst);
@@ -46,24 +42,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (historyError) throw new Error(historyError.message);
     
     let dailyChange: number | null = null;
+    // ★★★ データが2件未満でもエラーにせず、dailyChangeをnullのままにする ★★★
     if (historyData && historyData.length >= 2) {
-      const latestData = historyData[historyData.length - 1];
       const previousDayData = historyData.filter(d => new Date(d.created_at) < today_0_jst).pop();
-      if (latestData && previousDayData) {
-        const latestValue = Number(latestData.index_value);
+      if (previousDayData) {
+        const latestValue = Number(latestEntry.index_value);
         const previousValue = Number(previousDayData.index_value);
-        if (previousValue > 0 && isFinite(latestValue) && isFinite(previousValue)) {
+        if (isFinite(latestValue) && isFinite(previousValue) && previousValue > 0) {
           dailyChange = ((latestValue - previousValue) / previousValue) * 100;
         }
       }
     }
     
-    const limitedHistory = historyData ? historyData.slice(-100) : [];
-
-    // --- 3. フロントエンドに返すデータをまとめる ---
     res.status(200).json({
-      indexHistory: limitedHistory,
-      constituentPrices,
+      latestEntry: latestEntry,
+      indexHistory: historyData ? historyData.slice(-100) : [],
       dailyChange,
     });
 

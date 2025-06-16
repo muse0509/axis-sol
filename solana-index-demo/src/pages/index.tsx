@@ -24,12 +24,21 @@ import styles from '../styles/Home.module.css';
 import { particlesOptions } from '../utils/particles';
 
 // --- 型定義 ---
-type AssetPrice = {
+type BreakdownAsset = {
   symbol: string;
-  price: number;
-  change: number | null;
-  marketCap: number;
-  volume24h: number;
+  basePrice: number;
+  currentPrice: number;
+  ratio: number;
+  change24h: number | null;
+};
+
+type LatestEntry = {
+  created_at: string;
+  index_value: number;
+  calculation_breakdown: {
+    sumOfRatios: number;
+    assets: BreakdownAsset[];
+  };
 };
 
 type IndexData = {
@@ -38,8 +47,8 @@ type IndexData = {
 };
 
 type Props = {
+  initialLatestEntry: LatestEntry | null;
   initialIndexHistory: IndexData[];
-  initialConstituentPrices: AssetPrice[];
   initialDailyChange: number | null;
   error?: string;
 };
@@ -59,13 +68,13 @@ const sectionVariants: Variants = {
 
 // --- UIコンポーネント ---
 const Home: NextPage<Props> = ({ 
+  initialLatestEntry, 
   initialIndexHistory, 
-  initialConstituentPrices, 
   initialDailyChange, 
   error 
 }) => {
+  const [latestEntry, setLatestEntry] = useState(initialLatestEntry);
   const [indexHistory, setIndexHistory] = useState(initialIndexHistory);
-  const [constituentPrices, setConstituentPrices] = useState(initialConstituentPrices);
   const [dailyChange, setDailyChange] = useState(initialDailyChange);
   const [pageError, setPageError] = useState(error);
   const [animationTrigger, setAnimationTrigger] = useState(0);
@@ -74,21 +83,20 @@ const Home: NextPage<Props> = ({
   const prevDailyChange = useRef(0);
 
   useEffect(() => {
-    const latestValue = indexHistory.length > 0 ? indexHistory[indexHistory.length - 1].index_value : 0;
-    prevIndexValue.current = latestValue;
+    prevIndexValue.current = latestEntry?.index_value || 0;
     prevDailyChange.current = dailyChange || 0;
-  }, [indexHistory, dailyChange]);
+  }, [latestEntry, dailyChange]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/get-latest-data');
+        const response = await fetch('/api/get-latest-data', { cache: 'no-store' });
         if (!response.ok) { console.error("Failed to fetch latest data"); return; }
         const data = await response.json();
         if (data.error) { console.error("API Error:", data.error); return; }
         
+        setLatestEntry(data.latestEntry);
         setIndexHistory(data.indexHistory);
-        setConstituentPrices(data.constituentPrices);
         setDailyChange(data.dailyChange);
         setPageError(undefined);
         setAnimationTrigger(prev => prev + 1);
@@ -105,19 +113,19 @@ const Home: NextPage<Props> = ({
     await loadSlim(engine);
   }, []);
 
-  if (pageError) {
+  if (pageError || !latestEntry) {
     return (
       <div className={styles.container}>
         <main className={styles.main}>
           <h1 className={styles.title}>An Error Occurred</h1>
-          <p className={styles.errorText}>{pageError}</p>
+          <p className={styles.errorText}>{pageError || "No data available."}</p>
         </main>
       </div>
     );
   }
 
-  const latestIndexData = indexHistory[indexHistory.length - 1];
-  const latestIndexValue = latestIndexData ? latestIndexData.index_value : 0;
+  const { index_value: latestIndexValue, calculation_breakdown: breakdown } = latestEntry;
+  const { sumOfRatios, assets: constituentAssets } = breakdown || { sumOfRatios: 0, assets: [] };
 
   const chartData = indexHistory.map(item => ({
     full_date: new Date(item.created_at),
@@ -131,20 +139,12 @@ const Home: NextPage<Props> = ({
       const date = new Date(label);
       return (
         <div style={{ background: 'rgba(0,0,0,0.8)', padding: '10px', border: '1px solid #555', borderRadius: '8px' }}>
-          <p style={{ margin: 0, color: '#fff' }}>{`Value: ${payload[0].value.toFixed(2)}`}</p>
+          <p style={{ margin: 0, color: '#fff' }}>{`Value: ${Number(payload[0].value).toFixed(2)}`}</p>
           <p style={{ margin: 0, color: '#aaa', fontSize: '0.8rem' }}>{date.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</p>
         </div>
       );
     }
     return null;
-  };
-
-  const formatLargeNumber = (num: number) => {
-    if (num >= 1e12) return `${(num / 1e12).toFixed(2)}T`;
-    if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
-    if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
-    if (num >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
-    return num.toString();
   };
 
   return (
@@ -195,40 +195,25 @@ const Home: NextPage<Props> = ({
           <div className={styles.constituentHeader}>
             <h2 className={styles.constituentTitle}>Index Constituents</h2>
             <p className={styles.constituentDescription}>Each asset is equally weighted at 10% to ensure a balanced market representation.</p>
-            <p className={styles.constituentDisclaimer}>Note: This index updates hourly. The constituent assets are fixed during the beta period.</p>
+            <p className={styles.constituentDisclaimer}>
+              Note: This index updates hourly. The constituent assets are fixed during the beta period.
+            </p>
           </div>
           <div className={styles.constituentGrid}>
-            {constituentPrices.map(asset => (
+            {constituentAssets.map(asset => (
               <div key={asset.symbol} className={styles.assetCard}>
-                <div className={styles.assetHeader}>
+                 <div className={styles.assetHeader}>
                   <span className={styles.assetSymbol}>{asset.symbol}</span>
                   <span className={styles.assetWeight}>10%</span>
                 </div>
-                <div className={styles.assetPrice}>
-                  <CountUp key={`${asset.symbol}-price-${animationTrigger}`} start={0} end={asset.price} decimals={2} duration={2.5} separator="," prefix="$" />
-                </div>
-                <div className={styles.assetStats}>
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>1H Change</span>
-                    <span className={`${styles.statValue} ${asset.change && asset.change >= 0 ? styles.positiveChangeSmall : styles.negativeChangeSmall}`}>
-                      {asset.change !== null ? (
-                        <>
-                          {asset.change >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
-                          {Math.abs(asset.change).toFixed(2)}%
-                        </>
-                      ) : (
-                        'N/A'
-                      )}
-                    </span>
-                  </div>
-                  <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Market Cap</span>
-                    <span className={styles.statValue}>${formatLargeNumber(asset.marketCap)}</span>
-                  </div>
-                   <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Volume (24H)</span>
-                    <span className={styles.statValue}>${formatLargeNumber(asset.volume24h)}</span>
-                  </div>
+                <div className={styles.assetPriceContainer}>
+                    <span className={styles.assetPrice}>${asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    {asset.change24h !== null && (
+                        <span className={`${styles.changeContainerSmall} ${asset.change24h >= 0 ? styles.positiveChangeSmall : styles.negativeChangeSmall}`}>
+                        {asset.change24h >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
+                        {Math.abs(asset.change24h).toFixed(2)}%
+                        </span>
+                    )}
                 </div>
               </div>
             ))}
@@ -238,14 +223,36 @@ const Home: NextPage<Props> = ({
         <motion.div className={styles.methodologyContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
           <h2 className={styles.methodologyTitle}>Calculation Methodology</h2>
           <div className={styles.methodologyContent}>
-            <p>The index value is calculated based on the price performance of its constituent assets since the base date.</p>
-            <div className={styles.formulaBox}>
-              <span className={styles.formulaText}>Index = 100 × &sum; ( P_current / P_base ) / N</span>
+             <div className={styles.formulaBox}>
+              <span className={styles.formulaText}>
+                {Number(latestIndexValue).toFixed(2)} = 100 × {Number(sumOfRatios).toFixed(2)} / {constituentAssets.length}
+              </span>
             </div>
+            <table className={styles.breakdownTable}>
+              <thead>
+                <tr>
+                  <th>Asset</th>
+                  <th>Current Price</th>
+                  <th>Base Price</th>
+                  <th>Ratio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {constituentAssets.map(asset => (
+                  <tr key={asset.symbol}>
+                    <td className={styles.symbol}>{asset.symbol}</td>
+                    <td>${asset.currentPrice.toFixed(2)}</td>
+                    <td>${asset.basePrice.toFixed(2)}</td>
+                    <td>{asset.ratio.toFixed(4)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div className={styles.formulaLegend}>
               <span><b>P_current</b>: Current price of an asset</span>
-              <span><b>P_base</b>: Price of the asset on the base date</span>
-              <span><b>N</b>: Number of constituent assets (currently 10)</span>
+              {/* ★★★ Base Price の定義を明記 ★★★ */}
+              <span><b>P_base</b>: Price of the asset one year ago</span>
+              <span><b>N</b>: Number of constituent assets</span>
               <span><b>&sum;</b>: Summation across all assets</span>
             </div>
           </div>
@@ -302,42 +309,34 @@ const Home: NextPage<Props> = ({
 
 // --- サーバーサイドでの初回データ取得 ---
 export const getServerSideProps: GetServerSideProps = async () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const apiKey = process.env.CRYPTOCOMPARE_API_KEY;
-
-  if (!supabaseUrl || !supabaseKey || !apiKey) {
-    return { 
-      props: { 
-        initialIndexHistory: [],
-        initialConstituentPrices: [],
-        initialDailyChange: null,
-        error: "Server environment variables are not configured correctly." 
-      } 
-    };
-  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const CONSTITUENT_SYMBOLS = ['BTC', 'ETH', 'XRP', 'BNB', 'SOL', 'DOGE', 'TRX', 'ADA', 'SUI', 'AVAX'];
 
   try {
-    // --- `pricemultifull`で全データを一括取得 ---
-    const fullPriceResponse = await fetch(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${CONSTITUENT_SYMBOLS.join(',')}&tsyms=USD&api_key=${apiKey}`);
-    if (!fullPriceResponse.ok) throw new Error('Failed to fetch full constituent data for SSR.');
-    const fullPriceData = await fullPriceResponse.json();
+    const { data: latestEntry, error: latestEntryError } = await supabase
+      .from('index_history')
+      .select('created_at, index_value, calculation_breakdown')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
 
-    const constituentPrices = CONSTITUENT_SYMBOLS.map(symbol => {
-      const data = fullPriceData.RAW?.[symbol]?.USD;
-      return {
-        symbol: symbol,
-        price: data?.PRICE || 0,
-        change: data?.CHANGEPCTHOUR || null,
-        marketCap: data?.MKTCAP || 0,
-        volume24h: data?.TOTALVOLUME24H || 0,
-      };
-    });
-
-    // --- インデックス履歴と前日比の取得 ---
+    // ★★★ データが1件もない場合のみエラーとする ★★★
+    if (latestEntryError) {
+      if (latestEntryError.code === 'PGRST116') { // The query returned no rows
+        return { 
+          props: { 
+            initialLatestEntry: null,
+            initialIndexHistory: [],
+            initialDailyChange: null,
+            error: "No index data found. Please run the calculation API first." 
+          } 
+        };
+      }
+      throw latestEntryError;
+    }
+    
     const now = new Date();
     const today_0_jst = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
     const yesterday_0_jst = new Date(today_0_jst);
@@ -349,37 +348,36 @@ export const getServerSideProps: GetServerSideProps = async () => {
       .order('created_at', { ascending: true })
       .gte('created_at', yesterday_0_jst.toISOString());
 
-    if (historyError) throw new Error(historyError.message);
-    
+    if (historyError) throw historyError;
+
     let dailyChange: number | null = null;
+    // ★★★ データが2件未満でもエラーにせず、dailyChangeをnullのままにする ★★★
     if (historyData && historyData.length >= 2) {
-      const latestData = historyData[historyData.length - 1];
       const previousDayData = historyData.filter(d => new Date(d.created_at) < today_0_jst).pop();
-      if (latestData && previousDayData) {
-        const latestValue = Number(latestData.index_value);
+      if (previousDayData) {
+        const latestValue = Number(latestEntry.index_value);
         const previousValue = Number(previousDayData.index_value);
-        if (previousValue > 0 && isFinite(latestValue) && isFinite(previousValue)) {
+        if (isFinite(latestValue) && isFinite(previousValue) && previousValue > 0) {
           dailyChange = ((latestValue - previousValue) / previousValue) * 100;
         }
       }
     }
-    
-    const limitedHistory = historyData ? historyData.slice(-100) : [];
 
     return {
       props: {
-        initialIndexHistory: limitedHistory,
-        initialConstituentPrices: constituentPrices,
+        initialLatestEntry: latestEntry,
+        initialIndexHistory: historyData ? historyData.slice(-100) : [],
         initialDailyChange: dailyChange,
       },
     };
   } catch (err: any) {
+    console.error("Error in getServerSideProps:", err);
     return {
       props: {
+        initialLatestEntry: null,
         initialIndexHistory: [],
-        initialConstituentPrices: [],
         initialDailyChange: null,
-        error: err.message,
+        error: err.message || "Failed to fetch initial data.",
       },
     };
   }
