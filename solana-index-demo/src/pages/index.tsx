@@ -191,7 +191,7 @@ const Home: NextPage<Props> = ({
         </motion.p>
         
         <motion.div className={styles.callToActionContainer} initial={{opacity: 0}} animate={{opacity: 1}} transition={{duration: 0.8, delay: 0.4}}>
-          <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:1e72d569-ce3f-5bf6-a4bd-3fd1ba1f169b" target="_blank" rel="noopener noreferrer" className={styles.primaryButton}>
+          <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.primaryButton}>
             Read WhitePaper
           </a>
         </motion.div>
