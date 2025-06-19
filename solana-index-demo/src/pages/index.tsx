@@ -25,6 +25,7 @@ import { motion, Variants } from 'framer-motion';
 import styles from '../styles/Home.module.css';
 import { particlesOptions } from '../utils/particles';
 import { marketEvents } from '../lib/market-events';
+import { getPerformanceMetrics, PerformanceData } from '../lib/performance';
 
 // --- 型定義 ---
 type BreakdownAsset = {
@@ -55,10 +56,12 @@ type MarketEvent = {
   description: string;
 };
 
+// ★★★ 新しいPropsの型定義 ★★★
 type Props = {
-  initialLatestEntry: LatestEntry | null;
-  initialNormalizedHistory: DailyData[];
-  initialDailyChange: number | null;
+  performance: PerformanceData | null;
+  latestEntry: LatestEntry | null;
+  chartData: DailyData[];
+  dailyChange: number | null;
   events: MarketEvent[];
   error?: string;
 };
@@ -78,14 +81,17 @@ const sectionVariants: Variants = {
 
 // --- UIコンポーネント ---
 const Home: NextPage<Props> = ({ 
-  initialLatestEntry, 
-  initialNormalizedHistory, 
-  initialDailyChange, 
+  performance,
+  latestEntry: initialLatestEntry,
+  chartData: initialChartData,
+  dailyChange: initialDailyChange,
   events,
   error 
 }) => {
+  // ★★★ 新しいPropsに合わせてStateを更新 ★★★
+  const [performanceData, setPerformanceData] = useState(performance);
   const [latestEntry, setLatestEntry] = useState(initialLatestEntry);
-  const [normalizedHistory, setNormalizedHistory] = useState(initialNormalizedHistory);
+  const [chartData, setChartData] = useState(initialChartData);
   const [dailyChange, setDailyChange] = useState(initialDailyChange);
   const [pageError, setPageError] = useState(error);
   const [animationTrigger, setAnimationTrigger] = useState(0);
@@ -94,10 +100,11 @@ const Home: NextPage<Props> = ({
   const prevDailyChange = useRef(0);
 
   useEffect(() => {
-    prevIndexValue.current = normalizedHistory.length > 0 ? normalizedHistory[normalizedHistory.length - 1].index_value : 0;
+    prevIndexValue.current = performanceData ? performanceData.latestValue : 0;
     prevDailyChange.current = dailyChange || 0;
-  }, [normalizedHistory, dailyChange]);
+  }, [performanceData, dailyChange]);
 
+  // ★★★ 将来的にはこのポーリングAPIもperformanceオブジェクトを返すように修正が必要です ★★★
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -106,9 +113,12 @@ const Home: NextPage<Props> = ({
         const data = await response.json();
         if (data.error) { console.error("API Error:", data.error); return; }
         
+        // 仮：現状のAPIに合わせて更新（将来的にはAPI側もperformanceを返すようにする）
         setLatestEntry(data.latestEntry);
-        setNormalizedHistory(data.normalizedHistory);
+        // chartDataやdailyChangeも同様に更新
+        // setChartData(data.chartData);
         setDailyChange(data.dailyChange);
+        // setPerformanceData(data.performance); // 本来はこうしたい
         setPageError(undefined);
         setAnimationTrigger(prev => prev + 1);
       } catch (err) {
@@ -124,7 +134,7 @@ const Home: NextPage<Props> = ({
     await loadSlim(engine);
   }, []);
 
-  if (pageError || !latestEntry || normalizedHistory.length === 0) {
+  if (pageError || !performanceData || !latestEntry || chartData.length === 0) {
     return (
       <div className={styles.container}>
         <main className={styles.main}>
@@ -135,12 +145,10 @@ const Home: NextPage<Props> = ({
     );
   }
 
-  // ★★★ 表示用データの準備（変数をここで正しく定義） ★★★
-  const latestNormalizedValue = normalizedHistory[normalizedHistory.length - 1].index_value;
   const { calculation_breakdown: breakdown } = latestEntry;
   const { sumOfRatios, assets: constituentAssets } = breakdown || { sumOfRatios: 0, assets: [] };
 
-  const chartData = normalizedHistory.map(item => ({
+  const rechartsData = chartData.map(item => ({
     date: new Date(item.day).getTime(),
     value: item.index_value,
   }));
@@ -196,22 +204,41 @@ const Home: NextPage<Props> = ({
           </a>
         </motion.div>
         
+        {/* ★★★ S&P風の新しい指標表示エリア ★★★ */}
         <motion.div className={styles.indexDisplay} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
-          <p className={styles.indexLabel}>Current Index Value (Base: First day = 100)</p>
-          <div className={styles.indexValueContainer}>
-            <div className={styles.indexValue}>
-              <CountUp key={`index-${animationTrigger}`} start={prevIndexValue.current} end={latestNormalizedValue} decimals={2} duration={3} separator="," />
+          <div className={styles.spHeader}>
+            <div>
+              <h2 className={styles.spIndexName}>AXIS Equal Weighted Index</h2>
+              <p className={styles.spAsOfDate}>As of {performanceData.latestDate}</p>
+            </div>
+          </div>
+          <div className={styles.spValueContainer}>
+            <div className={styles.spMainValue}>
+              <CountUp key={`index-${animationTrigger}`} start={prevIndexValue.current} end={performanceData.latestValue} decimals={2} duration={3} separator="," /> USD
             </div>
             {dailyChange !== null && (
-              <div className={`${styles.changeContainer} ${dailyChange >= 0 ? styles.positiveChange : styles.negativeChange}`}>
-                {dailyChange >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
-                <CountUp key={`change-${animationTrigger}`} start={prevDailyChange.current} end={dailyChange} decimals={2} duration={3} suffix="%" />
-                <span>(24H)</span>
+              <div className={`${styles.spChangeValue} ${dailyChange >= 0 ? styles.positiveChange : styles.negativeChange}`}>
+                {dailyChange >= 0 ? '+' : ''}
+                <CountUp key={`change-${animationTrigger}`} start={prevDailyChange.current} end={dailyChange} decimals={2} duration={3} />% (1 Day)
               </div>
             )}
           </div>
+          <div className={styles.spPerformanceGrid}>
+            <div className={styles.spPerformanceItem}>
+              <span>YTD Return</span>
+              <span className={performanceData.ytdReturn && performanceData.ytdReturn >= 0 ? styles.positiveChange : styles.negativeChange}>
+                {performanceData.ytdReturn !== null ? `${performanceData.ytdReturn.toFixed(2)}%` : 'N/A'}
+              </span>
+            </div>
+            <div className={styles.spPerformanceItem}>
+              <span>1 YR Return</span>
+              <span className={performanceData.oneYearReturn && performanceData.oneYearReturn >= 0 ? styles.positiveChange : styles.negativeChange}>
+                {performanceData.oneYearReturn !== null ? `${performanceData.oneYearReturn.toFixed(2)}%` : 'N/A'}
+              </span>
+            </div>
+          </div>
         </motion.div>
-
+        
         <motion.div className={styles.constituentContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
           <div className={styles.constituentHeader}>
             <h2 className={styles.constituentTitle}>Index Constituents</h2>
@@ -248,7 +275,7 @@ const Home: NextPage<Props> = ({
         
         <motion.div className={styles.chartContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
           <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart data={rechartsData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="date" tickFormatter={formatDateTick} stroke="#888" type="number" scale="time" domain={['dataMin', 'dataMax']} />
               <YAxis stroke="#888" domain={['auto', 'auto']} />
@@ -257,7 +284,7 @@ const Home: NextPage<Props> = ({
               <Line type="monotone" dataKey="value" stroke="#FFFFFF" strokeWidth={2} dot={false} name="Index Value" />
               {events.map(event => {
                   const eventDate = new Date(event.event_date);
-                  const dataPoint = chartData.find(d => new Date(d.date).toDateString() === eventDate.toDateString());
+                  const dataPoint = rechartsData.find(d => new Date(d.date).toDateString() === eventDate.toDateString());
                   if (!dataPoint) return null;
 
                   return ( <ReferenceDot key={event.title} x={dataPoint.date} y={dataPoint.value} r={6} fill="#00E5FF" stroke="#000" /> );
@@ -286,7 +313,12 @@ const Home: NextPage<Props> = ({
           <div className={styles.methodologyContent}>
              <div className={styles.formulaBox}>
               <span className={styles.formulaText}>
-                {Number(latestNormalizedValue).toFixed(2)} = 100 × ( {Number(sumOfRatios).toFixed(2)} / {constituentAssets.length} )
+                {/* ★★★
+                      This formula display is based on the OLD normalization logic.
+                      It should be updated or removed depending on the new multi-index display logic.
+                      For now, it might show confusing values.
+                 ★★★ */}
+                {Number(performanceData.latestValue).toFixed(2)} = 100 × ( {Number(sumOfRatios).toFixed(2)} / {constituentAssets.length} )
               </span>
             </div>
             <table className={styles.breakdownTable}>
@@ -349,55 +381,58 @@ const Home: NextPage<Props> = ({
 };
 
 
-// --- サーバーサイドでの初回データ取得 ---
-export const getServerSideProps: GetServerSideProps = async () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+// --- ★★★ サーバーサイドでの初回データ取得 (全面改訂) ★★★ ---
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, 
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   try {
-    const { data: firstEntry, error: firstEntryError } = await supabase.from('index_history').select('index_value').order('created_at', { ascending: true }).limit(1).single();
-    if (firstEntryError) throw firstEntryError;
+    // 1. 新しいパフォーマンス指標（最新値, 1年リターン, YTDリターン等）をまとめて取得
+    const performance = await getPerformanceMetrics(supabase);
 
-    const baseIndexValue = Number(firstEntry.index_value);
-    if (baseIndexValue === 0) throw new Error("Base index value is zero.");
-
-    const { data: latestEntry, error: latestEntryError } = await supabase.from('index_history').select('created_at, index_value, calculation_breakdown').order('created_at', { ascending: false }).limit(1).single();
+    // 2. 計算内訳など、最新エントリの詳細を取得
+    const { data: latestEntry, error: latestEntryError } = await supabase
+      .from('index_history')
+      .select('created_at, calculation_breakdown')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
     if (latestEntryError) throw latestEntryError;
     
-    const { data: dailyHistory, error: dailyHistoryError } = await supabase.rpc('get_daily_index_history');
+    // 3. チャートに表示するための日次データを取得 (RPCを呼び出し)
+    const { data: chartData, error: dailyHistoryError } = await supabase.rpc('get_daily_index_history');
     if (dailyHistoryError) throw dailyHistoryError;
-    if (!dailyHistory) throw new Error("Daily history data is null.");
+    if (!chartData) throw new Error("Daily history data is null.");
     
-    const normalizedHistory = dailyHistory.map((item: any) => ({
-      day: item.day,
-      index_value: (Number(item.index_value) / baseIndexValue) * 100,
-    }));
-
+    // 4. 24時間変動率を計算
     let dailyChange: number | null = null;
-    if (normalizedHistory.length >= 2) {
-      const latestValue = normalizedHistory[normalizedHistory.length - 1].index_value;
-      const previousValue = normalizedHistory[normalizedHistory.length - 2].index_value;
-      if (isFinite(latestValue) && isFinite(previousValue) && previousValue > 0) {
+    if (chartData && chartData.length >= 2) {
+      const latestValue = chartData[chartData.length - 1].index_value;
+      const previousValue = chartData[chartData.length - 2].index_value;
+      if (previousValue > 0) {
         dailyChange = ((latestValue - previousValue) / previousValue) * 100;
       }
     }
 
     return {
       props: {
-        initialLatestEntry: latestEntry,
-        initialNormalizedHistory: normalizedHistory,
-        initialDailyChange: dailyChange,
+        performance,
+        latestEntry,
+        chartData,
+        dailyChange,
         events: marketEvents,
       },
     };
   } catch (err: any) {
-    console.error("Error in getServerSideProps:", err);
+    console.error("Error in getServerSideProps:", err.message);
     return {
       props: {
-        initialLatestEntry: null,
-        initialNormalizedHistory: [],
-        initialDailyChange: null,
+        performance: null,
+        latestEntry: null,
+        chartData: [],
+        dailyChange: null,
         events: marketEvents,
         error: err.message || "Failed to fetch initial data.",
       },

@@ -1,3 +1,14 @@
+:root {
+  --background-color: #121212;
+  --container-bg-color: rgba(26, 26, 26, 0.7);
+  --border-color: rgba(255, 255, 255, 0.15);
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --text-positive: #2e7d32;
+  --text-negative: #c62828;
+  --accent-color: #00E5FF;
+}
+
 html,
 body {
   padding: 0;
