@@ -16,33 +16,33 @@ export interface PriceStrategy {
     ],
     'LINK': [
       { type: 'chainlink', chain: 'ethereum', address: '0x2c1d072e956AFFC0D435Cb7AC38EF18d24d9127c' },
-      { type: 'pyth', feedId: '0x8ac0c70fff57e9a9bf352b2f02660638e3b1c3e1072a79BCBE728e5786a3949f' },
+      { type: 'pyth', feedId: '0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221' },
     ],
     'BNB': [
       { type: 'chainlink', chain: 'bsc', address: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE' },
-      { type: 'pyth', feedId: '0x42b89e7a451512b79a78a639b7b91314b9a7a974df83437637a2a1975b364e03' },
+      { type: 'pyth', feedId: '0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f' },
     ],
     'SOL': [
       { type: 'pyth', feedId: '0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d' },
     ],
     'DOGE': [
-      { type: 'chainlink', chain: 'bsc', address: '0x106518F2A1B65541A113702a45a87242139A5D7E' },
-      { type: 'pyth', feedId: '0xf7b76a543e11417253509b53f34589f21e5a593e8784d53894b5951e44f80145' },
+      { type: 'chainlink', chain: 'bsc', address: '0x3AB0A0d137D4F946fBB19eecc6e92E64660231C8' },
+      { type: 'pyth', feedId: '0xdcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c' },
     ],
     'TRX': [
-      { type: 'tronlink', chain: 'tron', address: 'TX2f1n5atQp29sjbF5w3bdo8p1nLgT28pS' },
-      { type: 'pyth', feedId: '0x76a26400a2955e09f579a321d5828373a1197305943b1418706c9e133e9d4a8e' },
+      { type: 'tronlink', chain: 'tron', address: 'TC6o8AakUg4Xz9nHY9qXpJNsgF7CQkwBqF' },
+      { type: 'pyth', feedId: '0x67aed5a24fdad045475e7195c98a98aea119c763f272d4523f5bac93a4f33c2b' },
     ],
     'ADA': [
-      { type: 'pyth', feedId: '0x3d1a0b3f17d363958f8e02b3f2c525883584aff1c5653b8175317e174112e5cb' },
-      { type: 'chainlink', chain: 'bsc', address: '0x2A1264662b6aD55D40CAcc2403975736f1571344' },
+      { type: 'pyth', feedId: '0x2a01deaec9e51a579277b34b122399984d0bbf57e2458a7e42fecd2829867a0d' },
+      { type: 'chainlink', chain: 'bsc', address: '0xa767f745331D267c7751297D982b050c93985627' },
     ],
     'SUI': [
-      { type: 'pyth', feedId: '0x23d72a553a3399990a44a67f62c040337f7a221f55979577908b981c2f62bd49' },
+      { type: 'pyth', feedId: '0x23d7315113f5b1d3ba7a83604c44b94d79f4fd69af77f804fc7f920a6dc65744' },
     ],
     'AVAX': [
       { type: 'chainlink', chain: 'avalanche', address: '0x0A77230d17318075983913bC2145DB16C7366156' },
-      { type: 'pyth', feedId: '0x992ab2a5d2e5a7b7a2d8442a8a1a2b0e9a5ef3180210e30b6910a30b616440f' },
+      { type: 'pyth', feedId: '0x93da3352f9f1d105fdfe4971cfa80e9dd777bfc5d0f683ebb6e1294b92137bb7' },
     ],
   };
   
