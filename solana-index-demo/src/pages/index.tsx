@@ -3,10 +3,15 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass } from 'lucide-react';
+import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet } from 'lucide-react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'; 
 import styles from '../styles/Landing.module.css';
 import { Header } from '../components/Header';
 import { Background } from '../components/Background';
+import { Modal } from '../components/Modal';
+import { Key, Lock, Gift } from 'lucide-react';
+import { Footer } from '../components/Footer'; 
 
 // --- セクション別コンポーネント ---
 // (これらのコンポーネント定義は変更ありません)
@@ -198,8 +203,8 @@ const RoadmapSection = () => {
 
 const TeamSection = () => {
     const teamMembers = [
-        { name: "Muse", role: "Founder & Developer", bio: "Solana ecosystem builder with a vision for safer, more accessible DeFi through proactive risk management.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
-        { name: "Jorge", role: "Data Scientist & Engineer", bio: "I am a college student currently living in Japan. Introduced by our founder Yusuke Muse, I have joined the Axis team to contribute to the growth of the Solana ecosystem.", image: "/jorge.jpg", link: "https://x.com/jorge__37348", isSuperTeam: false }
+        { name: "Muse", role: "Founder & Web3 Dev", bio: "Solana ecosystem builder with a vision for safer, more accessible DeFi through proactive risk management.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
+        { name: "Jorge", role: "Data Scientist & Developer", bio: "I am a college student currently living in Japan. Introduced by our founder Muse, I have joined the Axis team to contribute to the growth of the Solana ecosystem.", image: "/jorge.jpg", link: "https://x.com/jorge__37348", isSuperTeam: false }
     ];
     return(
     <div className={styles.sectionContent}>
@@ -227,7 +232,7 @@ const TeamSection = () => {
                     <p className={styles.teamRole}>{member.role}</p>
                     <p className={styles.teamBio}>{member.bio}</p>
                     <div className={styles.teamSocial}>
-                        <a href={member.link} target="_blank" rel="noopener noreferrer">{member.name === 'Muse' ? 'Twitter' : 'LinkedIn'}</a>
+                        <a href={member.link} target="_blank" rel="noopener noreferrer">X account</a>
                     </div>
                 </motion.div>
             ))}
@@ -235,16 +240,103 @@ const TeamSection = () => {
     </div>
 )};
 
+const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
+    const { connected, publicKey, disconnect } = useWallet();
+    const { setVisible } = useWalletModal();
+    const [isJoined, setIsJoined] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleJoin = async () => {
+        if (!publicKey) return;
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/join-waitlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ address: publicKey.toBase58() }),
+            });
+            const result = await response.json();
+            if (response.ok) {
+                setIsJoined(true);
+                setModalState({ isOpen: true, type: 'success', title: 'Welcome to the Waitlist!', message: 'You will be notified of early access and future rewards. Thank you for your support!' });
+            } else {
+                setModalState({ isOpen: true, type: 'error', title: 'Oops!', message: result.message || 'An error occurred. Please try again.' });
+            }
+        } catch (err) {
+            console.error("Failed to join waitlist:", err);
+            setModalState({ isOpen: true, type: 'error', title: 'Error', message: 'An unexpected error occurred.' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleConnectClick = () => {
+        setVisible(true);
+    };
+
+    const shortenAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(-4)}`;
+
+    return(
+    <div className={styles.sectionContent}>
+        <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Join the Genesis Program</h2>
+            <p className={styles.sectionSubtitle}>Your Solana address is your passport to the Axis ecosystem. No email required.</p>
+        </div>
+        <div className={styles.waitlistLayout}>
+            <div className={styles.benefitsContainer}>
+                <h4>By joining, you become eligible for:</h4>
+                <ul className={styles.benefitsList}>
+                    <li><Key size={20} /> <span>Early access to our beta platform.</span></li>
+                    <li><Gift size={20} /> <span>Future airdrops and community rewards.</span></li>
+                    <li><Lock size={20} /> <span>A secured spot for upcoming product launches.</span></li>
+                </ul>
+                <p className={styles.privacyNote}>We respect your privacy. We only store your wallet address and nothing else.</p>
+            </div>
+
+            <div className={styles.waitlistContainer}>
+                {!connected ? (
+                    <>
+                        <p>Connect your wallet to get started.</p>
+                        <button onClick={handleConnectClick} className={styles.customWalletButton}>
+                            <Wallet size={20} /> Connect Wallet
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <div className={styles.connectedWalletInfo}>
+                            <span>Connected as:</span>
+                            <code>{shortenAddress(publicKey!.toBase58())}</code>
+                            <button onClick={() => disconnect()} className={styles.disconnectButton}>Disconnect</button>
+                        </div>
+
+                        {!isJoined ? (
+                            <button onClick={handleJoin} className={styles.ctaButtonPrimary} disabled={isSubmitting}>
+                                {isSubmitting ? 'Submitting...' : <><Send size={18} /> Join the Program</>}
+                            </button>
+                        ) : (
+                            <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className={styles.successMessage}>
+                                <p>✅ Welcome! You're on the list.</p>
+                            </motion.div>
+                        )}
+                    </>
+                )}
+            </div>
+        </div>
+    </div>
+    );
+};
 
 const AxisLandingPage: NextPage = () => {
     const [currentSection, setCurrentSection] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false); // ★ 1. isMobile stateを追加
-    const fullText = "Returns are visible. Risk is invisible.";
+    const fullText = "It's the risk you don't see that matters.";
     const [typewriterText, setTypewriterText] = useState('');
     const isWheeling = useRef(false);
     const touchStartY = useRef(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [modalState, setModalState] = useState({ isOpen: false, type: 'success' as 'success' | 'error', title: '', message: '' });
+
   
     const sections = [
       { id: 'hero', component: HeroSection },
@@ -252,7 +344,9 @@ const AxisLandingPage: NextPage = () => {
       { id: 'product', component: ProductSection },
       { id: 'why', component: WhyIndexSection },
       { id: 'roadmap', component: RoadmapSection },
-      { id: 'team', component: TeamSection }
+      { id: 'team', component: TeamSection },
+      { id: 'waitlist', component: () => <WaitlistSection setModalState={setModalState} /> },
+ 
     ];
   
     // ★ 2. デバイスの幅を監視し、isMobile state を更新する useEffect
@@ -292,43 +386,50 @@ const AxisLandingPage: NextPage = () => {
     }, []);
   
     return (
-      <>
-        <AnimatePresence>
-          {isLoading && (
-            <motion.div
-              className={styles.loadingContainerLarge}
-              exit={{ opacity: 0, filter: 'blur(20px)' }}
-              transition={{ duration: 1.2, ease: 'circOut' }}
-            >
-              <div className={styles.loadingTextLarge}>
-                {typewriterText}<span className={styles.loadingCursorLarge}>|</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        {!isLoading && (
-            <div className={styles.fullPageContainer}>
-              {/* ★ 4. ヘッダーにも isMobile 情報を渡し、モバイル時はダミー関数を渡す */}
-              <Header setCurrentSection={isMobile ? () => {} : setCurrentSection} />
-              <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
-              
-              <div
-                className={styles.sectionsWrapper}
-                // ★ 5. PC表示（isMobileがfalse）の時だけ transform を適用する
-                style={!isMobile ? { transform: `translateY(-${currentSection * 100}dvh)` } : {}}
-              >
-                {sections.map((section) => (
-                  <Section key={section.id} id={section.id}>
-                    <section.component />
-                  </Section>
-                ))}
-              </div>
+        <>
+          {/* ★★★ モーダルをページの一番上の階層で呼び出す ★★★ */}
+          <Modal 
+              isOpen={modalState.isOpen}
+              onClose={() => setModalState({ ...modalState, isOpen: false })}
+              type={modalState.type}
+              title={modalState.title}
+              message={modalState.message}
+          />
+         <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className={styles.loadingContainerLarge}
+            exit={{ opacity: 0, filter: 'blur(20px)' }}
+            transition={{ duration: 1.2, ease: 'circOut' }}
+          >
+            <div className={styles.loadingTextLarge}>
+              {typewriterText}
+              <span className={styles.loadingCursor}></span>
             </div>
+          </motion.div>
         )}
-      </>
-    );
-  };
-  
-  export default AxisLandingPage;
+      </AnimatePresence>
+          
+          {!isLoading && (
+              <div className={styles.fullPageContainer}>
+                <Header setCurrentSection={setCurrentSection} />
+                <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
+                
+                <div className={styles.sectionsWrapper} style={{ transform: `translateY(-${currentSection * 100}vh)` }}>
+                  {sections.map((section, index) => (
+                    <Section key={section.id} id={section.id}>
+                      <section.component />
+                      
+                    </Section>
+                    
+                  ))}
+                </div>
+                <Footer />
+              </div>
+          )}
+        </>
+      );
+    };
+    
+    export default AxisLandingPage;
   

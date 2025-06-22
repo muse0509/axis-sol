@@ -1,4 +1,6 @@
-import { FaTwitter, FaTelegramPlane } from 'react-icons/fa';
+import React from 'react';
+import { FaXTwitter } from 'react-icons/fa6'; // ★★★ Xのアイコンをインポート ★★★
+import { FaTelegramPlane } from 'react-icons/fa';
 import styles from '../styles/Footer.module.css';
 
 export const Footer = () => {
@@ -9,10 +11,10 @@ export const Footer = () => {
           © {new Date().getFullYear()} Axis Protocol. All rights reserved.
         </p>
         <div className={styles.socials}>
-          <a href="https://x.com/muse_0509" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-            <FaTwitter />
+          <a href="https://x.com/axis__Solana" target="_blank" rel="noopener noreferrer" aria-label="X">
+            <FaXTwitter />
           </a>
-          <a href="https://t.me/yus0509" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+          <a href="https://t.me/+17f3f2qcJFMxYzE1" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
             <FaTelegramPlane />
           </a>
         </div>

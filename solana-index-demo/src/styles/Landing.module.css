@@ -33,7 +33,7 @@
 /* --- Loading Screen --- */
 .loadingContainerLarge {
     position: fixed; inset: 0;
-    background: #01041a;
+    background: black;
     display: flex; align-items: center; justify-content: center;
     z-index: 1000;
 }
@@ -46,6 +46,12 @@
     display: inline-block; width: 0.1em; margin-left: 0.1em;
     background-color: white;
     animation: blinkCursor 0.8s step-end infinite;
+}
+.loadingCursor::after {
+  content: '|'; /* CSSでカーソル文字を生成 */
+  display: inline-block;
+  margin-left: 0.2em;
+  animation: blinkCursor 0.8s step-end infinite;
 }
 @keyframes blinkCursor {
   from, to { background-color: transparent }
@@ -337,5 +343,170 @@
     width: 90%;
     max-width: 320px;
     text-align: center;
+  }
+
+  
+}
+/* --- (他のスタイルは変更なし) --- */
+/* ... */
+
+/* ★★★ Waitlist Section Styles (修正) ★★★ */
+.waitlistContainer {
+  max-width: 550px;
+  margin: 2rem auto 0;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.waitlistContainer > p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+/* ★★★ 新しいカスタムウォレットボタンのスタイル ★★★ */
+.customWalletButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #fff !important;
+  color: #000 !important;
+  font-weight: 600 !important;
+  border-radius: 0.5rem !important;
+  padding: 1rem 2.5rem !important;
+  transition: all 0.3s ease !important;
+  border: none;
+  cursor: pointer;
+}
+.customWalletButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+}
+
+.connectedWalletInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgba(0,0,0,0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.connectedWalletInfo code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  color: #a78bfa;
+}
+.disconnectButton {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.disconnectButton:hover {
+  color: #fff;
+}
+
+
+.waitlistContainer button.ctaButtonPrimary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.successMessage p {
+  margin: 0;
+  padding: 0.75rem 1.5rem;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  border-radius: 0.5rem;
+  color: #4ade80;
+  font-weight: 500;
+}
+
+/* --- (他のスタイルは変更なし) --- */
+/* ... */
+
+/* ★★★ Waitlist Section Styles (修正) ★★★ */
+.waitlistLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+.benefitsContainer {
+  text-align: left;
+}
+.benefitsContainer h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #d1d5db;
+  margin-bottom: 1.5rem;
+}
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.benefitsList li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+}
+.benefitsList li svg {
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+.privacyNote {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #6b7280; /* gray-500 */
+  font-style: italic;
+}
+
+.waitlistContainer {
+  max-width: 550px;
+  margin: 0; /* Auto marginをリセット */
+  padding: 2.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.waitlistContainer > p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+
+/* --- レスポンシブ対応の修正 --- */
+@media (max-width: 768px) {
+  /* ... (他のモバイルスタイル) ... */
+  .waitlistLayout {
+      grid-template-columns: 1fr; /* スマートフォンでは縦に並べる */
+  }
+  .benefitsContainer {
+      text-align: center;
+  }
+  .benefitsList li {
+      justify-content: center;
+      text-align: left;
   }
 }

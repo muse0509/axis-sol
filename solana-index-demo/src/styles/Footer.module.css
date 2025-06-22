@@ -1,45 +1,56 @@
+/* ★★★ フッターのスタイルを全面的に修正 ★★★ */
 .footer {
+    position: fixed; /* 画面に固定 */
+    bottom: 0;
+    left: 0;
     width: 100%;
-    padding: 2rem;
+    z-index: 100; /* ヘッダーと同じ階層に */
+    background: rgba(13, 13, 46, 0.5);
+    backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 10;
-    margin-top: auto; /* Push footer to the bottom */
-  }
-  
-  .container {
+}
+
+.container {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem 2rem; /* 少しコンパクトに */
     flex-wrap: wrap;
     gap: 1rem;
-  }
-  
-  .copyright {
-    color: #a0a0a0;
-    font-size: 0.9rem;
+}
+
+.copyright {
+    color: #a9a9b3;
+    font-size: 0.8rem;
     margin: 0;
-  }
-  
-  .socials {
+}
+
+.socials {
     display: flex;
     gap: 1.5rem;
-  }
-  
-  .socials a {
-    color: #a0a0a0;
-    font-size: 1.25rem;
-    transition: color 0.2s;
-  }
-  
-  .socials a:hover {
+}
+
+.socials a {
+    color: #a9a9b3;
+    font-size: 1.2rem;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.socials a:hover {
     color: #ffffff;
-  }
-  
-  @media (max-width: 768px) {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
     .container {
-      flex-direction: column;
-      justify-content: center;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
     }
-  }
+    .footer {
+        position: relative; /* スマートフォンでは固定を解除し、コンテンツの末尾に自然に表示 */
+    }
+}

@@ -16,6 +16,7 @@ const menuItems = [
   { name: "Why Axis", index: 3 },
   { name: "Roadmap", index: 4 },
   { name: "Team", index: 5 },
+  { name: "Waitlist", index: 6 },
 ];
 
 export const Header = ({ setCurrentSection }: HeaderProps) => {
