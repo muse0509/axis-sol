@@ -74,7 +74,7 @@ const AnalysisPage: NextPage<Props> = ({ dailyHistory, events, error }) => {
       
       <main className={styles.main}>
         <motion.div initial={{opacity: 0, y: -20}} animate={{opacity: 1, y: 0}} transition={{duration: 0.8}}>
-          <Link href="/" className={styles.backLink}>← Back to Dashboard</Link>
+        <Link href="/dashboard" className={styles.backLink}>← Back to Dashboard</Link>
           <h1 className={styles.title}>Historical Analysis</h1>
           <p className={styles.description}>
             A look at the index's performance correlated with significant market events over the past several months.
