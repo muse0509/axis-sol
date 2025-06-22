@@ -2,12 +2,12 @@ html,
 body {
   padding: 0;
   margin: 0;
-  /* ★★★ 全体のフォントを 'Inter' に設定 ★★★ */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
     Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
-  overflow: hidden; /* ★★★ スクロールバーを非表示にする ★★★ */
-
+  width: 100%;
+  /* overflow: hidden; を削除し、代わりに overflow-x: hidden; を使います */
+  overflow-x: hidden; /* 横スクロールのみを禁止して、意図しない縦スクロールを許容 */
 }
 
 a {
@@ -17,4 +17,9 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+/* 2️⃣ スマホでのパディングを安全側に */
+@media (max-width: 768px) {
+  .section { padding: min(6vh, 3rem) 1rem; }
 }

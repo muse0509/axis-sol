@@ -9,6 +9,7 @@ import { Header } from '../components/Header';
 import { Background } from '../components/Background';
 
 // --- セクション別コンポーネント ---
+// (これらのコンポーネント定義は変更ありません)
 
 const Section = ({ children, id }: { children: React.ReactNode, id: string }) => (
   <section id={id} className={styles.section}>
@@ -24,39 +25,40 @@ const Section = ({ children, id }: { children: React.ReactNode, id: string }) =>
 );
 
 const HeroSection = () => (
-  <div className={styles.heroContent}>
-    <motion.h1 
-      className={styles.heroTitleLarge}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-    >
-      Buy the<br />
-      <span className={styles.heroTitleGradientLarge}>Crypto market.</span>
-    </motion.h1>
-    <motion.p 
-      className={styles.heroSubtitleLarge}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.4 }}
-    >
-      Axis Protocol illuminates true risk,<br />building a foundation for stable, informed growth.
-    </motion.p>
-    <motion.div 
-      className={styles.heroCtaGroup}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.6 }}
-    >
-      <Link href="/dashboard" className={styles.ctaButtonPrimary}>
-        View Demo App
-      </Link>
-      <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
-        View Whitepaper →
-      </a>
-    </motion.div>
-  </div>
-);
+    <div className={styles.heroContent}>
+      <motion.h1 
+        className={styles.heroTitleLarge}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      >
+        Buy the<br />
+        <span className={styles.heroTitleGradientLarge}>Crypto market.</span>
+      </motion.h1>
+      <motion.p 
+        className={styles.heroSubtitleLarge}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      >
+        Axis Protocol illuminates true risk,<br />building a foundation for stable, informed growth.
+      </motion.p>
+      <motion.div 
+        className={styles.heroCtaGroup}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+      >
+        <Link href="/dashboard" className={styles.ctaButtonPrimary}>
+          View Demo App
+        </Link>
+        <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
+          View Whitepaper →
+        </a>
+      </motion.div>
+    </div>
+  );
+
 
 const RisksSection = () => {
     const risks = [
@@ -196,8 +198,8 @@ const RoadmapSection = () => {
 
 const TeamSection = () => {
     const teamMembers = [
-        { name: "Muse", role: "Founder & Developer", bio: "Solana ecosystem builder with a vision for safer, more accessible DeFi through proactive risk management.", image: "/muse.jpg", link: "https://twitter.com/0xMuse", isSuperTeam: true },
-        { name: "Jorge", role: "Data Scientist & Engineer", bio: "I am a college student currently living in Japan. Introduced by our founder Yusuke Muse, I have joined the Axis team to contribute to the growth of the Solana ecosystem.", image: "/jorge.jpg", link: "#", isSuperTeam: false }
+        { name: "Muse", role: "Founder & Developer", bio: "Solana ecosystem builder with a vision for safer, more accessible DeFi through proactive risk management.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
+        { name: "Jorge", role: "Data Scientist & Engineer", bio: "I am a college student currently living in Japan. Introduced by our founder Yusuke Muse, I have joined the Axis team to contribute to the growth of the Solana ecosystem.", image: "/jorge.jpg", link: "https://x.com/jorge__37348", isSuperTeam: false }
     ];
     return(
     <div className={styles.sectionContent}>
@@ -215,12 +217,10 @@ const TeamSection = () => {
                     viewport={{ once: true, amount: 0.5 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
                 >
-                    {/* pfpとバッジを格納するコンテナ */}
                     <div className={styles.teamPfpContainer}>
                         <Image src={member.image} alt={member.name} width={120} height={120} className={styles.teamPfp} />
-                        {/* isSuperTeamがtrueの場合のみバッジを表示 */}
                         {member.isSuperTeam && (
-                            <Image src="/superteam.png" alt="SuperTeam" width={60} height={60} className={styles.superTeamBadge} />
+                            <Image src="/superteam.png" alt="SuperTeam Badge" width={60} height={60} className={styles.superTeamBadge} />
                         )}
                     </div>
                     <h3 className={styles.teamName}>{member.name}</h3>
@@ -236,109 +236,99 @@ const TeamSection = () => {
 )};
 
 
-// --- メインページコンポーネント ---
-
 const AxisLandingPage: NextPage = () => {
-  const [currentSection, setCurrentSection] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const fullText = "Returns are visible. Risk is invisible.";
-  const [typewriterText, setTypewriterText] = useState('');
-  const isWheeling = useRef(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  const sections = [
-    { id: 'hero', component: HeroSection },
-    { id: 'risks', component: RisksSection },
-    { id: 'product', component: ProductSection },
-    { id: 'why', component: WhyIndexSection },
-    { id: 'roadmap', component: RoadmapSection },
-    { id: 'team', component: TeamSection }
-  ];
-
-  // タイプライターアニメーション
-  useEffect(() => {
-    let index = 0;
-    const timer = setInterval(() => {
-      if (index < fullText.length) {
-        setTypewriterText(fullText.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(timer);
-        setTimeout(() => setIsLoading(false), 1200);
-      }
-    }, 120);
-    return () => clearInterval(timer);
-  }, []);
-
-  // ★★★ ここを修正 ★★★
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (isWheeling.current) return;
-      
-      const direction = e.deltaY > 0 ? 1 : -1;
-      
-      // isWheelingのセットをここで行うことで、不要なスクロールを防ぐ
-      isWheeling.current = true;
-      
-      // 状態更新関数を使い、常に最新のcurrentSectionにアクセスする
-      setCurrentSection(prevSection => {
-        const nextSection = prevSection + direction;
-        // 0以上、かつ、セクションの最大数未満に収める
-        return Math.max(0, Math.min(sections.length - 1, nextSection));
-      });
-      
-      setTimeout(() => { 
-        isWheeling.current = false; 
-      }, 1200); // アニメーション時間 + バッファ
-    };
-
-    window.addEventListener('wheel', handleWheel);
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [sections.length]); // 依存配列を修正し、関数の再生成を適切に管理
-
-  // マウス追跡
-  useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
-          setMousePosition({ x: e.clientX, y: e.clientY });
+    const [currentSection, setCurrentSection] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(false); // ★ 1. isMobile stateを追加
+    const fullText = "Returns are visible. Risk is invisible.";
+    const [typewriterText, setTypewriterText] = useState('');
+    const isWheeling = useRef(false);
+    const touchStartY = useRef(0);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+    const sections = [
+      { id: 'hero', component: HeroSection },
+      { id: 'risks', component: RisksSection },
+      { id: 'product', component: ProductSection },
+      { id: 'why', component: WhyIndexSection },
+      { id: 'roadmap', component: RoadmapSection },
+      { id: 'team', component: TeamSection }
+    ];
+  
+    // ★ 2. デバイスの幅を監視し、isMobile state を更新する useEffect
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768);
       };
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  return (
-    <>
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            className={styles.loadingContainerLarge}
-            exit={{ opacity: 0, filter: 'blur(20px)' }}
-            transition={{ duration: 1.2, ease: 'circOut' }}
-          >
-            <div className={styles.loadingTextLarge}>
-              {typewriterText}<span className={styles.loadingCursorLarge}>|</span>
+  
+      handleResize(); // 初期表示時にも判定を実行
+      window.addEventListener('resize', handleResize);
+  
+      // コンポーネントがアンマウントされる時にリスナーを削除
+      return () => window.removeEventListener('resize', handleResize);
+    }, []); // このEffectはマウント時に一度だけ実行
+  
+    // タイプライターアニメーション
+    useEffect(() => {
+      let index = 0;
+      const timer = setInterval(() => {
+        if (index < fullText.length) {
+          setTypewriterText(fullText.slice(0, index + 1));
+          index++;
+        } else {
+          clearInterval(timer);
+          setTimeout(() => setIsLoading(false), 1200);
+        }
+      }, 120);
+      return () => clearInterval(timer);
+    }, []);
+  
+   
+    // マウス追跡
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+  
+    return (
+      <>
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              className={styles.loadingContainerLarge}
+              exit={{ opacity: 0, filter: 'blur(20px)' }}
+              transition={{ duration: 1.2, ease: 'circOut' }}
+            >
+              <div className={styles.loadingTextLarge}>
+                {typewriterText}<span className={styles.loadingCursorLarge}>|</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {!isLoading && (
+            <div className={styles.fullPageContainer}>
+              {/* ★ 4. ヘッダーにも isMobile 情報を渡し、モバイル時はダミー関数を渡す */}
+              <Header setCurrentSection={isMobile ? () => {} : setCurrentSection} />
+              <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
+              
+              <div
+                className={styles.sectionsWrapper}
+                // ★ 5. PC表示（isMobileがfalse）の時だけ transform を適用する
+                style={!isMobile ? { transform: `translateY(-${currentSection * 100}dvh)` } : {}}
+              >
+                {sections.map((section) => (
+                  <Section key={section.id} id={section.id}>
+                    <section.component />
+                  </Section>
+                ))}
+              </div>
             </div>
-          </motion.div>
         )}
-      </AnimatePresence>
-      
-      {!isLoading && (
-          <div className={styles.fullPageContainer}>
-            <Header setCurrentSection={setCurrentSection} />
-            <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
-            
-            <div className={styles.sectionsWrapper} style={{ transform: `translateY(-${currentSection * 100}vh)` }}>
-              {sections.map((section) => (
-                <Section key={section.id} id={section.id}>
-                  <section.component />
-                </Section>
-              ))}
-            </div>
-          </div>
-      )}
-    </>
-  );
-};
-
-export default AxisLandingPage;
+      </>
+    );
+  };
+  
+  export default AxisLandingPage;
+  
