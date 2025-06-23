@@ -100,7 +100,7 @@ const ProductSection = () => {
     const logos = [
       { src: '/solana.png', alt: 'Solana' },
       { src: '/ethereum.png', alt: 'Ethereum' },
-      { src: '/base.svg', alt: 'Base' },
+      { src: '/Base.svg', alt: 'Base' },
       { src: '/polygon.png', alt: 'Polygon' },
     ];
   
