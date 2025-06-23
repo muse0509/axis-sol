@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaXTwitter } from 'react-icons/fa6'; // ★★★ Xのアイコンをインポート ★★★
+import { FaGithub, FaXTwitter } from 'react-icons/fa6'; // ★★★ Xのアイコンをインポート ★★★
 import { FaTelegramPlane } from 'react-icons/fa';
 import styles from '../styles/Footer.module.css';
 
@@ -11,6 +11,10 @@ export const Footer = () => {
           © {new Date().getFullYear()} Axis Protocol. All rights reserved.
         </p>
         <div className={styles.socials}>
+        <a href="https://github.com/muse0509/axis-sol" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <FaGithub />
+        </a>
+
           <a href="https://x.com/axis__Solana" target="_blank" rel="noopener noreferrer" aria-label="X">
             <FaXTwitter />
           </a>
