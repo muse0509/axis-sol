@@ -3,14 +3,13 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet } from 'lucide-react';
+import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'; 
 import styles from '../styles/Landing.module.css';
 import { Header } from '../components/Header';
 import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
-import { Key, Lock, Gift } from 'lucide-react';
 import { Footer } from '../components/Footer'; 
 
 // --- セクション別コンポーネント ---
@@ -96,37 +95,89 @@ const RisksSection = () => {
     </div>
 )};
 
-const ProductSection = () => (
-  <div className={styles.sectionContent}>
-    <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Our Product</h2>
-        <p className={styles.sectionSubtitle}>The Axis Index offers a new paradigm for crypto investment.</p>
-    </div>
-    <div className={styles.productLayout}>
-        <motion.div 
-            className={styles.productCard}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-        >
-            <h3>1. A Transparent Benchmark</h3>
-            <p>We calculate a transparent, equally-weighted index from a basket of high-quality crypto assets. This provides a true measure of the market's health, free from the bias of mega-cap assets.</p>
-        </motion.div>
-        <motion.div
-            className={styles.productCard}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-        >
-            <h3>2. A Single Asset for Diversified Growth</h3>
-            <p>We will issue a fully collateralized token that tracks the value of our index. This token allows you to invest in the growth of the entire ecosystem with a single, easily manageable asset.</p>
-        </motion.div>
-    </div>
-  </div>
-);
+const ProductSection = () => {
+    // 表示するロゴのリストを定義
+    const logos = [
+      { src: '/solana.png', alt: 'Solana' },
+      { src: '/ethereum.png', alt: 'Ethereum' },
+      { src: '/base.svg', alt: 'Base' },
+      { src: '/polygon.png', alt: 'Polygon' },
+    ];
+  
+    return (
+      <div className={styles.sectionContent}>
+        {/* --- セクションヘッダー (変更なし) --- */}
+        <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>The Power of the Market, in a Single Token.</h2>
+            <p className={styles.sectionSubtitle}>
+              We designed a transparent, equally-weighted index from a basket of high-quality crypto assets. 
+              This is tracked by a single, fully-collateralized token, allowing you to invest in the growth of the entire ecosystem with a disciplined, passive strategy.
+            </p>
+        </div>
+    
+        {/* --- 2カラムのレイアウト (変更なし) --- */}
+        <div className={styles.productGrid}>
+            <motion.div 
+                className={styles.productConcept}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+            >
+                <h3>Our Advantage: True Decentralization</h3>
+                <p>
+                  While other index products rely on centralized vaults and complex bridging, Axis is built on a foundation of true cross-chain interoperability.
+                </p>
+            </motion.div>
+            <motion.div 
+                className={styles.productFeatures}
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.7, delay: 0.4 }}
+            >
+                <ul>
+                  <li><CheckCircle size={20}/> <strong>Unified Access:</strong> Buy, sell, and use the Axis Index Token on any supported chain without wrapping or bridging.</li>
+                  <li><CheckCircle size={20}/> <strong>Deep Liquidity:</strong> By tapping into native USDC on each chain, we ensure robust liquidity and minimal slippage.</li>
+                  <li><CheckCircle size={20}/> <strong>Simplified UX:</strong> A seamless experience for users, no matter which ecosystem they prefer. This is the key to mass adoption.</li>
+                </ul>
+            </motion.div>
+        </div>
 
+        {/* ★★★ ここから回転ロゴ帯の代わりに、新しいタイムライン風レイアウトを追加 ★★★ */}
+        <div className={styles.chainTimelineWrapper}>
+            <h4 className={styles.chainTimelineTitle}>Natively Supported Chains</h4>
+            <div className={styles.chainTimeline}>
+                <div className={styles.chainTimelineConnector}></div>
+                {logos.map((logo, index) => (
+                    <div 
+                        key={logo.alt} 
+                        className={`${styles.chainTimelineItem} ${index % 2 === 0 ? styles.chainTimelineItemLeft : styles.chainTimelineItemRight}`}
+                    >
+                         <motion.div
+                            initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true, amount: 0.5 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className={styles.chainLogoCard}
+                        >
+                            <Image 
+                                    src={logo.src} 
+                                    alt={logo.alt} 
+                                    fill // widthとheightの代わりにfillを使用
+                                    style={{ objectFit: 'contain' }} // アスペクト比を維持
+                                />
+                            
+                        </motion.div>
+                    </div>
+                ))}
+            </div>
+        </div>
+        {/* ★★★ タイムライン風レイアウトはここまで ★★★ */}
+
+      </div>
+    );
+};
 const WhyIndexSection = () => (
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
@@ -163,7 +214,9 @@ const WhyIndexSection = () => (
 const RoadmapSection = () => {
     const roadmapItems = [
         { icon: Flag, phase: "Phase 1: Foundation (Q4 2025)", title: "Core Protocol Launch", description: "Deployment of the initial Axis risk management framework on the Solana mainnet." },
-        { icon: Target, phase: "Phase 2: Expansion (Q1 2026)", title: "Index Token Launch", description: "Launch of the first tokenized index vault, enabling users to 'buy the market'." },
+        // --- ここを修正 ---
+        { icon: Target, phase: "Phase 2: Market Entry (Q1 2026)", title: "DEX Listing & Partner Integrations", description: "Making the Axis Index Token tradable on major DEXs like Jupiter & Orca, and starting integrations to have it accepted as collateral across the DeFi ecosystem." },
+        // --- ここまで ---
         { icon: Rocket, phase: "Phase 3: Ecosystem Growth (Q2 2026 & Beyond)", title: "Multi-Chain Integration", description: "Expanding the Axis philosophy and products to other leading blockchain ecosystems." },
     ];
   return (

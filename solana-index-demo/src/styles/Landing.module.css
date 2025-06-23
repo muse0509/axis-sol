@@ -510,3 +510,273 @@
       text-align: left;
   }
 }
+
+/* --- ファイルの末尾にある productGrid 関連のスタイルを以下のように修正・追記してください --- */
+
+/* ★★★ 新 Product Section Styles (修正版) ★★★ */
+.productGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: 3rem;
+}
+
+.productConcept h3 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.productConcept p {
+    color: #9ca3af;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+
+.chainLogos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center; /* 画像を中央揃えに */
+    gap: 1.5rem; /* 画像間のスペース */
+    /* font-size は不要になったので削除 */
+}
+.chainLogoImage { /* Imageコンポーネントに適用するクラスを追加 */
+    transition: all 0.2s ease-in-out;
+    filter: grayscale(50%); /* 通常時は少しグレーアウト */
+    opacity: 0.7;
+}
+.chainLogoImage:hover {
+    filter: grayscale(0%); /* ホバーでフルカラーに */
+    opacity: 1;
+    transform: scale(1.1); /* 少し拡大 */
+}
+
+.productFeatures ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2.5rem;
+    border-radius: 1rem;
+}
+
+.productFeatures li {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.productFeatures li svg {
+    color: #3b82f6; /* A accent color */
+    margin-top: 5px;
+    flex-shrink: 0;
+}
+
+/* ★★★ Responsive adjustments for Product Section ★★★ */
+@media (max-width: 900px) {
+    .productGrid {
+        grid-template-columns: 1fr;
+    }
+    .productConcept,
+    .productFeatures {
+        text-align: center;
+    }
+    .chainLogos {
+        justify-content: center;
+    }
+}/* 以下のマーキー関連のスタイルを削除してください:
+  .logoMarqueeWrapper, .marqueeTitle, .logoMarquee, .logoTrack, .logoItem
+*/
+
+
+/* ★★★ 新しいチェーンタイムライン用のスタイルをここに追加します ★★★ */
+.chainTimelineWrapper {
+  margin-top: 5rem;
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chainTimelineTitle {
+  text-align: center;
+  color: #9ca3af;
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.chainTimeline {
+  position: relative;
+}
+
+.chainTimelineConnector {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: translateX(-50%);
+}
+
+.chainTimelineItem {
+  position: relative;
+  width: 50%;
+  margin-bottom: 2rem;
+}
+
+.chainTimelineItemLeft {
+  left: 0;
+  padding-right: 2rem;
+}
+
+.chainTimelineItemRight {
+  left: 50%;
+  padding-left: 2rem;
+}
+
+
+
+.chainLogoImageContainer {
+  position: relative;
+  width: 100px;   /* 50px から 60px に変更 */
+  height: 100px;  /* 50px から 60px に変更 */
+  flex-shrink: 0;
+}
+
+.chainLogoCard {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* ロゴと文字の間隔はそのまま or 少し広げてもOK */
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  transition: all 0.2s ease-in-out;
+}
+.chainLogoCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+
+.chainTimelineItemLeft .chainLogoCard {
+  justify-content: flex-end;
+}
+
+.chainTimelineItemRight .chainLogoCard {
+  justify-content: flex-start;
+}
+
+.chainLogoCard span {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+/* ★★★ レスポンシブ調整 ★★★ */
+@media (max-width: 768px) {
+  .chainTimelineConnector {
+      left: 25px; /* 左端に線を寄せる */
+  }
+  .chainTimelineItem,
+  .chainTimelineItemLeft,
+  .chainTimelineItemRight {
+      width: 100%;
+      left: 0;
+      padding-left: 60px; /* アイコン分のスペースを確保 */
+      padding-right: 0;
+  }
+  .chainTimelineItemLeft .chainLogoCard,
+  .chainTimelineItemRight .chainLogoCard {
+      justify-content: flex-start;
+  }
+  .chainLogoCard {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* ロゴと文字の間隔はそのまま or 少し広げてもOK */
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+  }
+}
+/* ... 既存のスタイルの末尾に以下を追記 ... */
+
+/* ★★★ Waitlist Counter Styles ★★★ */
+.waitlistCounterContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2.5rem;
+  background: rgba(22, 22, 50, 0.4); /* 少し濃い背景色 */
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.waitlistCountText {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  text-align: center;
+  color: #e5e7eb; /* 明るいグレー */
+}
+
+.waitlistCountText span {
+  display: inline-block;
+  background: linear-gradient(45deg, #818cf8, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0 0.25rem;
+}
+
+.dotsGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.moreDotsText {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* レスポンシブ対応の修正 */
+@media (max-width: 768px) {
+  /* ... (既存のモバイルスタイル) ... */
+  .waitlistLayout {
+      grid-template-columns: 1fr; /* スマートフォンでは縦に並べる */
+      gap: 2rem;
+  }
+  .benefitsContainer {
+      text-align: center;
+      display: none; /* スマホではカウンターと登録フォームに集中させるため非表示に */
+  }
+  .waitlistCounterContainer {
+    order: -1; /* カウンターを登録フォームの上に表示 */
+  }
+}
