@@ -54,7 +54,7 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <Link href="/dashboard" className={styles.ctaButtonPrimary}>
+        <Link href="https://aixs-apps.vercel.app/" className={styles.ctaButtonPrimary}>
           View Demo App
         </Link>
         <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
