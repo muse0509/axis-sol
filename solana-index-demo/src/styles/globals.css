@@ -6,6 +6,8 @@ body {
     Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
   width: 100%;
+  scroll-behavior: smooth;
+  
   /* overflow: hidden; を削除し、代わりに overflow-x: hidden; を使います */
   overflow-x: hidden; /* 横スクロールのみを禁止して、意図しない縦スクロールを許容 */
 }
@@ -22,4 +24,14 @@ a {
 /* 2️⃣ スマホでのパディングを安全側に */
 @media (max-width: 768px) {
   .section { padding: min(6vh, 3rem) 1rem; }
+}
+
+:root{
+  --glass-bg      : rgba(255,255,255,0.24);   /* 透過度 0.24 ≈ Apple */
+  --glass-border  : rgba(255,255,255,0.38);   /* 内枠ハイライト */
+  --blur-strength : 18px;                     /* PC:18 / SP:12 */
+  --blur-sat      : 180%;
+}
+@media (max-width: 768px){
+  :root { --blur-strength: 12px; }
 }

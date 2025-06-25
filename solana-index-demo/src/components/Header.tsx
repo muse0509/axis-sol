@@ -1,138 +1,84 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
-import { motion, AnimatePresence,  Variants } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+
+// 1. 作成したCSS Modulesファイルをインポート
 import styles from '../styles/Header.module.css';
 
-
-interface HeaderProps {
-  setCurrentSection: (index: number) => void;
-}
-
-const menuItems = [
-  { name: "Home", index: 0 },
-  { name: "Risks", index: 1 },
-  { name: "Product", index: 2 },
-  { name: "Why Axis", index: 3 },
-  { name: "Roadmap", index: 4 },
-  { name: "Team", index: 5 },
-  { name: "Waitlist", index: 6 },
+const navItems = [
+  { name: 'Home', href: '#hero' },
+  { name: 'Risks', href: '#risks' },
+  { name: 'Product', href: '#product' },
+  { name: 'Why Axis', href: '#why' },
+  { name: 'Roadmap', href: '#roadmap' },
+  { name: 'Team', href: '#team' },
+  { name: 'WL', href: '#waitlist' },
 ];
 
-export const Header = ({ setCurrentSection }: HeaderProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const Header = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleNavClick = (index: number) => {
-    setCurrentSection(index);
-    setIsOpen(false);
-  };
-
-  const menuVariants: Variants = {
-    open: {
-      x: 0,
-      transition: {
-        staggerChildren: 0.07,
-        delayChildren: 0.2,
-        ease: 'easeOut',          // ← 型 union に含まれる値へ変更
-        duration: 0.5,
-        type: 'tween',            // 明示すると可読性↑
-      },
-    },
-    closed: {
-      x: '100%',                  // 旧版なら 320 など number に統一
-      transition: {
-        staggerChildren: 0.05,
-        staggerDirection: -1,
-        when: 'afterChildren',
-        ease: 'easeIn',
-        duration: 0.4,
-        type: 'tween',
-      },
-    },
-  };
-
-  const itemVariants = {
-    open: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        y: { stiffness: 1000, velocity: -100 },
-      },
-    },
-    closed: {
-      y: 50,
-      opacity: 0,
-      transition: {
-        y: { stiffness: 1000 },
-      },
-    },
+  const handleLinkClick = () => {
+    setIsDrawerOpen(false);
   };
 
   return (
-    <header className={styles.header}>
-      <div className={styles.headerContent}>
-        <div className={styles.headerLogo}>
-          <Image src="/logo.png" alt="Axis Protocol Logo" width={140} height={50} priority />
+    <>
+      {/* 2. ▼▼▼ すべての className を {styles.クラス名} の形式に書き換え ▼▼▼ */}
+
+      {/* ---------- PC用ヘッダー (ガラス板) ---------- */}
+      <div className={styles.wrapper}>
+        <div className={styles.pill}>
+        <a href="#hero" className={styles.logoLink}>
+            <Image
+              src="/logo.png"  // ★ publicフォルダからのパス。ご自身のファイル名に変更してください。
+              alt="Axis Protocol Logo" // ロゴの説明
+              width={80} // ★ ロゴの実際の幅に合わせて調整
+              height={28} // ★ ロゴの実際の高さに合わせて調整
+              priority // ページの最初に読み込む重要な画像であることを示す
+            />
+          </a>
+          <nav className={styles.nav}>
+            {navItems.map((item) => (
+              <a key={item.name} href={item.href}>
+                {/* button自体にはクラス名は不要 (親の.navから指定されているため) */}
+                <button>{item.name}</button>
+              </a>
+            ))}
+          </nav>
         </div>
-
-        <nav className={styles.desktopNav}>
-          {menuItems.map((item) => (
-            <button key={item.name} onClick={() => handleNavClick(item.index)}>
-              {item.name}
-            </button>
-          ))}
-        </nav>
-
-        <button
-          className={styles.hamburgerButton}
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
-        >
-          <AnimatePresence initial={false} mode="wait">
-            <motion.span
-              key={isOpen ? 'x' : 'menu'}
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
-            </motion.span>
-          </AnimatePresence>
-        </button>
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className={styles.mobileNavWrapper}
-            variants={menuVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-          >
-            <button
-              className={styles.mobileNavCloseButton}
-              onClick={() => setIsOpen(false)}
-              aria-label="Close menu"
-            >
-                <X size={32} />
-            </button>
+      {/* ---------- ハンバーガーボタン (SP用) ---------- */}
+      <button 
+        className={styles.hamburger} 
+        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+        aria-label="メニューを開く"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6H20M4 12H20M4 18H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
 
-            <motion.nav className={styles.mobileNav}>
-              {menuItems.map((item) => (
-                <motion.button
-                  key={item.name}
-                  onClick={() => handleNavClick(item.index)}
-                  variants={itemVariants}
-                >
-                  {item.name}
-                </motion.button>
-              ))}
-            </motion.nav>
+      {/* ---------- モバイル用ドロワーメニュー ---------- */}
+      <AnimatePresence>
+        {isDrawerOpen && (
+          <motion.div
+            className={styles.drawer}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          >
+            {navItems.map((item) => (
+              <a key={item.name} href={item.href} onClick={handleLinkClick}>
+                 {/* button自体にはクラス名は不要 (親の.drawerから指定されているため) */}
+                <button>{item.name}</button>
+              </a>
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 };

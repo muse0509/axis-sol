@@ -6,6 +6,8 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl } from '@solana/web3.js';
 import SmoothScroller from '../components/Lenis';
 
+
+
 // CSSのインポートを一度にまとめる
 import '@solana/wallet-adapter-react-ui/styles.css';
 import '../styles/globals.css';

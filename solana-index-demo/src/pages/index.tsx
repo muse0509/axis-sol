@@ -12,6 +12,7 @@ import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
 import { Footer } from '../components/Footer'; 
 
+
 // --- セクション別コンポーネント ---
 // (これらのコンポーネント定義は変更ありません)
 
@@ -380,13 +381,11 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
 };
 
 const AxisLandingPage: NextPage = () => {
-    const [currentSection, setCurrentSection] = useState(0);
+   
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false); // ★ 1. isMobile stateを追加
     const fullText = "It's the risk you don't see that matters.";
     const [typewriterText, setTypewriterText] = useState('');
-    const isWheeling = useRef(false);
-    const touchStartY = useRef(0);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [modalState, setModalState] = useState({ isOpen: false, type: 'success' as 'success' | 'error', title: '', message: '' });
 
@@ -465,18 +464,19 @@ const AxisLandingPage: NextPage = () => {
           
           {!isLoading && (
               <div className={styles.fullPageContainer}>
-                <Header setCurrentSection={setCurrentSection} />
-                <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
-                
-                <div className={styles.sectionsWrapper} style={{ transform: `translateY(-${currentSection * 100}vh)` }}>
-                  {sections.map((section, index) => (
-                    <Section key={section.id} id={section.id}>
-                      <section.component />
-                      
-                    </Section>
-                    
-                  ))}
-                </div>
+              {/* 3. Headerから setCurrentSection props を削除 */}
+              <Header /> 
+              <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
+              
+              {/* 4. ▼▼▼ sectionsWrapper から transformスタイルを削除 ▼▼▼ */}
+              <div className={styles.sectionsWrapper}>
+                {sections.map((section, index) => (
+                  // Sectionコンポーネントはidを持っているので、そのまま使えます
+                  <Section key={section.id} id={section.id}>
+                    <section.component />
+                  </Section>
+                ))}
+              </div>
                 <Footer />
               </div>
           )}
