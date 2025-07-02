@@ -3,18 +3,17 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift } from 'lucide-react';
+import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift, Users } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'; 
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import styles from '../styles/Landing.module.css';
 import { Header } from '../components/Header';
 import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
-import { Footer } from '../components/Footer'; 
+import { Footer } from '../components/Footer';
 
 
 // --- セクション別コンポーネント ---
-// (これらのコンポーネント定義は変更ありません)
 
 const Section = ({ children, id }: { children: React.ReactNode, id: string }) => (
   <section id={id} className={styles.section}>
@@ -31,30 +30,30 @@ const Section = ({ children, id }: { children: React.ReactNode, id: string }) =>
 
 const HeroSection = () => (
     <div className={styles.heroContent}>
-      <motion.h1 
+      <motion.h1
         className={styles.heroTitleLarge}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        Buy the<br />
-        <span className={styles.heroTitleGradientLarge}>Crypto market.</span>
+        Markets can't grow up<br />
+        <span className={styles.heroTitleGradientLarge}>without a good guide.</span>
       </motion.h1>
-      <motion.p 
+      <motion.p
         className={styles.heroSubtitleLarge}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
       >
-        Axis Protocol illuminates true risk,<br />building a foundation for stable, informed growth.
+        This is Axis. We are building a new foundation for stable, informed growth in the crypto market.
       </motion.p>
-      <motion.div 
+      <motion.div
         className={styles.heroCtaGroup}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <Link href="https://aixs-apps.vercel.app/" className={styles.ctaButtonPrimary}>
+        <Link href="/dashboard" className={styles.ctaButtonPrimary}>
           View Demo App
         </Link>
         <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
@@ -67,15 +66,15 @@ const HeroSection = () => (
 
 const RisksSection = () => {
     const risks = [
-        { icon: Brain, title: 'The "Mental Cost" of Volatility', description: "A 30% drawdown isn't just a number. It's the anxiety that clouds judgment." },
-        { icon: Clock, title: 'The "Time Cost" of Opportunity Loss', description: 'Focusing solely on one asset means missing out on countless other growth opportunities.' },
-        { icon: Shield, title: 'The "Structural Cost" of Concentration', description: 'Savvy investors prioritize avoiding critical losses over maximizing every potential gain.' }
+        { icon: Brain, title: 'The Illusion of Single-Asset Bets', description: "Thinking you'll get rich just by holding Bitcoin is a common mistake. A single asset's fall can hurt investors badly." },
+        { icon: Clock, title: 'The Game of Survival', description: 'The market is a zero-sum game. To build wealth, you must play safe and prioritize stability, not just chase risky high returns.' },
+        { icon: Shield, title: 'The Goal: Stability Over Hype', description: 'The biggest success in a volatile market isn\'t chasing the highest peak. It\'s achieving stability to survive and win over time.' }
     ];
     return(
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>The Invisible Costs</h2>
-            <p className={styles.sectionSubtitle}>We celebrate the wins, but often overlook the hidden prices we pay along the way.</p>
+            <h2 className={styles.sectionTitle}>The Unspoken Rules of Crypto</h2>
+            <p className={styles.sectionSubtitle}>To win, you must first understand the game. The most important rule is to play safe.</p>
         </div>
         <div className={styles.riskGrid}>
             {risks.map((risk, index) => (
@@ -97,7 +96,6 @@ const RisksSection = () => {
 )};
 
 const ProductSection = () => {
-    // 表示するロゴのリストを定義
     const logos = [
       { src: '/solana.png', alt: 'Solana' },
       { src: '/ethereum.png', alt: 'Ethereum' },
@@ -107,30 +105,27 @@ const ProductSection = () => {
   
     return (
       <div className={styles.sectionContent}>
-        {/* --- セクションヘッダー (変更なし) --- */}
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>The Power of the Market, in a Single Token.</h2>
+            <h2 className={styles.sectionTitle}>The Solution We Need Now: An Index</h2>
             <p className={styles.sectionSubtitle}>
-              We designed a transparent, equally-weighted index from a basket of high-quality crypto assets. 
-              This is tracked by a single, fully-collateralized token, allowing you to invest in the growth of the entire ecosystem with a disciplined, passive strategy.
+              That's why we are building Axis. Our product is simple: we create transparent indexes with clear rules, then package them into a single token. Anyone can buy the market in one easy step.
             </p>
         </div>
-    
-        {/* --- 2カラムのレイアウト (変更なし) --- */}
+
         <div className={styles.productGrid}>
-            <motion.div 
+            <motion.div
                 className={styles.productConcept}
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
             >
-                <h3>Our Advantage: True Decentralization</h3>
+                <h3>Our Vision: A Public Good</h3>
                 <p>
-                  While other index products rely on centralized vaults and complex bridging, Axis is built on a foundation of true cross-chain interoperability.
+                  Our real goal is bigger. We are creating the index itself and giving it to the market as a trusted, open standard that anyone can use to build upon.
                 </p>
             </motion.div>
-            <motion.div 
+            <motion.div
                 className={styles.productFeatures}
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -138,21 +133,20 @@ const ProductSection = () => {
                 transition={{ duration: 0.7, delay: 0.4 }}
             >
                 <ul>
-                  <li><CheckCircle size={20}/> <strong>Unified Access:</strong> Buy, sell, and use the Axis Index Token on any supported chain without wrapping or bridging.</li>
-                  <li><CheckCircle size={20}/> <strong>Deep Liquidity:</strong> By tapping into native USDC on each chain, we ensure robust liquidity and minimal slippage.</li>
-                  <li><CheckCircle size={20}/> <strong>Simplified UX:</strong> A seamless experience for users, no matter which ecosystem they prefer. This is the key to mass adoption.</li>
+                  <li><CheckCircle size={20}/> <strong>Truly Decentralized:</strong> While others are limited to a single chain or use complex bridges, Axis has a multi-chain plan from day one.</li>
+                  <li><CheckCircle size={20}/> <strong>Fair & Transparent:</strong> Our model is designed to benefit everyone. We charge a small, fair fee to help the project and its users grow.</li>
+                  <li><CheckCircle size={20}/> <strong>Built on Solana, For Everyone:</strong> We are Solana experts with a vision to bring our robust risk management to all major chains.</li>
                 </ul>
             </motion.div>
         </div>
 
-        {/* ★★★ ここから回転ロゴ帯の代わりに、新しいタイムライン風レイアウトを追加 ★★★ */}
         <div className={styles.chainTimelineWrapper}>
             <h4 className={styles.chainTimelineTitle}>Natively Supported Chains</h4>
             <div className={styles.chainTimeline}>
                 <div className={styles.chainTimelineConnector}></div>
                 {logos.map((logo, index) => (
-                    <div 
-                        key={logo.alt} 
+                    <div
+                        key={logo.alt}
                         className={`${styles.chainTimelineItem} ${index % 2 === 0 ? styles.chainTimelineItemLeft : styles.chainTimelineItemRight}`}
                     >
                          <motion.div
@@ -162,51 +156,38 @@ const ProductSection = () => {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className={styles.chainLogoCard}
                         >
-                            <Image 
-                                    src={logo.src} 
-                                    alt={logo.alt} 
-                                    fill // widthとheightの代わりにfillを使用
-                                    style={{ objectFit: 'contain' }} // アスペクト比を維持
+                            <Image
+                                    src={logo.src}
+                                    alt={logo.alt}
+                                    fill
+                                    style={{ objectFit: 'contain' }}
                                 />
-                            
+
                         </motion.div>
                     </div>
                 ))}
             </div>
         </div>
-        {/* ★★★ タイムライン風レイアウトはここまで ★★★ */}
-
       </div>
     );
 };
-const WhyIndexSection = () => (
+
+const TractionSection = () => (
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Why an Index? Why Now?</h2>
-            <p className={styles.sectionSubtitle}>In a complex market, simplicity is the ultimate sophistication.</p>
+            <h2 className={styles.sectionTitle}>Traction & Community</h2>
+            <p className={styles.sectionSubtitle}>We're not just starting a project; we're building a movement.</p>
         </div>
         <div className={styles.whyLayout}>
-            <motion.div 
-                className={styles.whyCard}
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-            >
+            <motion.div className={styles.whyCard} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.7, delay: 0.2 }}>
                 <div className={styles.whyIconWrapper}><Zap /></div>
-                <h3>Why Now? The Market Has Matured.</h3>
-                <p>The crypto space is no longer just about one or two assets. A diverse, vibrant ecosystem of projects is thriving. It's time for an investment tool that reflects this new reality, moving beyond single-asset speculation to capture the pulse of the entire market.</p>
+                <h3>Expert-Validated Vision</h3>
+                <p>Our approach isn't just theory. From its earliest concept stages, Axis has received valuable technical feedback from seasoned members of the Backpack team and MagicBlock, ensuring our foundation is robust, secure, and ready to scale.</p>
             </motion.div>
-            <motion.div
-                className={styles.whyCard}
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.7, delay: 0.4 }}
-            >
-                <div className={styles.whyIconWrapper}><Compass /></div>
-                <h3>Why an Index? For Clarity and Stability.</h3>
-                <p>An index product is the most effective way to manage risk through automatic diversification. It removes the guesswork and emotional trading, offering a disciplined, passive strategy to gain exposure to the market's collective growth. It's not just an investment; it's a compass.</p>
+            <motion.div className={styles.whyCard} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.7, delay: 0.4 }}>
+                <div className={styles.whyIconWrapper}><Users /></div>
+                <h3>A Growing Community</h3>
+                <p>Our mission has already attracted a strong and growing community of over 100 early supporters who believe in a more stable and transparent future for DeFi.</p>
             </motion.div>
         </div>
     </div>
@@ -214,17 +195,15 @@ const WhyIndexSection = () => (
 
 const RoadmapSection = () => {
     const roadmapItems = [
-        { icon: Flag, phase: "Phase 1: Foundation (Q4 2025)", title: "Core Protocol Launch", description: "Deployment of the initial Axis risk management framework on the Solana mainnet." },
-        // --- ここを修正 ---
-        { icon: Target, phase: "Phase 2: Market Entry (Q1 2026)", title: "DEX Listing & Partner Integrations", description: "Making the Axis Index Token tradable on major DEXs like Jupiter & Orca, and starting integrations to have it accepted as collateral across the DeFi ecosystem." },
-        // --- ここまで ---
-        { icon: Rocket, phase: "Phase 3: Ecosystem Growth (Q2 2026 & Beyond)", title: "Multi-Chain Integration", description: "Expanding the Axis philosophy and products to other leading blockchain ecosystems." },
+        { icon: Flag, phase: "Phase 1: Foundation", title: "Secure the Protocol with Grant Funding", description: "Utilize grant funding to rigorously build, test, and audit the core Axis protocol, ensuring maximum safety and reliability from day one." },
+        { icon: Target, phase: "Phase 2: Launch & Seed Round", title: "Launch, List, and Acquire First Users", description: "Raise seed funding to officially launch the Axis Index Token, secure listings on major DEXs, and onboard our initial user base through strategic partnerships." },
+        { icon: Rocket, phase: "Phase 3: Scale & Profit", title: "Expand and Grow the Ecosystem", description: "Raise a subsequent funding round to expand to new chains, introduce new products, and scale towards profitability and long-term sustainability." },
     ];
   return (
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Our Roadmap</h2>
-            <p className={styles.sectionSubtitle}>A clear path forward, focused on delivering robust risk management solutions.</p>
+            <p className={styles.sectionSubtitle}>A clear, step-by-step plan to bring stability to the crypto world.</p>
         </div>
         <div className={styles.timeline}>
             <div className={styles.timelineConnector} />
@@ -257,14 +236,12 @@ const RoadmapSection = () => {
 
 const TeamSection = () => {
     const teamMembers = [
-        { name: "Muse", role: "Founder & Web3 Dev", bio: "Solana ecosystem builder with a vision for safer, more accessible DeFi through proactive risk management.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
-        { name: "Jorge", role: "Data Scientist & Developer", bio: "I am a college student currently living in Japan. Introduced by our founder Muse, I have joined the Axis team to contribute to the growth of the Solana ecosystem.", image: "/jorge.jpg", link: "https://x.com/jorge__37348", isSuperTeam: false }
+        { name: "Muse", role: "Founder & Full-Stack Dev", bio: "A founder who knows how to win. I led my team to a first-place victory in a major hackathon with 158 competing teams, and I am now dedicated full-time to making Axis a success.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
     ];
     return(
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Our Team</h2>
-            <p className={styles.sectionSubtitle}>A dedicated team passionate about bringing transparent risk management to DeFi.</p>
+            <h2 className={styles.sectionTitle}>The Right Person for the Job</h2>
         </div>
         <div className={styles.teamGrid}>
             {teamMembers.map((member, index) => (
@@ -333,8 +310,8 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
     return(
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Join the Genesis Program</h2>
-            <p className={styles.sectionSubtitle}>Your Solana address is your passport to the Axis ecosystem. No email required.</p>
+            <h2 className={styles.sectionTitle}>The Market Can Finally Grow Up.</h2>
+            <p className={styles.sectionSubtitle}>Because the guide has arrived. Join the Genesis Program to be part of the journey.</p>
         </div>
         <div className={styles.waitlistLayout}>
             <div className={styles.benefitsContainer}>
@@ -381,40 +358,24 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
 };
 
 const AxisLandingPage: NextPage = () => {
-   
+
     const [isLoading, setIsLoading] = useState(true);
-    const [isMobile, setIsMobile] = useState(false); // ★ 1. isMobile stateを追加
-    const fullText = "It's the risk you don't see that matters.";
+    const fullText = "Because markets can’t grow up without a good guide.";
     const [typewriterText, setTypewriterText] = useState('');
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [modalState, setModalState] = useState({ isOpen: false, type: 'success' as 'success' | 'error', title: '', message: '' });
 
-  
+
     const sections = [
       { id: 'hero', component: HeroSection },
       { id: 'risks', component: RisksSection },
       { id: 'product', component: ProductSection },
-      { id: 'why', component: WhyIndexSection },
+      { id: 'traction', component: TractionSection },
       { id: 'roadmap', component: RoadmapSection },
       { id: 'team', component: TeamSection },
       { id: 'waitlist', component: () => <WaitlistSection setModalState={setModalState} /> },
- 
     ];
-  
-    // ★ 2. デバイスの幅を監視し、isMobile state を更新する useEffect
-    useEffect(() => {
-      const handleResize = () => {
-        setIsMobile(window.innerWidth <= 768);
-      };
-  
-      handleResize(); // 初期表示時にも判定を実行
-      window.addEventListener('resize', handleResize);
-  
-      // コンポーネントがアンマウントされる時にリスナーを削除
-      return () => window.removeEventListener('resize', handleResize);
-    }, []); // このEffectはマウント時に一度だけ実行
-  
-    // タイプライターアニメーション
+
     useEffect(() => {
       let index = 0;
       const timer = setInterval(() => {
@@ -428,19 +389,17 @@ const AxisLandingPage: NextPage = () => {
       }, 120);
       return () => clearInterval(timer);
     }, []);
-  
-   
-    // マウス追跡
+
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
-  
+
     return (
         <>
-          {/* ★★★ モーダルをページの一番上の階層で呼び出す ★★★ */}
-          <Modal 
+          <Modal
               isOpen={modalState.isOpen}
               onClose={() => setModalState({ ...modalState, isOpen: false })}
               type={modalState.type}
@@ -461,17 +420,14 @@ const AxisLandingPage: NextPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-          
+
           {!isLoading && (
               <div className={styles.fullPageContainer}>
-              {/* 3. Headerから setCurrentSection props を削除 */}
-              <Header /> 
+              <Header />
               <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
-              
-              {/* 4. ▼▼▼ sectionsWrapper から transformスタイルを削除 ▼▼▼ */}
+
               <div className={styles.sectionsWrapper}>
-                {sections.map((section, index) => (
-                  // Sectionコンポーネントはidを持っているので、そのまま使えます
+                {sections.map((section) => (
                   <Section key={section.id} id={section.id}>
                     <section.component />
                   </Section>
@@ -483,6 +439,5 @@ const AxisLandingPage: NextPage = () => {
         </>
       );
     };
-    
+
     export default AxisLandingPage;
-  

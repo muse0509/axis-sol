@@ -192,15 +192,15 @@
 
 .constituentGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 1rem;
 }
 
 .assetCard {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1rem;
   transition: all 0.2s ease-in-out;
   display: flex;
   flex-direction: column;
@@ -550,6 +550,8 @@
   padding: 2rem;
   border-radius: 12px;
 }
+
+
 
 /* --- Responsive Styles --- */
 @media (max-width: 768px) {
