@@ -33,8 +33,9 @@ export const Header = () => {
             <Image
               src="/logo.png"  // ★ publicフォルダからのパス。ご自身のファイル名に変更してください。
               alt="Axis Protocol Logo" // ロゴの説明
-              width={80} // ★ ロゴの実際の幅に合わせて調整
-              height={28} // ★ ロゴの実際の高さに合わせて調整
+              width={60} // ★ ロゴの実際の幅に合わせて調整
+              height=
+              {60} // ★ ロゴの実際の高さに合わせて調整
               priority // ページの最初に読み込む重要な画像であることを示す
             />
           </a>

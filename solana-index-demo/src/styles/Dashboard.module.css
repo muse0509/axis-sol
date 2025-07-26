@@ -550,6 +550,39 @@
   padding: 2rem;
   border-radius: 12px;
 }
+/* --- Tech‑stack footer --- */
+.techStack{
+  display:flex;          /* 横並び */      /* MDN 基本パターン */  /* turn0search2 */
+  align-items:center;
+  gap:0.5rem;            /* `gap` は Flex でも使用可 */            /* turn0search9 */
+  margin:0 0 3rem;
+  font-size:0.9rem;
+}
+.poweredBy{ color:#a0a0a0; }
+
+.constituentGrid{
+  display:grid;
+  grid-template-columns:repeat(
+      auto-fit,                  /* 空きスペースがあれば列を詰める */  /* CSS‑Tricks */  /* turn0search0 */
+      minmax(160px,1fr)          /* 最低幅 160px, 最大 1fr          */  /* SO */          /* turn0search7 */
+  );
+  gap:1rem;
+}
+
+/* Glassmorphism utility  (Josh Comeau / dev.to を参考に統一) */
+.glass{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);        /* Chromium / FF */  /* turn0search1 */
+  -webkit-backdrop-filter:blur(10px);/* Safari */        /* turn0search11 */
+  border-radius:16px;
+}
+.indexDisplay,
+.chartContainer,
+.constituentContainer,
+.timelineContainer{ @extend .glass; } /* Sass例。CSSならコピペでOK */
+
+
 
 
 

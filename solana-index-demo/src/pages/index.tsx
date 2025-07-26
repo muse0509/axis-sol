@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift, Users } from 'lucide-react';
+import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift, Users, Mail, TrendingUp } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import styles from '../styles/Landing.module.css';
@@ -11,6 +11,7 @@ import { Header } from '../components/Header';
 import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
 import { Footer } from '../components/Footer';
+import calendlyStyles from '../styles/Calendly.module.css';
 
 
 // --- セクション別コンポーネント ---
@@ -36,8 +37,7 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        Markets can't grow up<br />
-        <span className={styles.heroTitleGradientLarge}>without a good guide.</span>
+        Axis is building the S&P 500 of Solana
       </motion.h1>
       <motion.p
         className={styles.heroSubtitleLarge}
@@ -45,7 +45,7 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
       >
-        This is Axis. We are building a new foundation for stable, informed growth in the crypto market.
+        a trusted crypto index that lets investors gain diversified exposure to the digital asset market with a single token.
       </motion.p>
       <motion.div
         className={styles.heroCtaGroup}
@@ -56,28 +56,28 @@ const HeroSection = () => (
         <Link href="/dashboard" className={styles.ctaButtonPrimary}>
           View Demo App
         </Link>
-        <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
-          View Whitepaper →
+        <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:576b9b2d-51bb-4c45-9dae-82d78bf332e6" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
+          View Pitch Deck →
         </a>
       </motion.div>
     </div>
   );
 
 
-const RisksSection = () => {
-    const risks = [
-        { icon: Brain, title: 'The Illusion of Single-Asset Bets', description: "Thinking you'll get rich just by holding Bitcoin is a common mistake. A single asset's fall can hurt investors badly." },
-        { icon: Clock, title: 'The Game of Survival', description: 'The market is a zero-sum game. To build wealth, you must play safe and prioritize stability, not just chase risky high returns.' },
-        { icon: Shield, title: 'The Goal: Stability Over Hype', description: 'The biggest success in a volatile market isn\'t chasing the highest peak. It\'s achieving stability to survive and win over time.' }
+const WhyWinSection = () => {
+    const advantages = [
+        { icon: CheckCircle, title: 'Proven, Professional Methodology', description: "Our first index mirrors the NASDAQ-100's successful model: a basket of top assets by market cap, equally weighted and rebalanced quarterly. A clear, robust strategy that avoids unproven complexity." },
+        { icon: Rocket, title: 'Strategic First-Mover on Solana', description: 'We are giving Solana a core financial primitive it lacks, positioning it as the premier chain for finance. This is a bet on Solana becoming the future of finance, driven by deep, personal passion.' },
+        { icon: Zap, title: 'A Deflationary Economic Engine', description: 'Our "Buyback & Burn" mechanism creates a direct link between our fund\'s AUM growth and the value of our governance token ($AXIS), creating a powerful, deflationary flywheel that rewards long-term holders.' }
     ];
     return(
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>The Unspoken Rules of Crypto</h2>
-            <p className={styles.sectionSubtitle}>To win, you must first understand the game. The most important rule is to play safe.</p>
+            <h2 className={styles.sectionTitle}>Why We Win</h2>
+            <p className={styles.sectionSubtitle}>Our competitive advantage is built on a professional methodology, strategic vision, and sustainable economics.</p>
         </div>
         <div className={styles.riskGrid}>
-            {risks.map((risk, index) => (
+            {advantages.map((advantage, index) => (
                 <motion.div
                     key={index}
                     className={styles.riskCard}
@@ -86,9 +86,9 @@ const RisksSection = () => {
                     viewport={{ once: true, amount: 0.5 }}
                     transition={{ duration: 0.6, delay: index * 0.2 }}
                 >
-                    <div className={styles.riskIconWrapper}><risk.icon className={styles.riskIcon} /></div>
-                    <h3 className={styles.riskCardTitle}>{risk.title}</h3>
-                    <p className={styles.riskCardDescription}>{risk.description}</p>
+                    <div className={styles.riskIconWrapper}><advantage.icon className={styles.riskIcon} /></div>
+                    <h3 className={styles.riskCardTitle}>{advantage.title}</h3>
+                    <p className={styles.riskCardDescription}>{advantage.description}</p>
                 </motion.div>
             ))}
         </div>
@@ -96,19 +96,12 @@ const RisksSection = () => {
 )};
 
 const ProductSection = () => {
-    const logos = [
-      { src: '/solana.png', alt: 'Solana' },
-      { src: '/ethereum.png', alt: 'Ethereum' },
-      { src: '/Base.svg', alt: 'Base' },
-      { src: '/polygon.png', alt: 'Polygon' },
-    ];
-  
     return (
       <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>The Solution We Need Now: An Index</h2>
+            <h2 className={styles.sectionTitle}>What We're Building</h2>
             <p className={styles.sectionSubtitle}>
-              That's why we are building Axis. Our product is simple: we create transparent indexes with clear rules, then package them into a single token. Anyone can buy the market in one easy step.
+              Axis is building the foundational asset management layer for the Solana ecosystem. Our first product, $AXIS-INDEX, is a trusted, on-chain index fund that allows anyone to invest in Solana's growth with a single click. We turn casino-level chaos into a professional-grade financial product.
             </p>
         </div>
 
@@ -120,9 +113,9 @@ const ProductSection = () => {
                 viewport={{ once: true, amount: 0.5 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
             >
-                <h3>Our Vision: A Public Good</h3>
+                <h3>Our Vision: The Asset Management Layer for the Digital Economy</h3>
                 <p>
-                  Our real goal is bigger. We are creating the index itself and giving it to the market as a trusted, open standard that anyone can use to build upon.
+                  Axis is more than a single fund. We are building the rails for a suite of sophisticated, passive investment products, becoming the on-chain equivalent of the S&P 500 for a new generation of investors.
                 </p>
             </motion.div>
             <motion.div
@@ -133,40 +126,11 @@ const ProductSection = () => {
                 transition={{ duration: 0.7, delay: 0.4 }}
             >
                 <ul>
-                  <li><CheckCircle size={20}/> <strong>Truly Decentralized:</strong> While others are limited to a single chain or use complex bridges, Axis has a multi-chain plan from day one.</li>
-                  <li><CheckCircle size={20}/> <strong>Fair & Transparent:</strong> Our model is designed to benefit everyone. We charge a small, fair fee to help the project and its users grow.</li>
-                  <li><CheckCircle size={20}/> <strong>Built on Solana, For Everyone:</strong> We are Solana experts with a vision to bring our robust risk management to all major chains.</li>
+                  <li><TrendingUp size={20}/> <strong>Explosive Growth Opportunity:</strong> Solana is a multi-billion dollar ecosystem lacking professional-grade, passive investment tools.</li>
+                  <li><CheckCircle size={20}/> <strong>Bridging TradFi & DeFi:</strong> The global asset management market is worth over $100 trillion. We are bringing its most successful model (index funds) on-chain.</li>
+                  <li><Shield size={20}/> <strong>Clear, Sustainable Business Model:</strong> Revenue is tied directly to Assets Under Management (AUM), a model proven for decades in TradFi.</li>
                 </ul>
             </motion.div>
-        </div>
-
-        <div className={styles.chainTimelineWrapper}>
-            <h4 className={styles.chainTimelineTitle}>Natively Supported Chains</h4>
-            <div className={styles.chainTimeline}>
-                <div className={styles.chainTimelineConnector}></div>
-                {logos.map((logo, index) => (
-                    <div
-                        key={logo.alt}
-                        className={`${styles.chainTimelineItem} ${index % 2 === 0 ? styles.chainTimelineItemLeft : styles.chainTimelineItemRight}`}
-                    >
-                         <motion.div
-                            initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true, amount: 0.5 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className={styles.chainLogoCard}
-                        >
-                            <Image
-                                    src={logo.src}
-                                    alt={logo.alt}
-                                    fill
-                                    style={{ objectFit: 'contain' }}
-                                />
-
-                        </motion.div>
-                    </div>
-                ))}
-            </div>
         </div>
       </div>
     );
@@ -175,19 +139,19 @@ const ProductSection = () => {
 const TractionSection = () => (
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>Traction & Community</h2>
-            <p className={styles.sectionSubtitle}>We're not just starting a project; we're building a movement.</p>
+            <h2 className={styles.sectionTitle}>Proven Vision & Traction</h2>
+            <p className={styles.sectionSubtitle}>We're not just starting a project; we're building a movement with key ecosystem support.</p>
         </div>
         <div className={styles.whyLayout}>
             <motion.div className={styles.whyCard} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.7, delay: 0.2 }}>
                 <div className={styles.whyIconWrapper}><Zap /></div>
-                <h3>Expert-Validated Vision</h3>
-                <p>Our approach isn't just theory. From its earliest concept stages, Axis has received valuable technical feedback from seasoned members of the Backpack team and MagicBlock, ensuring our foundation is robust, secure, and ready to scale.</p>
+                <h3>Ecosystem-Validated Vision</h3>
+                <p>Our vision isn't just theory. From its earliest stages, Axis has attracted the attention and support of core teams within the Solana ecosystem, including Backpack, Webacy, and MagicBlock, ensuring our foundation is robust and aligned with the market.</p>
             </motion.div>
             <motion.div className={styles.whyCard} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.5 }} transition={{ duration: 0.7, delay: 0.4 }}>
                 <div className={styles.whyIconWrapper}><Users /></div>
                 <h3>A Growing Community</h3>
-                <p>Our mission has already attracted a strong and growing community of over 100 early supporters who believe in a more stable and transparent future for DeFi.</p>
+                <p>Our mission has already attracted a strong and growing community of over 100 early supporters who believe in a more stable and transparent future for on-chain investing.</p>
             </motion.div>
         </div>
     </div>
@@ -195,15 +159,16 @@ const TractionSection = () => (
 
 const RoadmapSection = () => {
     const roadmapItems = [
-        { icon: Flag, phase: "Phase 1: Foundation", title: "Secure the Protocol with Grant Funding", description: "Utilize grant funding to rigorously build, test, and audit the core Axis protocol, ensuring maximum safety and reliability from day one." },
-        { icon: Target, phase: "Phase 2: Launch & Seed Round", title: "Launch, List, and Acquire First Users", description: "Raise seed funding to officially launch the Axis Index Token, secure listings on major DEXs, and onboard our initial user base through strategic partnerships." },
-        { icon: Rocket, phase: "Phase 3: Scale & Profit", title: "Expand and Grow the Ecosystem", description: "Raise a subsequent funding round to expand to new chains, introduce new products, and scale towards profitability and long-term sustainability." },
+        { icon: Flag, phase: "2025 Q4: Foundation", title: "Protocol Built & Secured", description: "Complete smart contract development, pass multiple top-tier security audits, and finalize the global-first legal structure in Dubai." },
+        { icon: Target, phase: "2026 Q1: Launch", title: "Mainnet Launch & Initial Adoption", description: "Launch the $AXIS-INDEX on mainnet and drive early AUM growth through the strategic 'Genesis Investor' airdrop campaign." },
+        { icon: Rocket, phase: "2026 Q2: Growth", title: "Scale & Integrate", description: "Achieve the milestone of $1M AUM and secure key partnerships with leading wallets and DeFi protocols to expand our reach." },
+        { icon: Compass, phase: "2026 Q3: Decentralization", title: "Empower the Community", description: "Launch $AXIS staking and governance features to decentralize control. Begin research and development for the next wave of products." },
     ];
   return (
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Our Roadmap</h2>
-            <p className={styles.sectionSubtitle}>A clear, step-by-step plan to bring stability to the crypto world.</p>
+            <p className={styles.sectionSubtitle}>A clear, step-by-step plan to build the asset management layer for the digital economy.</p>
         </div>
         <div className={styles.timeline}>
             <div className={styles.timelineConnector} />
@@ -236,12 +201,13 @@ const RoadmapSection = () => {
 
 const TeamSection = () => {
     const teamMembers = [
-        { name: "Muse", role: "Founder & Full-Stack Dev", bio: "A founder who knows how to win. I led my team to a first-place victory in a major hackathon with 158 competing teams, and I am now dedicated full-time to making Axis a success.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
+        { name: "Yusuke Kikuta", role: "Founder", bio: "A founder with a rare combination of obsessive focus, proven technical execution, and extreme learning agility. A self-taught engineer who transitioned from a 13-year career in music to independently building a successful freelance blockchain development career. This obsessive focus and resilience are our ultimate competitive advantages.", image: "/muse.jpg", link: "https://x.com/muse_0509", isSuperTeam: true },
     ];
     return(
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>The Right Person for the Job</h2>
+            <h2 className={styles.sectionTitle}>Why Me? A Founder-Led Bet</h2>
+            <p className={styles.sectionSubtitle}>Early-stage investing is a bet on the founder. I will out-learn, out-build, and out-execute any competitor.</p>
         </div>
         <div className={styles.teamGrid}>
             {teamMembers.map((member, index) => (
@@ -289,7 +255,7 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
             const result = await response.json();
             if (response.ok) {
                 setIsJoined(true);
-                setModalState({ isOpen: true, type: 'success', title: 'Welcome to the Waitlist!', message: 'You will be notified of early access and future rewards. Thank you for your support!' });
+                setModalState({ isOpen: true, type: 'success', title: 'Welcome!', message: 'You will be notified of early access and future rewards. Thank you for your support!' });
             } else {
                 setModalState({ isOpen: true, type: 'error', title: 'Oops!', message: result.message || 'An error occurred. Please try again.' });
             }
@@ -311,7 +277,7 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
     <div className={styles.sectionContent}>
         <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>The Market Can Finally Grow Up.</h2>
-            <p className={styles.sectionSubtitle}>Because the guide has arrived. Join the Genesis Program to be part of the journey.</p>
+            <p className={styles.sectionSubtitle}>Because the guide has arrived. Join us to be part of the journey.</p>
         </div>
         <div className={styles.waitlistLayout}>
             <div className={styles.benefitsContainer}>
@@ -342,7 +308,7 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
 
                         {!isJoined ? (
                             <button onClick={handleJoin} className={styles.ctaButtonPrimary} disabled={isSubmitting}>
-                                {isSubmitting ? 'Submitting...' : <><Send size={18} /> Join the Program</>}
+                                {isSubmitting ? 'Submitting...' : <><Send size={18} /> Join the Community</>}
                             </button>
                         ) : (
                             <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className={styles.successMessage}>
@@ -356,6 +322,33 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
     </div>
     );
 };
+const CalendlySection = () => (
+    <div className={calendlyStyles.calendlySection}>
+        <div className={styles.sectionContent}>
+            <div className={styles.sectionHeader}>
+                <h2 className={calendlyStyles.calendlyTitle}>Interested in Learning More?</h2>
+                <p className={calendlyStyles.calendlySubtitle}>
+                    Schedule a call with the founder to discuss our vision, strategy, and the angel round.
+                </p>
+            </div>
+            <div
+                className={calendlyStyles.calendlyEmbed}
+                dangerouslySetInnerHTML={{
+                    __html: `<iframe
+                        src="https://calendly.com/yusukekikuta-05/axis-pitch"
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                    ></iframe>`
+                }}
+            />
+             <div className={styles.contactDirect}>
+                <a href="mailto:yusukekikuta.05@gmail.com" className={styles.contactLink}><Mail size={18} /> yusukekikuta.05@gmail.com</a>
+                <a href="https://t.me/yus0509" target="_blank" rel="noopener noreferrer" className={styles.contactLink}><Send size={18} /> @yus0509 on Telegram</a>
+            </div>
+        </div>
+    </div>
+);
 
 const AxisLandingPage: NextPage = () => {
 
@@ -368,12 +361,13 @@ const AxisLandingPage: NextPage = () => {
 
     const sections = [
       { id: 'hero', component: HeroSection },
-      { id: 'risks', component: RisksSection },
+      { id: 'why-win', component: WhyWinSection },
       { id: 'product', component: ProductSection },
       { id: 'traction', component: TractionSection },
       { id: 'roadmap', component: RoadmapSection },
       { id: 'team', component: TeamSection },
       { id: 'waitlist', component: () => <WaitlistSection setModalState={setModalState} /> },
+      { id: 'booking', component: CalendlySection },
     ];
 
     useEffect(() => {

@@ -1,5 +1,11 @@
 import React from 'react';
-import ReactECharts from 'echarts-for-react';
+
+export interface EChartProps {
+  data: (string | number)[][]            // = EChartsData
+  events: { event_date: string; title: string; description: string }[]
+  disableAnimation?: boolean             // ← ここを props に定義
+}
+
 
 // イベント用の型定義
 type MarketEvent = {
@@ -121,13 +127,7 @@ const EChartsChart: React.FC<Props> = ({ data, events }) => {
   };
 
   return (
-    <ReactECharts
-      option={option}
-      style={{ height: '500px', width: '100%' }}
-      notMerge={true}
-      lazyUpdate={true}
-      theme={"dark"}
-    />
+    <div id="echarts-container" />
   );
 };
 
