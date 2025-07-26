@@ -20,6 +20,7 @@
     "@studio-freight/lenis": "^1.0.42",
     "@studio-freight/tempus": "^0.0.44",
     "@supabase/supabase-js": "^2.50.0",
+    "axios": "^1.11.0",
     "csv-parser": "^3.2.0",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
