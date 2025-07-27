@@ -1,184 +1,159 @@
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  
-  .modal {
-    background: #1C1C1E;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 90%;
-    max-width: 420px;
-    position: relative;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .header {
-    padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .header h3 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #F2F2F7;
-  }
-  
-  .closeButton {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #8A8A8E;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    transition: color 0.2s ease;
-  }
-  .closeButton:hover {
-    color: #F2F2F7;
-  }
-  
-  .content {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-  
-  .prompt {
-    font-size: 0.9rem;
-    color: #8A8A8E;
-    text-align: center;
-    margin: 0;
-  }
-  
-  .actionButton {
-    padding: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #121212; /* 文字色を黒に */
-    background-color: #F2F2F7; /* 背景色を明るいグレー（ほぼ白）に */
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    height: 52px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: none; /* 派手な影を削除 */
-  }
-  
-  .actionButton:hover:not(:disabled) {
-    background-color: #FFFFFF; /* ホバー時に純白に */
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1); /* ほんのり白い光彩を追加 */
-  }
-  
-  .actionButton:disabled {
-    background-image: none;
-    background-color: #3A3A3C;
-    color: #8A8A8E;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .inputWrapper {
-    background: #121212;
-    border-radius: 16px;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .inputHeader {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: #8A8A8E;
-    margin-bottom: 0.75rem;
-  }
-  .inputBody {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .input {
-    width: 100%;
-    background: none;
-    border: none;
-    color: #F2F2F7;
-    font-size: 2rem;
-    font-weight: 500;
-    outline: none;
-    padding: 0;
-  }
-  .input::placeholder { color: #48484A; }
-  .input[type=number] { -moz-appearance: textfield; }
-  .input::-webkit-outer-spin-button, .input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .maxButton {
-    background: #3A3A3C;
-    color: #F2F2F7;
-    border: none;
-    border-radius: 8px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  .maxButton:hover { background: #48484A; }
-  .tokenLabel { font-size: 1.2rem; font-weight: 600; color: #F2F2F7; }
-  .swapArrow { text-align: center; font-size: 1.5rem; color: #8A8A8E; line-height: 0; margin: -0.5rem 0; }
-  .priceInfo { text-align: center; font-size: 0.9rem; color: #8A8A8E; }
-  
-  .successIcon {
-    font-size: 3rem;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: rgba(0, 229, 255, 0.1);
-    color: #00E5FF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-  }
-  .successAmount { font-size: 1.5rem; font-weight: 600; color: #F2F2F7; text-align: center; margin: 0; }
-  .txLink {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #00E5FF;
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-top: 1rem;
-    transition: color 0.2s ease;
-  }
-  .txLink:hover { color: #8affff; }
-  .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(0, 0, 0, 0.2);
-    border-top-color: #000;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto;
-  }
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
+/* src/styles/BuyModal.module.css */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.4);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+
+.modal {
+  width: min(880px, 92vw);
+  border-radius: 16px;
+  background: #111;
+  color: #eee;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.statusBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #cfd3dc;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  display: inline-block;
+}
+.dotOn { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+.dotOff { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
+.statusText { opacity: 0.95; }
+
+.networkBadge {
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(99,102,241,0.18);
+  border: 1px solid rgba(99,102,241,0.35);
+  color: #c7c9ff;
+  font-size: 12px;
+}
+
+.close {
+  appearance: none;
+  background: transparent;
+  color: #aaa;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.close:hover { color: #fff; }
+
+.body { padding: 18px; }
+
+.centerBox {
+  padding: 32px 16px 40px;
+  display: grid;
+  place-items: center;
+  gap: 16px;
+}
+.connectHint { color: #cfd3dc; text-align: center; }
+.walletBtnWrap { display: grid; place-items: center; }
+.walletBtn {
+  --btn-bg: #4f46e5;
+  background: var(--btn-bg);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.walletBtn:hover { filter: brightness(1.05); }
+
+.row { margin-bottom: 14px; }
+.label { display: block; margin-bottom: 8px; color: #cfd3dc; }
+
+.amountWrap {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 16px;
+}
+
+.maxBtn,
+.mintBtn {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.maxBtn {
+  background: rgba(148,163,184,0.2);
+  color: #e2e8f0;
+}
+.maxBtn:hover { background: rgba(148,163,184,0.28); }
+
+.mintBtn {
+  background: #766ff1;
+  color: #0b1212;
+}
+.mintBtn[disabled] { opacity: 0.6; cursor: not-allowed; }
+.mintBtn:not([disabled]):hover { filter: brightness(1.05); }
+
+.grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.card {
+  background: #151515;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px;
+}
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #cfd3dc;
+  margin-bottom: 6px;
+}
+.kv strong { color: #fff; font-size: 18px; }
+.kvSub { font-size: 12px; color: #9aa4b2; }
+
+.note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #98a2b3;
+  line-height: 1.5;
+  word-break: break-all;
+}

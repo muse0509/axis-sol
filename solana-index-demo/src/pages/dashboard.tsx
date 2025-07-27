@@ -17,9 +17,10 @@ import { particlesOptions } from '../utils/particles'
 import { marketEvents } from '../lib/market-events'
 import { promises as fs } from 'fs'
 import path from 'path'
-import dynamic from 'next/dynamic'
 import type { EChartProps } from '../components/EChartsChart'
 import BuyModal from '../components/BuyModal'
+ import dynamic from 'next/dynamic'
+ const WalletBar = dynamic(() => import('@/components/WalletBar'), { ssr: false })
 
 /* ---------- Lazy‑load ECharts ---------- */
 const EChartsChart = dynamic<EChartProps>(
@@ -195,6 +196,8 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
           <motion.p className={styles.description} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
             An equally weighted index designed to capture the true sentiment of the crypto market, moving beyond the bias of major assets.
           </motion.p>
+
+          <WalletBar />
 
           {/* --- CTA --- */}
           <motion.div className={styles.callToActionContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
