@@ -1,7 +1,7 @@
 // src/lib/axis.ts
 import { PublicKey } from '@solana/web3.js';
 
-export const PROGRAM_ID = new PublicKey('9tBJstf7q2MZXSmSECCLoXV5YMaEpQHNfWLwT33MLzdg');
+export const PROGRAM_ID = new PublicKey('99pW6SYcKG6hqYDRuQzhVvEj5XEVKfcCmQXmyK9YU19h');
 
 // initialize.ts の結果
 export const STATE     = new PublicKey('AheJyVHxRRMXxoiMoQUXje4rX4XwhuK4pPKcaF7dSV2Z');

@@ -16,7 +16,7 @@ import '../styles/globals.css'
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   // ★ Devnet を固定
   const network = WalletAdapterNetwork.Devnet
-  const endpoint = useMemo(() => process.env.NEXT_PUBLIC_RPC_ENDPOINT ?? clusterApiUrl(network), [network])
+  const endpoint = "https://api.devnet.solana.com";
 
   // ★ Phantom だけ（必要に応じて他ウォレットも追加）
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [])
