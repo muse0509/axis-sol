@@ -19,7 +19,7 @@ export const PROGRAM_ID = new Web3PublicKey('12B8b2nhzn3iWcRuSKPenZAeKtePeuWUxxZ
 export const USDC_MINT  = new Web3PublicKey('2Xos1H2fh1GFgmfUq968JnFS8B47G1Uqa8gFUs4a2F43')
 
 // [最終修正] 新しいStateのSeed
-const STATE_SEED: Buffer = Buffer.from("state-v9");
+const STATE_SEED: Buffer = Buffer.from("state-v13");
 
 export const TOKEN_PROGRAM = TOKEN_PROGRAM_ID
 export const ASSOCIATED_TOKEN_PROGRAM = ASSOCIATED_TOKEN_PROGRAM_ID

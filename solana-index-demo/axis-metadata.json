@@ -1,0 +1,9 @@
+{
+    "name": "Axis Index Token",
+    "symbol": "AXIS",
+    "description": "An equally weighted index to capture the true sentiment of the crypto market.",
+    "image": "https://github.com/muse0509/axis-sol/blob/main/solana-index-demo/public/axisToken.png",
+    "attributes": [
+        { "trait_type": "Asset Class", "value": "Index Token" }
+    ]
+}

@@ -108,7 +108,9 @@ const BuyModal: React.FC<Props> = ({ isOpen, onClose, indexPrice }) => {
       console.log("Verifying Pyth accounts exist...");
       for (let i = 0; i < remainingAccounts.length; i++) {
         try {
-          const accountInfo = await connection.getAccountInfo(remainingAccounts[i].pubkey);
+          const publicKey = new PublicKey(remainingAccounts[i].pubkey);
+          const accountInfo = await connection.getAccountInfo(publicKey)
+          console.log(accountInfo);
           console.log(`Pyth account [${i}] ${remainingAccounts[i].pubkey.toBase58()}: ${accountInfo ? 'EXISTS' : 'NOT FOUND'}`);
           if (accountInfo) {
             console.log(`  Owner: ${accountInfo.owner.toBase58()}`);
