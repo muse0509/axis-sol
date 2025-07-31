@@ -1,0 +1,8 @@
+{
+    "name": "AXIS Index Token",
+    "symbol": "AXIS",
+    "description": "Index token tracking the Market Pulse Index.",
+    "image": "https://github.com/muse0509/axis-sol/blob/main/solana-index-demo/public/axisToken.png",
+    "attributes": []
+  }
+  

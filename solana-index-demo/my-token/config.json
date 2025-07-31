@@ -1,0 +1,24 @@
+{
+  "tokenStandard": "nft",
+  "number": 1,
+  "symbol": "AXIS",
+  "sellerFeeBasisPoints": 100,
+  "isMutable": true,
+  "isSequential": true,
+  "creators": [
+    {
+      "address": "4N2CNF2FxvW2dAmRLGovJFw72izfKbnp63qGz63Ve7RT",
+      "share": 100
+    }
+  ],
+  "uploadMethod": "bundlr",
+  "ruleSet": null,
+  "awsConfig": null,
+  "sdriveApiKey": null,
+  "nftStorageAuthToken": null,
+  "shdwStorageAccount": null,
+  "pinataConfig": null,
+  "hiddenSettings": null,
+  "guards": null,
+  "maxEditionSupply": null
+}

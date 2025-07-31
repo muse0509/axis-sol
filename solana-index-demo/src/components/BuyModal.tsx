@@ -1,181 +1,145 @@
+'use client'
 import React, { useEffect, useMemo, useState } from 'react'
-import styles from '../styles/BuyModal.module.css'
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { PublicKey } from '@solana/web3.js'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import toast from 'react-hot-toast'
-import { BN } from '@coral-xyz/anchor'
-import { PublicKey } from '@solana/web3.js'
-import { getAssociatedTokenAddress, createAssociatedTokenAccountInstruction } from '@solana/spl-token'
+import { getAssociatedTokenAddress } from '@solana/spl-token'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 
-import {
-  getProgram,
-  getUserUsdcBalance,
-  formatAddress,
-  deriveStatePda,
-  fetchState,
-  TOKEN_PROGRAM,
-  USDC_MINT,
-} from '@/lib/anchorClient'
-
+// 【修正点】ここでの静的インポートを削除します。
+// import { AxisSDK } from '@/axis-sdk/AxisSDK' 
 import NetworkGuard from './NetworkGuard'
+import styles from '../styles/BuyModal.module.css'
 
-const USDC_DECIMALS = 6
+// 定数
+const USDC_MINT = new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr')
 
-type Props = { isOpen: boolean; onClose: () => void; indexPrice: number }
+// 共通のヘルパー関数
+const formatAddress = (publicKey) => {
+  if (!publicKey) return ''
+  const base58 = publicKey.toBase58()
+  return `${base58.slice(0, 4)}…${base58.slice(-4)}`
+}
 
-const BuyModal: React.FC<Props> = ({ isOpen, onClose, indexPrice }) => {
+const getUserUsdcBalance = async (connection, publicKey, usdcMint) => {
+  try {
+    const ata = await getAssociatedTokenAddress(usdcMint, publicKey)
+    const balance = await connection.getTokenAccountBalance(ata)
+    return balance.value.uiAmount || 0
+  } catch (e) {
+    return 0
+  }
+}
+
+// このコンポーネントは、dashboard.tsxから以下のpropsを受け取ることを想定
+// - isOpen: boolean
+// - onClose: () => void
+// - indexPrice: number | null (現在の指数価格)
+export default function BuyModal({ isOpen, onClose, indexPrice }) {
   const { connection } = useConnection()
-  const wallet = useWallet()
-  const { connected, publicKey } = wallet
+  const { publicKey, sendTransaction, connected } = useWallet()
+  const wallet = useWallet() // SDKはwalletオブジェクト全体を必要とする
+
+  const [usdcBalance, setUsdcBalance] = useState(0)
+  const [qty, setQty] = useState('10') // ユーザーが入力するUSDCの量
+  const [loading, setLoading] = useState(false)
 
   const networkName = useMemo(() => (connection?.rpcEndpoint || '').toLowerCase().includes('devnet') ? 'Devnet' : 'Mainnet', [connection?.rpcEndpoint]);
-  const isDevnet = networkName === 'Devnet'
 
-  const [indexAmountUi, setIndexAmountUi] = useState('1')
-  const [loading, setLoading] = useState(false)
-  const [usdcBalance, setUsdcBalance] = useState<number>(0)
-
-  const estUsdcPerIndex = useMemo(() => Math.max(0, indexPrice / 100), [indexPrice])
-  const estCost = useMemo(() => {
-    const qty = Number(indexAmountUi || '0')
-    return !Number.isFinite(qty) || qty <= 0 ? 0 : qty * estUsdcPerIndex
-  }, [indexAmountUi, estUsdcPerIndex])
-
+  // USDC残高の取得
   useEffect(() => {
-    (async () => {
-      if (!connected || !publicKey) { setUsdcBalance(0); return }
-      try {
-        const bal = await getUserUsdcBalance(connection, publicKey, USDC_MINT)
-        setUsdcBalance(bal)
-      } catch (e) { console.warn('fetch usdc balance failed:', e); setUsdcBalance(0) }
-    })()
-  }, [connected, publicKey, connection])
-
-  const onMax = () => {
-    if (estUsdcPerIndex <= 0) { setIndexAmountUi('0'); return }
-    const max = Math.floor((usdcBalance / estUsdcPerIndex) * 1e6) / 1e6
-    setIndexAmountUi(String(Math.max(0, max)))
-  }
-
-  const onMint = async () => {
-    if (!connected || !publicKey) return toast.error('Connect your wallet first.')
-    if (!isDevnet) return toast.error('This dApp is Devnet-only.')
-  
-    const usdcAmount = new BN(1 * (10 ** USDC_DECIMALS));
-    const loadingId = toast.loading('Sending transaction…')
-    setLoading(true)
+    if (!publicKey || !connection || !isOpen) return
     
-    try {
-      const program = getProgram(connection, wallet)
-      const state = await fetchState(program);
-      console.log("Fetched on-chain state:", state);
-      console.log("--- Verifying Constituents Data ---");
-      state.constituents.forEach((c, index) => {
-        console.log(`[Constituent ${index}]`);
-        console.log(`  -> Token Mint:     ${c.tokenMint.toBase58()}`);
-        console.log(`  -> Pyth Price Acc: ${c.pythPriceAcc.toBase58()}`);
-        console.log(`  -> Target BPS:     ${c.targetBps}`);
-      });
-      console.log("------------------------------------");
-
-      if (!state.vaultUsdc || !state.vaultSol) {
-        throw new Error("On-chain state is outdated. Please re-initialize the fund.");
-      }
-
-      const userUsdcAta = await getAssociatedTokenAddress(state.usdcMint, publicKey);
-      const userIndexAta = await getAssociatedTokenAddress(state.indexMint, publicKey);
-      console.log("User ATAs derived:", { userUsdcAta: userUsdcAta.toBase58(), userIndexAta: userIndexAta.toBase58() });
-
-      // 修正: constituentsの順序とtargetBpsの確認を追加
-      console.log("On-chain constituents order and data:");
-      state.constituents.forEach((c, i) => {
-        console.log(`  [${i}] mint: ${c.tokenMint.toBase58()}, target_bps: ${c.targetBps}, pyth: ${c.pythPriceAcc.toBase58()}`);
-      });
-
-      // 修正: targetBps > 0 の条件を削除し、on-chainの順序通りにremainingAccountsを構築
-      const remainingAccounts = state.constituents.map(c => ({
-        pubkey: c.pythPriceAcc,
-        isSigner: false,
-        isWritable: false,
-      }));
-      
-      console.log("Constructed remainingAccounts in exact on-chain order:");
-      remainingAccounts.forEach((acc, i) => {
-        console.log(`  [${i}] ${acc.pubkey.toBase58()}`);
-      });
-
-      // Pythアカウントの存在確認を追加
-      console.log("Verifying Pyth accounts exist...");
-      for (let i = 0; i < remainingAccounts.length; i++) {
-        try {
-          const publicKey = new PublicKey(remainingAccounts[i].pubkey);
-          const accountInfo = await connection.getAccountInfo(publicKey)
-          console.log(accountInfo);
-          console.log(`Pyth account [${i}] ${remainingAccounts[i].pubkey.toBase58()}: ${accountInfo ? 'EXISTS' : 'NOT FOUND'}`);
-          if (accountInfo) {
-            console.log(`  Owner: ${accountInfo.owner.toBase58()}`);
-            console.log(`  Data length: ${accountInfo.data.length}`);
-          }
-        } catch (error) {
-          console.error(`Error checking Pyth account [${i}]:`, error);
-        }
-      }
-
-      const ataInstructions = [];
-      const userUsdcAtaInfo = await connection.getAccountInfo(userUsdcAta);
-      if (!userUsdcAtaInfo) {
-        ataInstructions.push(
-          createAssociatedTokenAccountInstruction(publicKey, userUsdcAta, publicKey, state.usdcMint)
-        );
-      }
-      const userIndexAtaInfo = await connection.getAccountInfo(userIndexAta);
-      if (!userIndexAtaInfo) {
-        ataInstructions.push(
-          createAssociatedTokenAccountInstruction(publicKey, userIndexAta, publicKey, state.indexMint)
-        );
-      }
-
-      const signature = await program.methods
-        .depositAndMint(usdcAmount)
-        .accounts({
-          state: deriveStatePda()[0],
-          user: publicKey,
-          userUsdcAta: userUsdcAta,
-          userIndexAta: userIndexAta,
-          vaultUsdc: state.vaultUsdc,
-          vaultSol: state.vaultSol,
-          indexMint: state.indexMint,
-          tokenProgram: TOKEN_PROGRAM,
-        })
-        .remainingAccounts(remainingAccounts)
-        .preInstructions(ataInstructions)
-        .rpc();
-  
-      console.log('Transaction signature:', signature)
-      toast.success('Successfully sent depositAndMint transaction!')
-      
-      const bal = await getUserUsdcBalance(connection, publicKey, state.usdcMint)
+    const fetchBalance = async () => {
+      const bal = await getUserUsdcBalance(connection, publicKey, USDC_MINT)
       setUsdcBalance(bal)
+    }
+
+    fetchBalance()
+  }, [publicKey, connection, isOpen, loading])
+
+  // --- イベントハンドラ ---
+  const handleMint = async () => {
+    if (!connected || !publicKey || !wallet.signTransaction) {
+      toast.error('ウォレットを接続してください。')
+      return
+    }
+    
+    if (networkName !== 'Devnet') {
+      toast.error('このdAppはDevnet専用です。')
+      return
+    }
+
+    const usdcAmount = parseFloat(qty)
+    if (isNaN(usdcAmount) || usdcAmount <= 0) {
+      toast.error('有効な数量を入力してください')
+      return
+    }
+    
+    if (usdcAmount > usdcBalance) {
+      toast.error('USDC残高が不足しています')
+      return
+    }
+    
+    setLoading(true)
+    const loadingToast = toast.loading('USDC送金のトランザクションを準備中...')
+
+    try {
+      // 【修正点】SDKをクライアントサイドでのみ動的にインポートする
+      const { AxisSDK } = await import('@/axis-sdk/AxisSDK');
       
-    } catch (e: any) {
-      console.error('[mint failed]', e)
-      const errorMessage = e?.error?.errorMessage || e?.message || 'Transaction failed';
-      if (!/re-initialize/i.test(errorMessage)) {
-        toast.error(errorMessage);
-      }
+      // SDKのインスタンスを作成 (walletオブジェクト全体を渡す)
+      const sdk = new AxisSDK(connection, wallet)
+      
+      // SDKのメソッドを呼び出し、USDC送金トランザクションを構築
+      const transaction = await sdk.buildUsdcDepositTransaction(usdcAmount);
+
+      // ウォレットに署名を要求して送信
+      const signature = await sendTransaction(transaction, connection);
+      
+      // トランザクションの完了を待つ
+      toast.loading('トランザクションの承認を待っています...', { id: loadingToast });
+      await connection.confirmTransaction(signature, 'confirmed');
+
+      toast.dismiss(loadingToast)
+      toast.success(
+        (t) => (
+          <span>
+            USDCの送金が完了しました！<br/>
+            バックエンドで処理後、トークンがミントされます。
+            <a 
+              href={`https://solscan.io/tx/${signature}?cluster=devnet`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: '#88aaff', marginLeft: '8px', textDecoration: 'underline' }}
+            >
+              Txを見る
+            </a>
+          </span>
+        ),
+        { duration: 10000 }
+      );
+      console.log('USDC Deposit transaction signature:', signature)
+      
+      setQty('10') // 入力欄をリセット
+      
+    } catch (error) {
+      console.error('handleMint error:', error)
+      const errorMessage = error.message || '処理に失敗しました'
+      toast.dismiss(loadingToast)
+      toast.error(errorMessage)
     } finally {
-      toast.dismiss(loadingId)
       setLoading(false)
     }
   }
-  
-  if (!isOpen) return null
 
+  if (!isOpen) return null
+  
   return (
     <NetworkGuard>
-      <div className={styles.backdrop} role="dialog" aria-modal="true">
+      <div className={styles.backdrop}>
         <div className={styles.modal}>
-          <div className={styles.header}>
+          <header className={styles.header}>
             <div className={styles.statusBar}>
               <span className={`${styles.dot} ${connected ? styles.dotOn : styles.dotOff}`} />
               <span className={styles.statusText}>
@@ -183,8 +147,9 @@ const BuyModal: React.FC<Props> = ({ isOpen, onClose, indexPrice }) => {
               </span>
               <span className={styles.networkBadge}>{networkName}</span>
             </div>
-            <button className={styles.close} onClick={onClose} aria-label="Close">×</button>
-          </div>
+            <button onClick={onClose} className={styles.close}>×</button>
+          </header>
+
           <div className={styles.body}>
             {!connected ? (
               <div className={styles.centerBox}>
@@ -193,29 +158,37 @@ const BuyModal: React.FC<Props> = ({ isOpen, onClose, indexPrice }) => {
               </div>
             ) : (
               <>
+                <div className={styles.infoRow}>
+                  <span>Your USDC Balance</span><strong>{usdcBalance.toFixed(6)}</strong>
+                </div>
+                <div className={styles.infoRow}>
+                  <span>Current Index Value</span><strong>{indexPrice ? indexPrice.toFixed(4) : 'N/A'}</strong>
+                </div>
+                
                 <div className={styles.row}>
-                  <label className={styles.label}>Amount (USDC)</label>
+                  <label>Amount to Spend (USDC)</label>
                   <div className={styles.amountWrap}>
-                    <input className={styles.input} inputMode="decimal" value={indexAmountUi} onChange={(e) => setIndexAmountUi(e.target.value)} placeholder="1.0" aria-label="USDC amount to deposit" />
-                    <button className={styles.maxBtn} onClick={onMax} type="button">Max</button>
-                    <button className={styles.mintBtn} onClick={onMint} disabled={loading} type="button">
-                      {loading ? 'Processing…' : 'Buy'}
+                    <input
+                      type="number"
+                      className={styles.input}
+                      value={qty}
+                      onChange={e => setQty(e.target.value)}
+                      min="0"
+                      step="1"
+                      disabled={loading}
+                    />
+                    <button
+                      className={styles.mintBtn}
+                      onClick={handleMint}
+                      disabled={loading || !publicKey}
+                    >
+                      {loading ? 'Processing…' : `Deposit USDC`}
                     </button>
                   </div>
                 </div>
-                <div className={styles.grid}>
-                  <div className={styles.card}>
-                    <div className={styles.kv}><span>Estimated Index Price</span><strong>${estUsdcPerIndex.toFixed(2)}</strong></div>
-                    <div className={styles.kv}><span>Estimated Cost</span><strong>${estCost.toFixed(2)}</strong></div>
-                  </div>
-                  <div className={styles.card}>
-                    <div className={styles.kv}><span>Your USDC (Devnet)</span>
-                      <strong>{usdcBalance.toLocaleString(undefined, { maximumFractionDigits: 6 })}</strong></div>
-                    <div className={styles.kvSub}>Make sure you hold some SOL for network fees.</div>
-                  </div>
-                </div>
+                
                 <p className={styles.note}>
-                  This is a test transaction. It will deposit 1 USDC and attempt to mint the index token based on the on-chain NAV.
+                  This will transfer your USDC to the treasury. Your Index Tokens will be minted to your wallet by the backend service.
                 </p>
               </>
             )}
@@ -225,5 +198,3 @@ const BuyModal: React.FC<Props> = ({ isOpen, onClose, indexPrice }) => {
     </NetworkGuard>
   )
 }
-
-export default BuyModal

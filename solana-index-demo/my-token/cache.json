@@ -1,0 +1,26 @@
+{
+  "program": {
+    "candyMachine": "6TLsSqW2dkNjYGaRWCwoHwLrRKZJAiTRcAMT8YPUZwqj",
+    "candyGuard": "",
+    "candyMachineCreator": "J8sBtjqT3jBva4ru3W4pfU2XxbfXbAzJSa9ZZaVLYZCL",
+    "collectionMint": "8KE8cdtSsCJknFA6JdyYHniJ4XBvDWVZ4Ap6YUWkvUcP"
+  },
+  "items": {
+    "-1": {
+      "name": "Axis Index Collection",
+      "image_hash": "b48984f94b5d30b7760e6f7d97c74ca8c942778fa7434f5c6a64f1089dcbae8c",
+      "image_link": "https://gateway.irys.xyz/dHxnzwn7uyXo8yzLnhXUVPHZfDq34VTaXizEfqwA58H?ext=png",
+      "metadata_hash": "aee9d9c07831353b2471698883eea33bc77bc2fb2094f963fdf815db37403488",
+      "metadata_link": "https://gateway.irys.xyz/FWhYyu1Fp37NNgcE5K652DE6BTNVEDdCfDqZ8uXg1DHU",
+      "onChain": true
+    },
+    "0": {
+      "name": "Axis Index Token",
+      "image_hash": "b48984f94b5d30b7760e6f7d97c74ca8c942778fa7434f5c6a64f1089dcbae8c",
+      "image_link": "https://gateway.irys.xyz/Bm2fXmmLF5Na5q9icvHNwzmuLSFS362gKRfCYqkc3q6V?ext=png",
+      "metadata_hash": "56adf4552cb4c396bb16e73a44c655ed03c6e7a5471d59b0f6790a5275aa9645",
+      "metadata_link": "https://gateway.irys.xyz/9mueAXzJrFbn6ZFxF2Xc3zGPBMvzxWZK2qQ49G9K8HuH",
+      "onChain": true
+    }
+  }
+}

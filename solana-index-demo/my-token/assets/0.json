@@ -1,0 +1,14 @@
+{
+    "name": "Axis Index Token",
+    "symbol": "AXIS",
+    "description": "An equally weighted index to capture the true sentiment of the crypto market.",
+    "image": "0.png",
+    "attributes": [
+        { "trait_type": "Asset Class", "value": "Index Token" }
+    ],
+    "properties": {
+        "files": [
+            { "uri": "0.png", "type": "image/png" }
+        ]
+    }
+}
