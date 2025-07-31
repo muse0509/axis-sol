@@ -19,9 +19,10 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import type { EChartProps } from '../components/EChartsChart'
 import BuyModal from '../components/BuyModal'
+
  import dynamic from 'next/dynamic'
  const WalletBar = dynamic(() => import('@/components/WalletBar'), { ssr: false })
-
+ const BurnModal = dynamic(() => import('@/components/BurnModal'), { ssr: false })
 /* ---------- Lazy‑load ECharts ---------- */
 const EChartsChart = dynamic<EChartProps>(
   () => import('../components/EChartsChart'),
@@ -106,6 +107,7 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
   const [assets,      setAssets]      = useState<RealTimeAsset[]>([])
   const [loading,     setLoading]     = useState(true)
   const [modalOpen,   setModalOpen]   = useState(false)
+  const [burnOpen,  setBurnOpen]  = useState(false)
   const [currentIdx,  setCurrentIdx]  = useState<number | null>(null)
 
   /* ---------- Particles ---------- */
@@ -204,6 +206,9 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
             <button onClick={() => setModalOpen(true)} className={styles.primaryButton}>
               Buy Index Token
             </button>
+            <button onClick={() => setBurnOpen(true)} className={styles.secondaryButton}>
+              Burn Index Token
+            </button>
             <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.secondaryButton}>
               Read WhitePaper
             </a>
@@ -284,6 +289,12 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
 
       {/* --- Buy modal --- */}
       <BuyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} indexPrice={currentIdx ?? latestClose} />
+      <BurnModal
+        isOpen={burnOpen}
+        onClose={() => setBurnOpen(false)}
+        indexPrice={currentIdx ?? latestClose}
+      />
+
     </>
   )
 }

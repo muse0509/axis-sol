@@ -1,34 +1,22 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
-  webpack: (config, { isServer }) => {
-    // `fs`モジュールをサーバーサイドでのみ有効にする
+
+  // ⬇︎ トップレベル。プロトコル無しの「ホスト名」だけを書く
+  allowedDevOrigins: [
+    '0351cfe3887d.ngrok-free.app',
+  ],
+
+  webpack: (config: any, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
+      // fs モジュールをクライアント側で解決しない
+      config.resolve ??= {};
+      config.resolve.fallback ??= {};
       config.resolve.fallback.fs = false;
     }
-
-    // Solanaのライブラリが必要とするNode.jsのコアモジュールを
-    // ブラウザで動作するように設定する
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      crypto: require.resolve('crypto-browserify'),
-      stream: require.resolve('stream-browserify'),
-      assert: require.resolve('assert/'),
-      http: require.resolve('stream-http'),
-      https: require.resolve('https-browserify'),
-      os: require.resolve('os-browserify/browser'),
-      buffer: require.resolve('buffer/'),
-    };
-
-    // Bufferをグローバルに利用可能にするための設定
-    config.plugins.push(
-      new (require('webpack').ProvidePlugin)({
-        Buffer: ['buffer', 'Buffer'],
-      })
-    );
-    
     return config;
   },
-};
+}
 
-module.exports = nextConfig;
+export default nextConfig
