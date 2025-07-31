@@ -1,8 +1,10 @@
 {
     "name": "AXIS Index Token",
     "symbol": "AXIS",
-    "description": "Index token tracking the Market Pulse Index.",
-    "image": "https://github.com/muse0509/axis-sol/blob/main/solana-index-demo/public/axisToken.png",
-    "attributes": []
+    "description": "Equally weighted crypto market index token.",
+    "image": "https://raw.githubusercontent.com/muse0509/axis-sol/main/solana-index-demo/my-token/assets/0.png",
+    "extensions": {
+      "website": "https://www.axis-protocol.xyz"
+    }
   }
   

@@ -1,70 +1,188 @@
+/* /styles/BuyModal.module.css */
+
+/* --- Backdrop & Modal Container --- */
 .backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
 .modal {
-  background: #fff;
-  border-radius: 8px;
-  width: 400px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  width: 420px;
+  background: linear-gradient(180deg, #0b1020 0%, #0d1226 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  color: #e7ecff;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
+/* --- Header --- */
 .header {
-  padding: 16px;
-  background: #f5f5f5;
+  padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff4d4d; /* Red for disconnected */
+}
+.dotOn {
+  background-color: #4dff88; /* Green for connected */
+  box-shadow: 0 0 5px #4dff88;
+}
+.statusText {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.networkBadge {
+  background: rgba(123, 162, 255, 0.12);
+  color: #aecdff;
+  border: 1px solid rgba(123, 162, 255, 0.28);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
 }
 
 .close {
   background: none;
   border: none;
-  font-size: 1.2rem;
   cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+.close:hover {
+  color: rgba(255, 255, 255, 0.9);
 }
 
+/* --- Body --- */
 .body {
-  padding: 16px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+/* Wallet Not Connected State */
+.centerBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 0;
+}
+.connectHint {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 24px;
+}
+.walletBtnWrap {
+  /* WalletMultiButtonのスタイルを上書きするためのラッパー */
+}
+/* グローバルCSSでWalletMultiButton自体を調整するか、
+   以下のようにラッパー内でセレクタを特定してスタイルを適用します */
+.walletBtnWrap > .wallet-adapter-button {
+  background: #7aa2ff;
+  color: #0b1020;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+.walletBtnWrap > .wallet-adapter-button:hover {
+  background: #97b5ff;
+}
+
+
+/* Wallet Connected State */
 .infoRow {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.infoRow span {
+  color: rgba(255, 255, 255, 0.6);
+}
+.infoRow strong {
+  color: #fff;
+  font-weight: 600;
+  font-family: monospace; /* 数字は見やすく */
 }
 
 .row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.row label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+.amountWrap {
+  display: flex;
+  gap: 8px;
 }
 
 .input {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e7ecff;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.input:focus {
+  outline: none;
+  border-color: #7aa2ff;
+  box-shadow: 0 0 0 2px rgba(122, 162, 255, 0.3);
 }
 
 .mintBtn {
-  padding: 8px 16px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+  padding: 12px 20px;
+  background: #7aa2ff;
+  color: #0b1020;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 700;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+.mintBtn:hover:not(:disabled) {
+  background: #97b5ff;
+}
+.mintBtn:disabled {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
 }
 
-.mintBtn:disabled {
-  background: #aaa;
-  cursor: not-allowed;
+.note {
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  line-height: 1.5;
 }
