@@ -135,23 +135,45 @@ const prevStyle = {
   const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
   const originalText = handleEl?.textContent ?? '';
   if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
+  const now = new Date();
+const tsText = new Intl.DateTimeFormat('ja-JP', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  timeZoneName: 'short',   // ← "JST" を付けたい場合
+  hour12: false,
+}).format(now);  // Intl はロケール/タイムゾーンに基づく公式手段です。:contentReference[oaicite:3]{index=3}
+
+const canvas = await html2canvas(el, {
+  width: w,
+  height: h,
+  scrollX: 0,
+  scrollY: 0,
+  scale: 2,
+  useCORS: true,
+  backgroundColor: null,
+  onclone: (doc) => {
+    // 既存：ハンドルの差し込み
+    const hNode = doc.getElementById('handle-preview');
+    if (hNode) hNode.textContent = twitterHandle || '@your_handle';
+
+    // 既存：不要要素の非表示
+    const p = doc.getElementById('preview-particles');
+    if (p) (p as HTMLElement).style.visibility = 'hidden';
+
+    // ★ 新規：作成日時を “クローンにだけ” 差し込み＆表示
+    const tsNode = doc.getElementById('timestamp') as HTMLElement | null;
+    if (tsNode) {
+      tsNode.textContent = `Created: ${tsText}`;
+      tsNode.style.display = 'block';    // ← UIでは非表示だった要素を、クローンでだけ表示
+    }
+  },
+});
   
-  // ★ windowWidth/windowHeight は指定しない（再レイアウトの原因）
-  const canvas = await html2canvas(el, {
-    width: w,
-    height: h,
-    scrollX: 0,
-    scrollY: 0,
-    scale: 2,
-    useCORS: true,
-    backgroundColor: null,
-    onclone: (doc) => {
-      const hNode = doc.getElementById('handle-preview');
-      if (hNode) hNode.textContent = twitterHandle || '@your_handle';
-      const p = doc.getElementById('preview-particles');
-      if (p) (p as HTMLElement).style.visibility = 'hidden';
-    },
-  });
   
   // 画像保存（既存のまま）
   const image = canvas.toDataURL('image/png');
@@ -226,6 +248,7 @@ const prevStyle = {
               </span>
               <span>Tag @Axis__Solana to participate!</span>
             </div>
+            <div id="timestamp" className={styles.timestamp} aria-hidden="true"></div>
           </div>
         </div>
 
