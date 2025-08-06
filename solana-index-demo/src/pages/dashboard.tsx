@@ -212,6 +212,9 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
             <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.secondaryButton}>
               Read WhitePaper
             </a>
+            <a href="/challenge" target="_blank" rel="noopener noreferrer" className={styles.secondaryButton}>
+                Create Challenge Image
+              </a>
           </motion.div>
 
           {/* --- Powered by --- */}
