@@ -89,66 +89,86 @@ const ChallengePage: NextPage = () => {
         window.scrollTo(0, 0); // ← 重要
   
         // 2) キャプチャ用に一時的に「内容ぶんのサイズ」に広げる
-        const prevStyle = {
-          height: el.style.height,
-          maxHeight: el.style.maxHeight,
-          overflow: el.style.overflow,
-          transform: el.style.transform,
-        };
+        // 直前までの処理はそのまま
+
+// スタイル退避
+const prevStyle = {
+    height: el.style.height,
+    maxHeight: el.style.maxHeight,
+    overflow: el.style.overflow,
+    transform: el.style.transform,
+  };
   
-        // Framer Motion 等の transform があると計測が狂うことがあるので一時解除
-        el.style.transform = 'none';
-        // 重要：overflow を可視化、固定高さを解除
-        el.style.maxHeight = 'none';
-        el.style.overflow  = 'visible';
+  // 計測のため一時的にレイアウト制約を外す
+  el.style.transform = 'none';
+  el.style.maxHeight = 'none';
+  el.style.overflow  = 'visible';
   
-        // scroll サイズを計測
-        const w = el.scrollWidth;
-        const h = el.scrollHeight;
-        el.style.height = h + 'px';
+  // ★ 高さ固定をいったん解除（CSS で 675px 固定されているため）
+  const prevHeightInline = el.style.height;
+  el.style.height = 'auto';
   
-        // レイアウト反映を 1 フレーム待つ
-        await new Promise(requestAnimationFrame);
+  // 1フレーム待ってレイアウト反映
+  await new Promise(requestAnimationFrame);
   
-        const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
-        const originalText = handleEl?.textContent ?? '';
-        if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
+  // 横幅は border を含む実寸
+  const rect = el.getBoundingClientRect();
+  const w = Math.round(rect.width);
   
-        const canvas = await html2canvas(el, {
-          // ← ここが切れ対策の肝：内容ぶんの幅・高さで確定撮り
-          width: w,
-          height: h,
-          windowWidth: w,
-          windowHeight: h,
-          // 念のためスクロールの影響を排除
-          scrollX: 0,
-          scrollY: 0,
-          scale: 2,
-          useCORS: true,
-          backgroundColor: null,
-          onclone: (doc) => {
-            const hNode = doc.getElementById('handle-preview');
-            if (hNode) hNode.textContent = twitterHandle || '@your_handle';
-            // 背景の Particles など、不要ならここで非表示にしてもOK
-            const p = doc.getElementById('preview-particles');
-            if (p) (p as HTMLElement).style.visibility = 'hidden';
-          },
-        });
+  // 縦は “中身の総量”（padding 含む・border 含まず）
+  const contentH = Math.ceil(el.scrollHeight);
   
-        const image = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = image;
-        link.download = 'AxisAnalystChallenge.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+  // border 分を加算して「見た目の総高さ」にする
+  const cs = getComputedStyle(el);
+  const borderV =
+    Math.ceil(parseFloat(cs.borderTopWidth || '0')) +
+    Math.ceil(parseFloat(cs.borderBottomWidth || '0'));
+  const h = contentH + borderV;
   
-        // 復元
-        if (handleEl) handleEl.textContent = originalText;
-        el.style.height    = prevStyle.height;
-        el.style.maxHeight = prevStyle.maxHeight;
-        el.style.overflow  = prevStyle.overflow;
-        el.style.transform = prevStyle.transform;
+  // ここで高さをロック（キャプチャ中に動かないように）
+  el.style.height = h + 'px';
+  
+  // 念のため1フレーム
+  await new Promise(requestAnimationFrame);
+  
+  // ハンドルのテキスト調整（既存のまま）
+  const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
+  const originalText = handleEl?.textContent ?? '';
+  if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
+  
+  // ★ windowWidth/windowHeight は指定しない（再レイアウトの原因）
+  const canvas = await html2canvas(el, {
+    width: w,
+    height: h,
+    scrollX: 0,
+    scrollY: 0,
+    scale: 2,
+    useCORS: true,
+    backgroundColor: null,
+    onclone: (doc) => {
+      const hNode = doc.getElementById('handle-preview');
+      if (hNode) hNode.textContent = twitterHandle || '@your_handle';
+      const p = doc.getElementById('preview-particles');
+      if (p) (p as HTMLElement).style.visibility = 'hidden';
+    },
+  });
+  
+  // 画像保存（既存のまま）
+  const image = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = image;
+  link.download = 'AxisAnalystChallenge.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // 復元
+  if (handleEl) handleEl.textContent = originalText;
+  el.style.height    = prevHeightInline || prevStyle.height;
+  el.style.maxHeight = prevStyle.maxHeight;
+  el.style.overflow  = prevStyle.overflow;
+  el.style.transform = prevStyle.transform;
+  
       } catch (e) {
         console.error(e);
         alert('An error occurred while generating the image. Please try again.');
@@ -183,7 +203,7 @@ const ChallengePage: NextPage = () => {
           <div ref={previewRef} className={styles.previewContainer}>
             <Particles id="preview-particles" options={{ ...particlesOptions, background: { color: { value: '#000' } } }} className={styles.previewParticles} />
             <div className={styles.previewHeader}>
-              <h1 className={styles.italicTitle}>My #AxisAnalystChallenge</h1>
+              <h1 className={styles.italicTitle}>My #AxisAnalystChallenge 🏆</h1>
               <p>Index Rebalance Thesis</p>
             </div>
             <div className={styles.previewContent}>
@@ -202,7 +222,7 @@ const ChallengePage: NextPage = () => {
             </div>
             <div className={styles.previewFooter}>
               <span>Analysis by: 
-                <strong id="handle-preview">{twitterHandle || '@your_handle'}</strong>
+              <span id="handle-preview">{twitterHandle || '@your_handle'}</span>
               </span>
               <span>Tag @Axis__Solana to participate!</span>
             </div>
