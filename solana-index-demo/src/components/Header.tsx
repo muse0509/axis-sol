@@ -6,13 +6,14 @@ import Image from 'next/image';
 import styles from '../styles/Header.module.css';
 
 const navItems = [
-  { name: 'Home', href: '#hero' },
-  { name: 'Risks', href: '#risks' },
-  { name: 'Product', href: '#product' },
-  { name: 'Why Axis', href: '#why' },
-  { name: 'Roadmap', href: '#roadmap' },
-  { name: 'Team', href: '#team' },
-  { name: 'WL', href: '#waitlist' },
+  { name: 'Home', href: '/' },
+  { name: 'Risks', href: '/#risks' },
+  { name: 'Product', href: '/#product' },
+  { name: 'Why Axis', href: '/#why' },
+  { name: 'Roadmap', href: '/#roadmap' },
+  { name: 'Team', href: '/#team' },
+  { name: 'Leaderboard', href: '/leaderboard' },
+  { name: 'WL', href: '/#waitlist' },
 ];
 
 export const Header = () => {
@@ -29,7 +30,7 @@ export const Header = () => {
       {/* ---------- PC用ヘッダー (ガラス板) ---------- */}
       <div className={styles.wrapper}>
         <div className={styles.pill}>
-        <a href="#hero" className={styles.logoLink}>
+        <a href="/" className={styles.logoLink}>
             <Image
               src="/logo.png"  // ★ publicフォルダからのパス。ご自身のファイル名に変更してください。
               alt="Axis Protocol Logo" // ロゴの説明
