@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import { useCallback, useRef, useState, useEffect } from 'react' // useEffect をインポート
+import { useCallback, useRef, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { motion, AnimatePresence } from 'framer-motion'
 import Particles from 'react-tsparticles'
@@ -19,6 +18,32 @@ type TokenInfo = {
   reason: string
 }
 
+const ImagePreviewModal = ({ imageUrl, onClose }: { imageUrl: string; onClose: () => void }) => {
+  return (
+    <motion.div
+      className={styles.modalOverlay}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className={styles.modalContent}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button onClick={onClose} className={styles.modalCloseButton}><FiX /></button>
+        <img src={imageUrl} alt="Generated Challenge Preview" className={styles.generatedImage} />
+        <p className={styles.modalInstruction}>
+          Press and hold (or right-click) the image to save.
+        </p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 const ChallengePage: NextPage = () => {
   // --- STATE MANAGEMENT ---
   const [constituents, setConstituents] = useState<string[]>(CURRENT_CONSTITUENTS)
@@ -30,12 +55,20 @@ const ChallengePage: NextPage = () => {
 
   const previewRef = useRef<HTMLDivElement>(null)
   const [isDownloading, setIsDownloading] = useState(false)
-  // ★★★ 新しいstateを追加: 画像生成の準備状態を管理 ★★★
   const [isPreparing, setIsPreparing] = useState(false)
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+
+  // ★★★ デバイスがタッチ対応か判定するフラグ (一度だけ判定) ★★★
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => {
+    // クライアントサイドでのみ実行
+    setIsTouchDevice(('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+  }, []);
+
 
   const particlesInit = useCallback(async (engine: Engine) => { await loadSlim(engine) }, [])
 
-  // --- LOGIC (No Changes) ---
+  // --- LOGIC ---
   const handleRemove = (symbol: string) => {
     if (removedTokens.length >= 3) { alert('You can only remove up to 3 tokens.'); return }
     setConstituents(constituents.filter(s => s !== symbol))
@@ -63,14 +96,12 @@ const ChallengePage: NextPage = () => {
     setAddedTokens(addedTokens.filter(t => t.id !== id))
   }
 
-  // ★★★ 修正点 1: ボタンクリック時の処理をシンプル化 ★★★
-  // この関数は、画像生成の「準備開始」を指示するだけになります。
   const startDownloadProcess = () => {
+    if(isDownloading) return;
     setIsPreparing(true)
   }
 
-  // ★★★ 修正点 2: 画像生成の本体をuseEffectに移動 ★★★
-  // isPreparingがtrueになった後（＝画面更新が完了した後）に、この中身が実行されます。
+  // --- IMAGE GENERATION ---
   useEffect(() => {
     if (!isPreparing) return;
   
@@ -79,118 +110,69 @@ const ChallengePage: NextPage = () => {
       if (!el) { setIsPreparing(false); return; }
   
       setIsDownloading(true);
+      // このtry...finallyブロックはPC/スマホ共通
       try {
-        // 0) 文字欠け対策（任意・前回提案と同じ）
         if ((document as any).fonts?.ready) {
-          try { await (document as any).fonts.ready; } catch {}
+            try { await (document as any).fonts.ready; } catch(e) { console.warn('Font ready API failed.', e) }
+        }
+        window.scrollTo(0, 0);
+
+        // (この部分のスタイル操作は元のコードと同じです)
+        const originalStyle = {
+            transform: el.style.transform, maxHeight: el.style.maxHeight,
+            height: el.style.height, overflow: el.style.overflow
+        };
+        el.style.transform = 'none'; el.style.maxHeight = 'none';
+        el.style.height = 'auto'; el.style.overflow = 'visible';
+        await new Promise(res => requestAnimationFrame(res));
+  
+        const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
+        const originalText = handleEl?.textContent ?? '';
+        if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
+        const now = new Date();
+        const tsText = new Intl.DateTimeFormat('ja-JP', {
+            timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short', hour12: false,
+        }).format(now);
+
+        const canvas = await html2canvas(el, {
+          scale: 2, useCORS: true, backgroundColor: null, scrollX: -window.scrollX,
+          scrollY: -window.scrollY, windowWidth: document.documentElement.offsetWidth,
+          windowHeight: document.documentElement.offsetHeight,
+          onclone: (doc) => {
+            const hNode = doc.getElementById('handle-preview');
+            if (hNode) hNode.textContent = twitterHandle || '@your_handle';
+            const p = doc.getElementById('preview-particles');
+            if (p) (p as HTMLElement).style.visibility = 'hidden';
+            const tsNode = doc.getElementById('timestamp') as HTMLElement | null;
+            if (tsNode) {
+              tsNode.textContent = `Created: ${tsText}`;
+              tsNode.style.display = 'block';
+            }
+          },
+        });
+        
+        // ★★★ ここでPCとスマホの処理を分岐 ★★★
+        if (isTouchDevice) {
+          // 【スマホの場合】モーダルで画像を表示
+          const imageUrl = canvas.toDataURL('image/png');
+          setGeneratedImageUrl(imageUrl);
+        } else {
+          // 【PCの場合】画像を直接ダウンロード
+          const image = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = image;
+          link.download = 'AxisAnalystChallenge.png';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
   
-        // 1) スクロール起因のオフセットずれを避ける（既知のワークアラウンド）
-        window.scrollTo(0, 0); // ← 重要
-  
-        // 2) キャプチャ用に一時的に「内容ぶんのサイズ」に広げる
-        // 直前までの処理はそのまま
+        // スタイルを元に戻す
+        if (handleEl) handleEl.textContent = originalText;
+        el.style.transform = originalStyle.transform; el.style.maxHeight = originalStyle.maxHeight;
+        el.style.height = originalStyle.height; el.style.overflow = originalStyle.overflow;
 
-// スタイル退避
-const prevStyle = {
-    height: el.style.height,
-    maxHeight: el.style.maxHeight,
-    overflow: el.style.overflow,
-    transform: el.style.transform,
-  };
-  
-  // 計測のため一時的にレイアウト制約を外す
-  el.style.transform = 'none';
-  el.style.maxHeight = 'none';
-  el.style.overflow  = 'visible';
-  
-  // ★ 高さ固定をいったん解除（CSS で 675px 固定されているため）
-  const prevHeightInline = el.style.height;
-  el.style.height = 'auto';
-  
-  // 1フレーム待ってレイアウト反映
-  await new Promise(requestAnimationFrame);
-  
-  // 横幅は border を含む実寸
-  const rect = el.getBoundingClientRect();
-  const w = Math.round(rect.width);
-  
-  // 縦は “中身の総量”（padding 含む・border 含まず）
-  const contentH = Math.ceil(el.scrollHeight);
-  
-  // border 分を加算して「見た目の総高さ」にする
-  const cs = getComputedStyle(el);
-  const borderV =
-    Math.ceil(parseFloat(cs.borderTopWidth || '0')) +
-    Math.ceil(parseFloat(cs.borderBottomWidth || '0'));
-  const h = contentH + borderV;
-  
-  // ここで高さをロック（キャプチャ中に動かないように）
-  el.style.height = h + 'px';
-  
-  // 念のため1フレーム
-  await new Promise(requestAnimationFrame);
-  
-  // ハンドルのテキスト調整（既存のまま）
-  const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
-  const originalText = handleEl?.textContent ?? '';
-  if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
-  const now = new Date();
-const tsText = new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  timeZoneName: 'short',   // ← "JST" を付けたい場合
-  hour12: false,
-}).format(now);  // Intl はロケール/タイムゾーンに基づく公式手段です。:contentReference[oaicite:3]{index=3}
-
-const canvas = await html2canvas(el, {
-  width: w,
-  height: h,
-  scrollX: 0,
-  scrollY: 0,
-  scale: 2,
-  useCORS: true,
-  backgroundColor: null,
-  onclone: (doc) => {
-    // 既存：ハンドルの差し込み
-    const hNode = doc.getElementById('handle-preview');
-    if (hNode) hNode.textContent = twitterHandle || '@your_handle';
-
-    // 既存：不要要素の非表示
-    const p = doc.getElementById('preview-particles');
-    if (p) (p as HTMLElement).style.visibility = 'hidden';
-
-    // ★ 新規：作成日時を “クローンにだけ” 差し込み＆表示
-    const tsNode = doc.getElementById('timestamp') as HTMLElement | null;
-    if (tsNode) {
-      tsNode.textContent = `Created: ${tsText}`;
-      tsNode.style.display = 'block';    // ← UIでは非表示だった要素を、クローンでだけ表示
-    }
-  },
-});
-  
-  
-  // 画像保存（既存のまま）
-  const image = canvas.toDataURL('image/png');
-  const link = document.createElement('a');
-  link.href = image;
-  link.download = 'AxisAnalystChallenge.png';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  // 復元
-  if (handleEl) handleEl.textContent = originalText;
-  el.style.height    = prevHeightInline || prevStyle.height;
-  el.style.maxHeight = prevStyle.maxHeight;
-  el.style.overflow  = prevStyle.overflow;
-  el.style.transform = prevStyle.transform;
-  
       } catch (e) {
         console.error(e);
         alert('An error occurred while generating the image. Please try again.');
@@ -201,8 +183,7 @@ const canvas = await html2canvas(el, {
     };
   
     generateImage();
-  }, [isPreparing, twitterHandle]);
-   // isPreparingが変更された時に実行
+  }, [isPreparing, twitterHandle, isTouchDevice]); // ★★★ 依存配列に isTouchDevice を追加 ★★★
 
 
   // --- X SHARE URL ---
@@ -217,10 +198,20 @@ const canvas = await html2canvas(el, {
         <meta name="description" content="Create your custom image for the #AxisAnalystChallenge" />
       </Head>
 
+      {/* モーダルは isTouchDevice で表示/非表示を制御する必要はない */}
+      {/* generatedImageUrl がセットされた時だけ表示されるため、スマホの時しか表示されない */}
+      <AnimatePresence>
+        {generatedImageUrl && (
+            <ImagePreviewModal
+                imageUrl={generatedImageUrl}
+                onClose={() => setGeneratedImageUrl(null)}
+            />
+        )}
+      </AnimatePresence>
+
       <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className={styles.particles} />
 
       <main className={styles.main}>
-        {/* Upper Preview Panel */}
         <div className={styles.previewPanel}>
           <div ref={previewRef} className={styles.previewContainer}>
             <Particles id="preview-particles" options={{ ...particlesOptions, background: { color: { value: '#000' } } }} className={styles.previewParticles} />
@@ -243,18 +234,15 @@ const canvas = await html2canvas(el, {
               </div>
             </div>
             <div className={styles.previewFooter}>
-              <span>Analysis by: 
-              <span id="handle-preview">{twitterHandle || '@your_handle'}</span>
-              </span>
+              <span>Analysis by: <span id="handle-preview">{twitterHandle || '@your_handle'}</span></span>
               <span>Tag @Axis__Solana to participate!</span>
             </div>
             <div id="timestamp" className={styles.timestamp} aria-hidden="true"></div>
           </div>
         </div>
 
-        {/* Lower Control Panel */}
         <div className={`${styles.controlPanel} ${styles.glass}`}>
-          {/* Panel 1-3 ... (変更なし) */}
+          {/* ... Panel 1-3 は変更なし ... */}
           <div className={styles.controlSection}>
             <h2 className={styles.controlTitle}>1. Select Tokens to Remove</h2>
             <motion.div layout className={styles.tokenGrid}><AnimatePresence>{constituents.map(symbol => (<motion.div key={symbol} layoutId={symbol} initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} onClick={() => handleRemove(symbol)} className={styles.tokenPill} whileHover={{ scale: 1.1, backgroundColor: '#333' }}>{symbol}</motion.div>))}</AnimatePresence></motion.div>
@@ -269,7 +257,6 @@ const canvas = await html2canvas(el, {
             <div className={styles.listContainer}>{addedTokens.map(token => (<motion.div key={token.id} layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className={styles.listCard}><div className={styles.listCardHeader}><span>{token.symbol}</span><button onClick={() => handleDeleteAdded(token.id)} className={styles.revertButton}><FiX /></button></div><p className={styles.reasonText}>{token.reason || 'No reason provided.'}</p></motion.div>))}</div>
           </div>
 
-          {/* Panel 4: Finalize & Share */}
           <div className={styles.actionSection}>
             <h2 className={styles.controlTitle}>4. Finalize & Share</h2>
             <div className={styles.handleInputGroup}>
@@ -277,12 +264,14 @@ const canvas = await html2canvas(el, {
               <input type="text" placeholder="@your_handle" value={twitterHandle} onChange={(e) => setTwitterHandle(e.target.value)} />
             </div>
             <div className={styles.actionButtons}>
-              {/* ★★★ ボタンがクリックされたら新しい関数を呼ぶ ★★★ */}
               <button onClick={startDownloadProcess} className={styles.downloadButton} disabled={isDownloading}>
                 <FiDownload />
-                <span>{isDownloading ? 'Generating...' : 'Download Image'}</span>
+                {/* ★★★ ボタンのテキストを分かりやすく変更 ★★★ */}
+                <span>{isDownloading ? 'Generating...' : (isTouchDevice ? 'Generate Image' : 'Download Image')}</span>
               </button>
-              <p className={styles.instructionText}>Download the image and then post it!</p>
+              <p className={styles.instructionText}>
+                {isTouchDevice ? 'Generate image first, then post it!' : 'Download the image and then post it!'}
+              </p>
               <a href={shareUrl} target="_blank" rel="noopener noreferrer" className={styles.shareButton}>
                 <FaXTwitter />
                 <span>Post on X</span>
