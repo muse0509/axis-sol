@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift, Users, Mail, TrendingUp } from 'lucide-react';
+import { Brain, Clock, Shield, Rocket, Flag, Target, Zap, Compass, Send, Wallet, CheckCircle, Key, Lock, Gift, Users, Mail, TrendingUp, Trophy } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import styles from '../styles/Landing.module.css';
@@ -12,6 +12,7 @@ import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
 import { Footer } from '../components/Footer';
 import calendlyStyles from '../styles/Calendly.module.css';
+import { useReferral } from '../utils/useReferral';
 
 
 // --- セクション別コンポーネント ---
@@ -55,6 +56,9 @@ const HeroSection = () => (
       >
         <Link href="/dashboard" className={styles.ctaButtonPrimary}>
           View Demo App
+        </Link>
+        <Link href="/leaderboard" className={styles.ctaButtonSecondary}>
+          <Trophy size={18} /> View Leaderboard
         </Link>
         <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:576b9b2d-51bb-4c45-9dae-82d78bf332e6" target="_blank" rel="noopener noreferrer" className={styles.ctaButtonSecondary}>
           View Pitch Deck →
@@ -242,6 +246,7 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
     const { setVisible } = useWalletModal();
     const [isJoined, setIsJoined] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { referrer, hasReferrer } = useReferral();
 
     const handleJoin = async () => {
         if (!publicKey) return;
@@ -281,11 +286,18 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
         </div>
         <div className={styles.waitlistLayout}>
             <div className={styles.benefitsContainer}>
+                {hasReferrer && (
+                    <div className={styles.referralNotice}>
+                        <p>🎉 You were referred by a community member!</p>
+                        <p>You'll receive bonus rewards when you join.</p>
+                    </div>
+                )}
                 <h4>By joining, you become eligible for:</h4>
                 <ul className={styles.benefitsList}>
                     <li><Key size={20} /> <span>Early access to our beta platform.</span></li>
                     <li><Gift size={20} /> <span>Future airdrops and community rewards.</span></li>
                     <li><Lock size={20} /> <span>A secured spot for upcoming product launches.</span></li>
+                    <li><Trophy size={20} /> <span>Referral rewards for inviting friends.</span></li>
                 </ul>
                 <p className={styles.privacyNote}>We respect your privacy. We only store your wallet address and nothing else.</p>
             </div>
