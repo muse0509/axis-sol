@@ -36,6 +36,9 @@ const EChartsChart = dynamic<EChartProps>(
   }
 )
 
+/* ---------- External API base ---------- */
+const API_BASE = 'https://axis-trigger.kidneyweakx.workers.dev'
+
 /* ---------- 型 ---------- */
 type FeedPrice = { price: string; expo: number }
 type PythFeed  = { id: string;   price: FeedPrice }
@@ -54,6 +57,16 @@ interface CalculationBreakdown {
 interface LatestEntry  { created_at: string; index_value: number }
 interface MarketEvent  { event_date: string; title: string; description: string }
 type EChartsData  = (string | number)[][]
+
+/* ---------- FAMC index API response ---------- */
+interface FamcIndexResponse {
+  indexPrice: number
+  baseDate: string
+  baseIndex: number
+  currentIndex: number
+  symbols: string[]
+  count: number
+}
 
 interface Props {
   initialLatestEntry: LatestEntry | null
@@ -113,13 +126,6 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
   /* ---------- Particles ---------- */
   const particlesInit = useCallback(async (engine: Engine) => { await loadSlim(engine) }, [])
 
-  /* ---------- Base price lookup ---------- */
-  const basePriceMap = useMemo(() => {
-    const map: Record<string, number> = {}
-    baseDayData.assets.forEach(a => { map[a.symbol] = a.basePrice })
-    return map
-  }, [])
-
   /* ---------- Fetch latest price every 5 s ---------- */
   useEffect(() => {
     const es = new EventSource('/api/price-stream')
@@ -146,16 +152,30 @@ const Home: NextPage<Props> = ({ initialLatestEntry, initialDailyChange, events,
                   )
                   return same ? prev : mapped
                 })
-                const sum = mapped.reduce((s, a) => {
-                 const bp = basePriceMap[a.symbol]; return bp ? s + a.currentPrice / bp : s
-               }, 0)
-                setCurrentIdx(100 * (sum / baseDayData.assets.length))
                 setLoading(false)
               } catch {}
             }
             es.onerror = () => { /* 自動再接続に任せる */ }
             return () => es.close()
-          }, [basePriceMap])
+          }, [])
+
+  /* ---------- Poll normalized index from external endpoint ---------- */
+  useEffect(() => {
+    let cancelled = false
+    const fetchIndex = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/famcindexprice`)
+        if (!res.ok) return
+        const data: FamcIndexResponse = await res.json()
+        if (!cancelled && typeof data.indexPrice === 'number') {
+          setCurrentIdx(data.indexPrice)
+        }
+      } catch {}
+    }
+    fetchIndex()
+    const id = setInterval(fetchIndex, 5000)
+    return () => { cancelled = true; clearInterval(id) }
+  }, [])
   /* ---------- CSV error fallback ---------- */
   if (error || !initialLatestEntry || !echartsData?.length) {
     return (
