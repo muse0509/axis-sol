@@ -1,5 +1,5 @@
 {
-  "name": "axis-sdk",
+  "name": "@axis-protocol/sdk",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
