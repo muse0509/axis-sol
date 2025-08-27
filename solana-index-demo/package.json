@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@axis-protocol/sdk": "^1.0.2",
     "@coral-xyz/anchor": "^0.31.1",
     "@jup-ag/api": "^6.0.44",
     "@meteora-ag/dlmm": "^1.5.5",

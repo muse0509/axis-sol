@@ -108,7 +108,7 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
       setBusy(true); setErrorMsg(null); setStep('building')
 
       // Dynamic import to avoid SSR issues
-      const { AxisSDK } = await import('@/axis-sdk/AxisSDK')
+      const { AxisSDK } = await import('@axis-protocol/sdk')
       const sdk = new AxisSDK(connection, wallet)
 
       const { transaction, memoId: mid } = await sdk.buildIndexTokenDepositTransaction(qAxis)
