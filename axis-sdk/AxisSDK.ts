@@ -13,8 +13,14 @@ import {
     createTransferCheckedInstruction,     // AXIS (Token-2022)
     TOKEN_2022_PROGRAM_ID,
   } from '@solana/spl-token'
-  import type { WalletContextState } from '@solana/wallet-adapter-react'
   import { Buffer } from 'buffer'
+  
+  // Define a minimal wallet interface
+  interface WalletContextState {
+    publicKey: PublicKey | null
+    signTransaction: (transaction: VersionedTransaction) => Promise<VersionedTransaction>
+    signAllTransactions: (transactions: VersionedTransaction[]) => Promise<VersionedTransaction[]>
+  }
   
   // Ensure Buffer exists in the browser bundle
   if (typeof globalThis !== 'undefined' && !(globalThis as any).Buffer) {
