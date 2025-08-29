@@ -14,7 +14,6 @@ import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi'
 import CountUp from 'react-countup'
 import { motion, Variants } from 'framer-motion'
 
-import styles from '../../styles/Dashboard.module.css'
 import { particlesOptions } from '../../utils/particles'
 import type { EChartProps } from '../../components/EChartsChart'
 import BuyModal from '../../components/BuyModal'
@@ -136,9 +135,9 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
 
   if (error || !initialLatestEntry || !echartsData?.length) {
     return (
-      <div className={styles.container}>
-        <main className={styles.main}>
-          <h1 className={styles.title}>Error</h1>
+      <div className="px-6 md:px-16 bg-black text-white min-h-screen overflow-x-hidden relative">
+        <main className="min-h-screen py-8 md:py-16 flex flex-col items-center z-10 relative">
+          <h1 className="m-0 leading-tight text-4xl md:text-6xl font-bold tracking-tighter flex items-center gap-4 md:gap-6">Error</h1>
           <p>{error || 'No data available.'}</p>
         </main>
       </div>
@@ -152,74 +151,74 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
 
   return (
     <>
-      <div className={styles.container}>
-        <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className={styles.particles} />
+      <div className="px-6 md:px-16 bg-black text-white min-h-screen overflow-x-hidden relative">
+        <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className="fixed inset-0 w-full h-full z-0 pointer-events-none" />
 
-        <main className={styles.main}>
-          <motion.h1 className={styles.title} initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+        <main className="min-h-screen py-8 md:py-16 flex flex-col items-center z-10 relative">
+          <motion.h1 className="m-0 leading-tight text-4xl md:text-6xl font-bold tracking-tighter flex items-center gap-4 md:gap-6" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <Image src="/logo.png" alt="Logo" width={250} height={200} priority />
           </motion.h1>
 
-          <motion.p className={styles.description} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
+          <motion.p className="my-4 mb-8 leading-relaxed text-lg md:text-xl text-gray-400 text-center max-w-[600px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
             An equally weighted index designed to capture the true sentiment of the crypto market, moving beyond the bias of major assets.
           </motion.p>
 
           <WalletBar />
 
-          <motion.div className={styles.callToActionContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
-            <button onClick={() => setModalOpen(true)} className={styles.primaryButton}>
+          <motion.div className="flex flex-col md:flex-row gap-4 mb-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
+            <button onClick={() => setModalOpen(true)} className="inline-block px-7 py-3 rounded-lg text-base font-semibold no-underline transition-all duration-200 ease-in-out border border-transparent cursor-pointer bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.3)] hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(255,255,255,0.4)]">
               Buy Index Token
             </button>
-            <button onClick={() => setBurnOpen(true)} className={styles.secondaryButton}>
+            <button onClick={() => setBurnOpen(true)} className="inline-block px-7 py-3 rounded-lg text-base font-semibold no-underline transition-all duration-200 ease-in-out border border-transparent cursor-pointer bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/30">
               Burn Index Token
             </button>
-            <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className={styles.secondaryButton}>
+            <a href="https://muse-7.gitbook.io/axiswhitepaper/" target="_blank" rel="noopener noreferrer" className="inline-block px-7 py-3 rounded-lg text-base font-semibold no-underline transition-all duration-200 ease-in-out border border-transparent cursor-pointer bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/30">
               Read WhitePaper
             </a>
-            <a href="/challenge" target="_blank" rel="noopener noreferrer" className={styles.secondaryButton}>
+            <a href="/challenge" target="_blank" rel="noopener noreferrer" className="inline-block px-7 py-3 rounded-lg text-base font-semibold no-underline transition-all duration-200 ease-in-out border border-transparent cursor-pointer bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/30">
               Create Challenge Image
             </a>
           </motion.div>
 
-          <motion.div className={styles.techStack} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}>
-            <p className={styles.poweredBy}>Powered by&nbsp;</p>
+          <motion.div className="flex items-center gap-2 mb-12 text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}>
+            <p className="text-gray-400">Powered by&nbsp;</p>
             <Image src="/magicblock-logo.png" alt="MagicBlock" width={180} height={32} />
           </motion.div>
 
-          <motion.div className={styles.indexDisplay} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
-            <p className={styles.indexLabel}>Current Index Value (Base: 100)</p>
-            <div className={styles.indexValueContainer}>
-              <div className={styles.indexValue}>
+          <motion.div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 text-center backdrop-blur-md mb-12 w-full max-w-[500px]" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.8 }}>
+            <p className="m-0 mb-4 text-lg md:text-xl text-gray-400 font-medium">Current Index Value (Base: 100)</p>
+            <div className="flex flex-col md:flex-row items-baseline justify-center gap-4 md:gap-6">
+              <div className="text-4xl md:text-6xl font-bold leading-none bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent text-shadow-[0_0_25px_rgba(255,255,255,0.6)]">
                 <CountUp end={displayedIdx} decimals={2} duration={0.2} separator="," />
               </div>
               {initialDailyChange !== null && (
-                <div className={`${styles.changeContainer} ${initialDailyChange >= 0 ? styles.positiveChange : styles.negativeChange}` }>
+                <div className={`text-2xl md:text-3xl font-semibold flex items-center gap-2 ${initialDailyChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {initialDailyChange >= 0 ? <FiTrendingUp /> : <FiTrendingDown />}
                   <CountUp key="daily-change" end={initialDailyChange} decimals={2} duration={0.5} suffix="%" />
-                  <span>(24H)</span>
+                  <span className="text-sm text-gray-400 font-normal ml-1">(24H)</span>
                 </div>
               )}
             </div>
           </motion.div>
 
-          <motion.div className={styles.constituentContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            <div className={styles.constituentHeader}>
-              <h2 className={styles.constituentTitle}>Index Constituents</h2>
-              <p className={styles.constituentDescription}>Each asset is equally weighted at 10% to ensure a balanced market representation.</p>
-              <p className={styles.constituentDisclaimer}>Prices are updated every five seconds via Pyth oracle feeds.</p>
+          <motion.div className="w-full max-w-[1000px] mb-12" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl md:text-3xl font-semibold m-0">Index Constituents</h2>
+              <p className="text-gray-400 max-w-[450px] mx-auto mt-2">Each asset is equally weighted at 10% to ensure a balanced market representation.</p>
+              <p className="text-gray-500 text-sm max-w-[450px] mx-auto mt-4 italic">Prices are updated every five seconds via Pyth oracle feeds.</p>
             </div>
 
             {loading ? (
-              <div className={styles.loadingText}>Loading real-time prices…</div>
+              <div className="text-center text-lg">Loading real-time prices…</div>
             ) : (
-              <div className={styles.constituentGrid}>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {assets.map(a => (
-                  <div key={a.symbol} className={styles.assetCard}>
-                    <div className={styles.assetHeader}>
-                      <span className={styles.assetSymbol}>{a.symbol}</span>
-                      <span className={styles.assetWeight}>10%</span>
+                  <div key={a.symbol} className="bg-white/5 border border-white/10 rounded-2xl p-3 md:p-4 transition-all duration-200 ease-in-out flex flex-col gap-3 md:gap-4 hover:-translate-y-1 hover:bg-white/15 hover:border-white/20">
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl md:text-3xl font-semibold">{a.symbol}</span>
+                      <span className="text-xs md:text-sm font-medium text-gray-400 bg-white/10 px-2 py-1 rounded-md">10%</span>
                     </div>
-                    <div className={styles.assetPrice}>
+                    <div className="text-2xl md:text-3xl font-medium text-left">
                       <CountUp key={`${a.symbol}-price`} end={a.currentPrice} decimals={a.currentPrice < 1 ? 5 : 2} duration={0.5} separator="," prefix="$" />
                     </div>
                   </div>
@@ -228,19 +227,22 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
             )}
           </motion.div>
 
-          <motion.div className={styles.chartContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+          <motion.div className="w-full max-w-[1000px] bg-white/5 border border-white/10 rounded-2xl p-4 md:p-8 backdrop-blur-md mb-12" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
             {echartsData && <EChartsChart data={echartsData} events={events} disableAnimation />}
           </motion.div>
 
-          <motion.div className={styles.timelineContainer} variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            <h2 className={styles.timelineTitle}>Event Timeline</h2>
-            <div className={styles.eventList}>
+          <motion.div className="w-full max-w-[1000px] mb-12" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
+            <h2 className="text-2xl md:text-3xl mb-6 border-l-4 border-white pl-4">Event Timeline</h2>
+            <div className="flex flex-col gap-8">
               {events.map(ev => (
-                <div key={ev.title} className={styles.eventItem}>
-                  <div className={styles.eventDate}>{new Date(ev.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
-                  <div className={styles.eventDetails}>
-                    <h3 className={styles.eventTitle}>{ev.title}</h3>
-                    <p className={styles.eventDescription}>{ev.description}</p>
+                <div key={ev.title} className="flex flex-col md:flex-row gap-3 md:gap-6 border-l-2 border-gray-500 pl-4 md:pl-6 relative">
+                  <div className="absolute left-[-7px] top-[5px] w-3 h-3 bg-cyan-400 rounded-full border-2 border-black"></div>
+                  <div className="font-semibold text-gray-400 min-w-[130px] pt-1">
+                    {new Date(ev.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </div>
+                  <div className="flex flex-col">
+                    <h3 className="text-lg md:text-xl font-semibold m-0 mb-2 text-white">{ev.title}</h3>
+                    <p className="text-sm md:text-base text-gray-400 leading-relaxed m-0">{ev.description}</p>
                   </div>
                 </div>
               ))}
