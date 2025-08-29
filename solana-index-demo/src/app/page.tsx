@@ -19,7 +19,8 @@ import { Footer } from '../components/Footer';
 const Section = ({ children, id }: { children: React.ReactNode, id: string }) => (
   <section
     id={id}
-    className="w-screen min-h-screen flex justify-center items-center py-24 px-6 relative"
+    className="w-full min-h-screen flex justify-center items-center py-24 px-6 relative"
+    style={{ minHeight: '100vh' }}
   >
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -57,10 +58,10 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <Link href="/dashboard" className="btn btn-lg bg-white text-black font-semibold border-2 border-transparent shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-transform">
+        <Link href="/dashboard" className="inline-block px-8 py-4 bg-white text-black font-semibold border-2 border-transparent rounded-lg shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-all duration-300 cursor-pointer">
           View Demo App
         </Link>
-        <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:576b9b2d-51bb-4c45-9dae-82d78bf332e6" target="_blank" rel="noopener noreferrer" className="btn btn-lg bg-transparent text-white border-2 border-white/50 hover:bg-white/10 hover:border-white">
+        <a href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:576b9b2d-51bb-4c45-9dae-82d78bf332e6" target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-4 bg-transparent text-white border-2 border-white/50 rounded-lg hover:bg-white/10 hover:border-white transition-all duration-300 cursor-pointer">
           View Pitch Deck →
         </a>
       </motion.div>
@@ -300,7 +301,7 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
                 {!connected ? (
                     <>
                         <p>Connect your wallet to get started.</p>
-                        <button onClick={handleConnectClick} className="btn btn-lg bg-white text-black font-semibold rounded-lg px-10 hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-transform">
+                        <button onClick={handleConnectClick} className="inline-block px-10 py-4 bg-white text-black font-semibold rounded-lg hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-all duration-300 cursor-pointer">
                             <Wallet size={20} /> Connect Wallet
                         </button>
                     </>
@@ -309,11 +310,11 @@ const WaitlistSection = ({ setModalState }: { setModalState: any }) => {
                         <div className="flex items-center gap-4 bg-black/30 px-4 py-2 rounded-md border border-white/10">
                             <span>Connected as:</span>
                             <code>{shortenAddress(publicKey!.toBase58())}</code>
-                            <button onClick={() => disconnect()} className="btn btn-ghost btn-xs text-gray-400 underline">Disconnect</button>
+                            <button onClick={() => disconnect()} className="inline-block px-3 py-1 bg-transparent text-gray-400 underline hover:text-white transition-colors duration-200 cursor-pointer">Disconnect</button>
                         </div>
 
                         {!isJoined ? (
-                            <button onClick={handleJoin} className="btn btn-primary" disabled={isSubmitting}>
+                            <button onClick={handleJoin} className="inline-block px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" disabled={isSubmitting}>
                                 {isSubmitting ? 'Submitting...' : <><Send size={18} /> Join the Community</>}
                             </button>
                         ) : (
@@ -422,17 +423,17 @@ const AxisLandingPage: NextPage = () => {
       </AnimatePresence>
 
           {!isLoading && (
-              <div className="relative bg-black text-white">
+              <div className="relative bg-black text-white min-h-screen">
               <Header />
               <Background mouseX={mousePosition.x} mouseY={mousePosition.y} />
 
-              <div className="w-full h-full">
+              <main className="w-full relative z-10 min-h-screen">
                 {sections.map((section) => (
                   <Section key={section.id} id={section.id}>
                     <section.component />
                   </Section>
                 ))}
-              </div>
+              </main>
                 <Footer />
               </div>
           )}

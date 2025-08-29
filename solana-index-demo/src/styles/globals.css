@@ -37,3 +37,13 @@ a {
 @media (max-width: 768px){
   :root { --blur-strength: 12px; }
 }
+
+/* Blinking cursor animation for typewriter effect */
+@keyframes blink-cursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink-cursor {
+  animation: blink-cursor 1s infinite;
+}

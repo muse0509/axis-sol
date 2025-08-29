@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from '../styles/Landing.module.css';
 
 interface BackgroundProps {
   mouseX: number;
@@ -18,8 +17,8 @@ export const Background = ({ mouseX, mouseY }: BackgroundProps) => {
   };
 
   return (
-    <div className={styles.background}>
-      <svg width="100%" height="100%" viewBox="0 0 1440 1024" preserveAspectRatio="xMidYMid slice" className={styles.backgroundSvg}>
+    <div className="fixed inset-0 pointer-events-none z-0">
+      <svg width="100%" height="100%" viewBox="0 0 1440 1024" preserveAspectRatio="xMidYMid slice" className="w-full h-full">
         <defs>
           <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" style={{ stopColor: 'rgba(0, 173, 238, 0.8)' }} />
