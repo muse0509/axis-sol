@@ -18,7 +18,7 @@ interface LatestEntry  { created_at: string; index_value: number }
 
 async function loadData() {
   try {
-    const csvPath = path.join(process.cwd(), 'data.csv')
+    const csvPath = path.join(process.cwd(), './src/lib/data/data.csv')
     const csvText = await fs.readFile(csvPath, 'utf8')
 
     const rows = csvText.trim().split('\n')
