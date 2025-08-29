@@ -1,7 +1,6 @@
 // /components/TxStatusModal.tsx
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
-import styles from '../styles/TxStatusModal.module.css'
 import { PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 
@@ -71,26 +70,26 @@ export default function TxStatusModal({
   if (!open) return null
 
   return (
-    <div className={styles.backdrop}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <div className={styles.title}>Order Settlement</div>
-          <button className={styles.close} onClick={onClose}>×</button>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-md backdrop-saturate-180 flex items-center justify-center z-[9999]">
+      <div className="w-[min(560px,92vw)] bg-gradient-to-b from-[#0b1020] to-[#0d1226] border border-white/8 shadow-2xl shadow-black/35 rounded-2xl text-[#e7ecff]">
+        <div className="flex justify-between items-center p-4 px-4.5 border-b border-white/6">
+          <div className="text-base font-semibold tracking-wide">Order Settlement</div>
+          <button className="bg-transparent border-0 text-[#9fb4ff] text-xl cursor-pointer hover:text-white transition-colors" onClick={onClose}>×</button>
         </div>
 
-        <div className={styles.body}>
-          <ol className={styles.stepper}>
-            <li className={styles.stepDone}>
-              <div className={styles.stepTitle}>USDC payment sent</div>
-              <a className={styles.link} href={explorerUrl} target="_blank" rel="noreferrer">View transaction</a>
-              <div className={styles.meta}><span>Memo:</span> <code>{memoId}</code></div>
+        <div className="p-4.5">
+          <ol className="list-none m-0 p-0 grid gap-3.5">
+            <li className="relative p-2.5 border border-[rgba(103,214,164,0.35)] rounded-xl bg-[rgba(60,210,150,0.08)]">
+              <div className="font-semibold mb-1">USDC payment sent</div>
+              <a className="text-[#9ab4ff] underline hover:text-blue-300 transition-colors" href={explorerUrl} target="_blank" rel="noreferrer">View transaction</a>
+              <div className="opacity-90 text-sm"><span>Memo:</span> <code className="font-mono">{memoId}</code></div>
             </li>
 
-            <li className={status === 'received' ? styles.stepDone : styles.stepActive}>
-              <div className={styles.stepTitle}>
+            <li className={status === 'received' ? 'relative p-2.5 border border-[rgba(103,214,164,0.35)] rounded-xl bg-[rgba(60,210,150,0.08)]' : 'relative p-2.5 border border-dashed border-[rgba(154,180,255,0.35)] rounded-xl bg-white/5'}>
+              <div className="font-semibold mb-1">
                 {status === 'received' ? 'AXIS delivered' : 'Waiting for settlement (backend)'}
               </div>
-              <div className={styles.meta}>
+              <div className="opacity-90 text-sm">
                 <span>Expected:</span> <b>{expectedAxis.toFixed(6)}</b> AXIS
                 {status === 'received' && (<>
                   &nbsp;|&nbsp;<span>Received:</span> <b>{axisReceived.toFixed(6)}</b> AXIS
@@ -99,29 +98,29 @@ export default function TxStatusModal({
             </li>
 
             <li className={
-              status === 'received' ? styles.stepDone :
-              status === 'timeout'  ? styles.stepFailed : styles.stepIdle
+              status === 'received' ? 'relative p-2.5 border border-[rgba(103,214,164,0.35)] rounded-xl bg-[rgba(60,210,150,0.08)]' :
+              status === 'timeout'  ? 'relative p-2.5 border border-[rgba(255,128,128,0.35)] rounded-xl bg-[rgba(255,64,64,0.08)]' : 'opacity-60'
             }>
-              <div className={styles.stepTitle}>
+              <div className="font-semibold mb-1">
                 {status === 'received' ? 'Completed' : status === 'timeout' ? 'Timeout' : 'Finalizing'}
               </div>
               {status === 'timeout' && (
-                <div className={styles.note}>
-                  Didn’t see the tokens within the expected window.  
-                  Keep this window open and try “Check again”, or contact support with the memo and signature.
+                <div className="mt-1.5 text-sm opacity-90">
+                  Didn't see the tokens within the expected window.  
+                  Keep this window open and try "Check again", or contact support with the memo and signature.
                 </div>
               )}
-              {status === 'error' && <div className={styles.note}>Error: {err}</div>}
+              {status === 'error' && <div className="mt-1.5 text-sm opacity-90">Error: {err}</div>}
             </li>
           </ol>
         </div>
 
-        <div className={styles.footer}>
-          <button className={styles.secondary} onClick={()=>{
+        <div className="flex justify-end gap-2 p-3.5 px-4.5 border-t border-white/6">
+          <button className="bg-transparent border border-white/20 text-[#d9e1ff] rounded-lg px-3.5 py-2.5 font-semibold cursor-pointer hover:bg-white/10 transition-colors" onClick={()=>{
             navigator.clipboard?.writeText(JSON.stringify({ memoId, usdcSignature, expectedAxis }))
           }}>Copy debug info</button>
 
-          <button className={styles.primary} onClick={onClose}>
+          <button className="bg-[#7aa2ff] border-0 text-[#0b1020] rounded-lg px-3.5 py-2.5 font-semibold cursor-pointer hover:bg-blue-400 transition-colors" onClick={onClose}>
             {status === 'received' ? 'Close' : 'Close anyway'}
           </button>
         </div>

@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { PublicKey } from '@solana/web3.js'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
-import styles from '../styles/RedeemModal.module.css'
 
 // ---- Constants (devnet) ----
 const AXIS_MINT_2022 = new PublicKey('6XJVFiPQZ9pAa6Cuhcm6jbHtV3G3ZjK3VZ2HNTanpAQ1') // Token-2022
@@ -109,7 +108,7 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
 
       // Dynamic import to avoid SSR issues
       const { AxisSDK } = await import('@axis-protocol/sdk')
-      const sdk = new AxisSDK(connection, wallet)
+      const sdk = new AxisSDK(connection, wallet as any)
 
       const { transaction, memoId: mid } = await sdk.buildIndexTokenDepositTransaction(qAxis)
       setMemoId(mid)
@@ -120,7 +119,7 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
       setStep('settling')
 
       // Poll your existing settlement endpoint (same idea as Buy flow)
-      // If you don’t have a dedicated endpoint yet, leave the button-driven "Check again".
+      // If you don't have a dedicated endpoint yet, leave the button-driven "Check again".
       let done = false
       const deadline = Date.now() + 90_000 // 90s
       while (!done && Date.now() < deadline) {
@@ -144,34 +143,34 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
   if (!isOpen) return null
 
   return (
-    <div className={styles.backdrop} role="dialog" aria-modal="true" aria-labelledby="redeem-title">
-      <div className={styles.modal}>
-        <header className={styles.header}>
-          <div className={styles.badges}>
-            <span className={styles.netBadge}>{networkName}</span>
-            <span className={styles.addr}>Connected: {fmtAddr(publicKey) || '—'}</span>
+    <div className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-[20px] grid place-items-center" role="dialog" aria-modal="true" aria-labelledby="redeem-title">
+      <div className="w-[min(980px,92vw)] bg-white/6 border border-white/12 rounded-2xl shadow-2xl shadow-black/60 p-5 text-white">
+        <header className="flex justify-between items-center mb-2">
+          <div className="flex gap-2 items-center text-sm text-[#cfd3dc]">
+            <span className="px-2 py-1 border border-white/20 rounded-md">{networkName}</span>
+            <span className="opacity-90">Connected: {fmtAddr(publicKey) || '—'}</span>
           </div>
-          <button className={styles.close} aria-label="Close" onClick={onClose}>×</button>
+          <button className="bg-transparent text-white text-3xl border-none cursor-pointer hover:text-gray-300 transition-colors" aria-label="Close" onClick={onClose}>×</button>
         </header>
 
-        <div className={styles.grid}>
+        <div className="grid grid-cols-[1.2fr_0.8fr] gap-4 lg:grid-cols-1">
           {/* Left: form */}
-          <section className={styles.panel}>
-            <div className={styles.kv}>
-              <span>Your AXIS Balance</span>
-              <strong>{axisBalance.toFixed(AXIS_DECIMALS)}</strong>
+          <section className="bg-white/4 border border-white/10 rounded-xl p-4">
+            <div className="flex items-baseline justify-between m-1">
+              <span className="text-[#B8C0CC]">Your AXIS Balance</span>
+              <strong className="font-bold">{axisBalance.toFixed(AXIS_DECIMALS)}</strong>
             </div>
-            <div className={styles.kv}>
-              <span>Current Index Value</span>
-              <strong>{indexPrice ? indexPrice.toFixed(6) : 'N/A'}</strong>
+            <div className="flex items-baseline justify-between m-1">
+              <span className="text-[#B8C0CC]">Current Index Value</span>
+              <strong className="font-bold">{indexPrice ? indexPrice.toFixed(6) : 'N/A'}</strong>
             </div>
 
-            <label className={styles.label} htmlFor="redeem-amt">Amount to Redeem (AXIS)</label>
+            <label className="block mt-3 mb-1.5 text-[#B8C0CC] text-sm" htmlFor="redeem-amt">Amount to Redeem (AXIS)</label>
             <input
               id="redeem-amt"
               ref={firstFocusableRef}
               type="number"
-              className={styles.input}
+              className="w-full px-4 py-3.5 rounded-lg border border-white/18 bg-black/35 text-white text-base focus:outline-none focus:border-[#88aaff] focus:shadow-[0_0_0_2px_rgba(136,170,255,0.25)]"
               value={amount}
               onChange={e => setAmount(e.target.value)}
               min="0"
@@ -180,15 +179,15 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
               inputMode="decimal"
             />
 
-            <div className={styles.quickRow}>
-              <button className={styles.quick} onClick={() => setPct(0.25)} disabled={busy}>25%</button>
-              <button className={styles.quick} onClick={() => setPct(0.5)}  disabled={busy}>50%</button>
-              <button className={styles.quick} onClick={() => setPct(0.75)} disabled={busy}>75%</button>
-              <button className={styles.quick} onClick={() => setPct(1)}    disabled={busy}>Max</button>
+            <div className="flex gap-2 mt-2.5 mb-4">
+              <button className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white cursor-pointer hover:bg-white/16 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => setPct(0.25)} disabled={busy}>25%</button>
+              <button className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white cursor-pointer hover:bg-white/16 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => setPct(0.5)}  disabled={busy}>50%</button>
+              <button className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white cursor-pointer hover:bg-white/16 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => setPct(0.75)} disabled={busy}>75%</button>
+              <button className="bg-white/10 border border-white/20 rounded-lg px-3 py-1.5 text-white cursor-pointer hover:bg-white/16 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" onClick={() => setPct(1)}    disabled={busy}>Max</button>
             </div>
 
             <button
-              className={styles.primary}
+              className="w-full px-4 py-3.5 rounded-lg border border-white/25 bg-white text-black font-bold cursor-pointer mt-1 shadow-lg shadow-white/25 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors"
               onClick={handleRedeem}
               disabled={busy || !publicKey}
             >
@@ -197,21 +196,21 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
 
             {/* Inline status */}
             {step !== 'idle' && (
-              <div className={styles.statusBox}>
+              <div className="mt-3 p-3 rounded-lg bg-black/35 border border-white/12 text-sm">
                 {step === 'building'  && <p>Preparing transaction…</p>}
                 {step === 'submitted' && <p>Transaction sent. Waiting for confirmation…</p>}
                 {step === 'settling'  && (
                   <p>
                     Waiting for backend settlement…{' '}
-                    <button className={styles.linkBtn} onClick={() => setStep('settling')}>Check again</button>
+                    <button className="text-[#9db7ff] underline bg-none border-none cursor-pointer hover:text-blue-300 transition-colors" onClick={() => setStep('settling')}>Check again</button>
                   </p>
                 )}
                 {step === 'settled'   && <p>Redeemed successfully. USDC should arrive shortly.</p>}
-                {step === 'error'     && <p className={styles.error}>{errorMsg}</p>}
+                {step === 'error'     && <p className="text-[#ff7b7b]">{errorMsg}</p>}
                 {txSig && (
                   <p>
                     Tx:&nbsp;
-                    <a className={styles.link} href={`https://solscan.io/tx/${txSig}?cluster=devnet`} target="_blank" rel="noreferrer">view</a>
+                    <a className="text-[#9db7ff] underline hover:text-blue-300 transition-colors" href={`https://solscan.io/tx/${txSig}?cluster=devnet`} target="_blank" rel="noreferrer">view</a>
                   </p>
                 )}
                 {memoId && <p>Memo: {memoId}</p>}
@@ -220,28 +219,28 @@ export default function RedeemModal({ isOpen, onClose, indexPrice }: Props) {
           </section>
 
           {/* Right: details */}
-          <aside className={styles.panel}>
-            <h3 id="redeem-title" className={styles.panelTitle}>Redemption Details</h3>
+          <aside className="bg-white/4 border border-white/10 rounded-xl p-4">
+            <h3 id="redeem-title" className="m-0 mb-3 text-lg opacity-95">Redemption Details</h3>
             <p>Your AXIS (Token-2022) is transferred to the treasury. The backend then executes the redemption settlement and returns USDC according to the index.</p>
-            <div className={styles.meta}>
+            <div className="grid grid-cols-1 gap-2.5 mt-2 break-all">
               <div>
-                <div className={styles.metaLabel}>AXIS Mint</div>
-                <div className={styles.metaValue}>{AXIS_MINT_2022.toBase58()}</div>
+                <div className="text-xs text-[#AEB6C4]">AXIS Mint</div>
+                <div className="font-mono text-sm">{AXIS_MINT_2022.toBase58()}</div>
               </div>
               <div>
-                <div className={styles.metaLabel}>Treasury (Owner)</div>
-                <div className={styles.metaValue}>{TREASURY_OWNER.toBase58()}</div>
+                <div className="text-xs text-[#AEB6C4]">Treasury (Owner)</div>
+                <div className="font-mono text-sm">{TREASURY_OWNER.toBase58()}</div>
               </div>
               <div>
-                <div className={styles.metaLabel}>USDC (devnet)</div>
-                <div className={styles.metaValue}>{USDC_DEV_MINT.toBase58()}</div>
+                <div className="text-xs text-[#AEB6C4]">USDC (devnet)</div>
+                <div className="font-mono text-sm">{USDC_DEV_MINT.toBase58()}</div>
               </div>
             </div>
 
-            <div className={styles.quoteBox}>
-              <div className={styles.kvSmall}>
-                <span>Expected USDC</span>
-                <strong>{expectedUsdc ? expectedUsdc.toFixed(6) : '—'}</strong>
+            <div className="mt-4 p-3 rounded-lg bg-black/35 border border-white/12">
+              <div className="flex items-baseline justify-between m-1">
+                <span className="text-[#B8C0CC] text-sm">Expected USDC</span>
+                <strong className="text-lg">{expectedUsdc ? expectedUsdc.toFixed(6) : '—'}</strong>
               </div>
               <small>Formula: Q<sub>USDC</sub> = Q<sub>AXIS</sub> × Index</small>
             </div>

@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import styles from '../styles/SettlementModal.module.css'
 
 type Props = {
   open: boolean
@@ -46,38 +45,47 @@ export default function SettlementModal({ open, onClose, depositSig, memoId, exp
 
   if (!open) return null
   return (
-    <div className={styles.backdrop}>
-      <div className={styles.modal}>
-        <header className={styles.header}>
-          <div className={styles.title}>Order Settlement</div>
-          <button className={styles.close} onClick={onClose}>×</button>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]">
+      <div className="w-[720px] max-w-[95vw] bg-[#0e1116] border border-[#232a36] rounded-2xl shadow-2xl shadow-black/35 text-[#e6edf3] flex flex-col">
+        <header className="flex items-center justify-between p-4 px-5 border-b border-[#1d2430]">
+          <div className="font-semibold text-lg">Order Settlement</div>
+          <button className="border-none bg-transparent text-[#8b98a5] text-2xl cursor-pointer hover:text-white transition-colors" onClick={onClose}>×</button>
         </header>
 
-        <div className={styles.body}>
-          <div className={styles.row}><span>USDC payment</span>
-            <a className={styles.link} href={`${explorerBase}/tx/${depositSig}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction</a></div>
-          {memoId && <div className={styles.row}><span>Memo</span><code className={styles.code}>{memoId}</code></div>}
-          {expectedText && <div className={styles.row}><span>Quote</span><b>{expectedText}</b></div>}
-
-          {phase === 'pending' && <div className={styles.statePending}>
-            <div className={styles.spinner} /><div>Waiting for settlement (backend)...</div>
+        <div className="p-4 px-5 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between gap-3">
+            <span>USDC payment</span>
+            <a className="text-[#8ab4ff] underline hover:text-blue-300 transition-colors" href={`${explorerBase}/tx/${depositSig}?cluster=devnet`} target="_blank" rel="noreferrer">View transaction</a>
+          </div>
+          {memoId && <div className="flex items-center justify-between gap-3">
+            <span>Memo</span>
+            <code className="bg-[#10151f] border border-[#243047] rounded-lg px-2 py-1 font-mono text-sm">{memoId}</code>
+          </div>}
+          {expectedText && <div className="flex items-center justify-between gap-3">
+            <span>Quote</span>
+            <b>{expectedText}</b>
           </div>}
 
-          {phase === 'paid' && <div className={styles.stateOk}>
-            <div className={styles.big}>✅ Settled</div>
-            {payoutSig && <a className={styles.link} href={`${explorerBase}/tx/${payoutSig}?cluster=devnet`} target="_blank" rel="noreferrer">View payout</a>}
+          {phase === 'pending' && <div className="flex items-center gap-2.5 mt-2">
+            <div className="w-4 h-4 rounded-full border-2 border-[#385989] border-t-transparent animate-spin" />
+            <div>Waiting for settlement (backend)...</div>
           </div>}
 
-          {phase === 'failed' && <div className={styles.stateErr}>
-            <div className={styles.big}>⚠️ Failed</div>
-            <div className={styles.errText}>{error || 'Unknown error'}</div>
+          {phase === 'paid' && <div className="flex items-center gap-2.5 mt-2">
+            <div className="text-lg font-bold">✅ Settled</div>
+            {payoutSig && <a className="text-[#8ab4ff] underline hover:text-blue-300 transition-colors" href={`${explorerBase}/tx/${payoutSig}?cluster=devnet`} target="_blank" rel="noreferrer">View payout</a>}
+          </div>}
+
+          {phase === 'failed' && <div className="flex items-center gap-2.5 mt-2">
+            <div className="text-lg font-bold">⚠️ Failed</div>
+            <div className="text-[#ff9aa2]">{error || 'Unknown error'}</div>
           </div>}
         </div>
 
-        <footer className={styles.footer}>
+        <footer className="flex justify-end gap-2 p-3 px-5 border-t border-[#1d2430]">
           {phase === 'pending'
-            ? <button className={styles.secondary} onClick={()=>setSince(Date.now())}>Check again</button>
-            : <button className={styles.primary} onClick={onClose}>Close</button>}
+            ? <button className="bg-[#1c2533] border border-[#2a3953] text-[#c7d0db] px-4 py-2.5 rounded-lg cursor-pointer hover:bg-[#2a3953] transition-colors" onClick={()=>setSince(Date.now())}>Check again</button>
+            : <button className="bg-blue-500 border-none text-white px-4 py-2.5 rounded-lg cursor-pointer hover:bg-blue-600 transition-colors" onClick={onClose}>Close</button>}
         </footer>
       </div>
     </div>

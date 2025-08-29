@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
       config.resolve ??= {};
       config.resolve.fallback ??= {};
       config.resolve.fallback.fs = false;
+      // walletconnect -> pino -> pino-pretty is optional; stub it out
+      config.resolve.alias ??= {};
+      config.resolve.alias['pino-pretty'] = false;
     }
     return config;
   },
