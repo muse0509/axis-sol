@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@axis-protocol/sdk": "^1.0.2",
@@ -14,6 +17,7 @@
     "@jup-ag/api": "^6.0.44",
     "@meteora-ag/dlmm": "^1.5.5",
     "@meteora-ag/dynamic-amm-sdk": "^1.3.8",
+    "@opennextjs/cloudflare": "^1.6.5",
     "@pythnetwork/client": "^2.22.1",
     "@pythnetwork/hermes-client": "^2.0.0",
     "@pythnetwork/price-service-client": "^1.9.0",
