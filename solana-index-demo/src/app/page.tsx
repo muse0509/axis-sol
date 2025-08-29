@@ -4,8 +4,8 @@ import type { NextPage } from 'next';
 import { AnimatePresence } from 'framer-motion';
 // Components
 import { Header } from '../components/common/Header';
-import { Background } from '../components/Background';
-import { Modal } from '../components/Modal';
+import { Background } from '../components/common/Background';
+import { Modal } from '../components/modals/Modal';
 import { Footer } from '../components/common/Footer';
 import {
   Section,

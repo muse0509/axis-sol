@@ -4,7 +4,7 @@ import { PublicKey } from '@solana/web3.js'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { getAssociatedTokenAddress } from '@solana/spl-token'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
-import SettlementModal from './SettlementModal'
+import SettlementModal from '../modals/SettlementModal'
 
 // ---- Constants (devnet) ----
 const USDC_MINT = new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr')

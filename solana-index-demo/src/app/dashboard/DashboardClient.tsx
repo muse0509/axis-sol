@@ -15,13 +15,13 @@ import CountUp from 'react-countup'
 import { motion, Variants } from 'framer-motion'
 
 import { particlesOptions } from '../../utils/particles'
-import type { EChartProps } from '../../components/EChartsChart'
-import BuyModal from '../../components/BuyModal'
+import type { EChartProps } from '../../components/charts/EChartsChart'
+import BuyModal from '../../components/dashboard/BuyModal'
 
-const WalletBar = dynamic(() => import('@/components/WalletBar'), { ssr: false })
-const BurnModal = dynamic(() => import('@/components/BurnModal'), { ssr: false })
+const WalletBar = dynamic(() => import('@/components/crypto/WalletBar'), { ssr: false })
+const BurnModal = dynamic(() => import('@/components/dashboard/BurnModal'), { ssr: false })
 const EChartsChart = dynamic<EChartProps>(
-  () => import('../../components/EChartsChart'),
+  () => import('../../components/charts/EChartsChart'),
   {
     ssr: false,
     loading: () => (
