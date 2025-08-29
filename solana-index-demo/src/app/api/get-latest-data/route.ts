@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { marketEvents } from '../../lib/market-events';
+import { NextRequest, NextResponse } from 'next/server';
+import { marketEvents } from '../../../lib/market-events';
 
 export const revalidate = 0;
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY!;
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -54,15 +54,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     // 6. フロントエンドに全てのデータを返す
-    res.status(200).json({
+    return NextResponse.json({
       latestEntry, // 生の最新データ（計算内訳テーブル用）
-      normalizedHistory, // 正規化されたチャート用データ
+      echartsData: normalizedHistory, // 正規化されたチャート用データ
       dailyChange,
       events: marketEvents,
     });
 
   } catch (err: any) {
     console.error("Error in /api/get-latest-data:", err);
-    res.status(500).json({ error: err.message });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

@@ -1,24 +1,21 @@
-// src/pages/_app.tsx
-import type { AppProps } from 'next/app'
+'use client'
+
 import React, { FC, useMemo } from 'react'
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
-import { clusterApiUrl } from '@solana/web3.js'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { Toaster } from 'react-hot-toast'
 import SmoothScroller from '../components/Lenis'
 
-// styles
 import '@solana/wallet-adapter-react-ui/styles.css'
-import '../styles/globals.css'
 
-const App: FC<AppProps> = ({ Component, pageProps }) => {
-  // ★ Devnet を固定
+type Props = { children: React.ReactNode }
+
+const Providers: FC<Props> = ({ children }) => {
   const network = WalletAdapterNetwork.Devnet
-  const endpoint = "https://api.devnet.solana.com";
+  const endpoint = 'https://api.devnet.solana.com'
 
-  // ★ Phantom だけ（必要に応じて他ウォレットも追加）
   const wallets = useMemo(() => [new PhantomWalletAdapter()], [])
 
   return (
@@ -26,8 +23,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <SmoothScroller>
-            <Component {...pageProps} />
-            {/* トーストはアプリ内に置く */}
+            {children}
             <Toaster position="top-right" />
           </SmoothScroller>
         </WalletModalProvider>
@@ -36,4 +32,6 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   )
 }
 
-export default App
+export default Providers
+
+

@@ -87,7 +87,7 @@ export default function BuyModal({ isOpen, onClose, indexPrice }: { isOpen: bool
     try {
       setBusy(true)
       const { AxisSDK } = await import('@axis-protocol/sdk')
-      const sdk = new AxisSDK(connection, wallet)
+      const sdk = new AxisSDK(connection, wallet as any)
       
       const { transaction, memoId: mid } = await sdk.buildUsdcDepositTransaction(usdcAmount)
       setMemoId(mid)
