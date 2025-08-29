@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import { AnimatePresence } from 'framer-motion';
 // Components
-import { Header } from '../components/common/Header';
-import { Background } from '../components/common/Background';
+import { Header, Background, Button, Card } from '../components/common';
 import { Modal } from '../components/modals/Modal';
 import { Footer } from '../components/common/Footer';
 import {
@@ -13,6 +12,7 @@ import {
   WhyWinSection,
   ProductSection,
   TractionSection,
+  StatsSection,
   RoadmapSection,
   TeamSection,
   WaitlistSection,
@@ -38,6 +38,7 @@ const AxisLandingPage: NextPage = () => {
     { id: 'why-win', component: WhyWinSection },
     { id: 'product', component: ProductSection },
     { id: 'traction', component: TractionSection },
+    { id: 'stats', component: StatsSection },
     { id: 'roadmap', component: RoadmapSection },
     { id: 'team', component: TeamSection },
     { id: 'waitlist', component: () => <WaitlistSection setModalState={setModalState} /> },
@@ -52,11 +53,11 @@ const AxisLandingPage: NextPage = () => {
         index++;
       } else {
         clearInterval(timer);
-        setTimeout(() => setIsLoading(false), 1200);
+        setTimeout(() => setIsLoading(false), 1000);
       }
-    }, 120);
+    }, 100);
     return () => clearInterval(timer);
-  }, [fullText]);
+  }, []); // Remove fullText dependency to prevent re-running
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });

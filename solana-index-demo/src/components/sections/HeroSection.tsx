@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Button } from '../common';
 
 const HeroSection = () => (
   <div className="text-center">
     <motion.h1
-      className="text-white font-extrabold tracking-tight leading-tight text-[clamp(3rem,10vw,5.5rem)] mb-8"
+      className="text-white font-extrabold tracking-tight leading-tight text-[clamp(2rem,10vw,4rem)] mb-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
@@ -29,21 +29,22 @@ const HeroSection = () => (
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.6 }}
     >
-      <Link 
+      <Button 
         href="/dashboard" 
-        className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all duration-300"
+        variant="primary"
+        size="lg"
       >
-        View Demo App
-      </Link>
+        Launch App
+      </Button>
       
-      <a 
+      <Button 
         href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:576b9b2d-51bb-4c45-9dae-82d78bf332e6" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="btn btn-outline btn-lg hover:btn-primary transition-all duration-300"
+        variant="outline"
+        size="lg"
+        external
       >
-        View Pitch Deck →
-      </a>
+        Pitch Deck →
+      </Button>
     </motion.div>
   </div>
 );

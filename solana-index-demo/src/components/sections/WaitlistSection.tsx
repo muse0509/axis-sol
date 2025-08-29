@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { Key, Gift, Lock, Wallet, Send } from 'lucide-react';
+import { Button, Card } from '../common';
 
 interface WaitlistSectionProps {
   setModalState: (state: { isOpen: boolean; type: 'success' | 'error'; title: string; message: string }) => void;
@@ -66,82 +67,87 @@ const WaitlistSection = ({ setModalState }: WaitlistSectionProps) => {
   return (
     <div>
       <div className="text-center mb-16">
-        <h2 className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold mb-6">The Market Can Finally Grow Up.</h2>
+        <h2 className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold mb-6">Join the Future</h2>
         <p className="text-gray-400 max-w-[800px] mx-auto leading-7 text-[clamp(1rem,4vw,1.1rem)]">
-          Because the guide has arrived. Join us to be part of the journey.
+          Be part of the journey. Join our waitlist for early access.
         </p>
       </div>
       
       <div className="grid md:grid-cols-2 gap-12 items-center mt-12">
         <div className="text-left space-y-6">
-          <h4 className="text-xl font-semibold">By joining, you become eligible for:</h4>
+          <h4 className="text-xl font-semibold">Benefits:</h4>
           <ul className="space-y-4">
             <li className="flex items-center gap-4 text-lg">
-              <div className="avatar placeholder">
-                <div className="bg-secondary/20 text-secondary rounded-full w-8 h-8">
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                <div className="bg-blue-500/20 text-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
                   <Key size={16} />
                 </div>
               </div>
-              <span>Early access to our beta platform.</span>
+              <span>Early access to beta platform</span>
             </li>
             <li className="flex items-center gap-4 text-lg">
-              <div className="avatar placeholder">
-                <div className="bg-secondary/20 text-secondary rounded-full w-8 h-8">
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                <div className="bg-blue-500/20 text-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
                   <Gift size={16} />
                 </div>
               </div>
-              <span>Future airdrops and community rewards.</span>
+              <span>Future airdrops and rewards</span>
             </li>
             <li className="flex items-center gap-4 text-lg">
-              <div className="avatar placeholder">
-                <div className="bg-secondary/20 text-secondary rounded-full w-8 h-8">
+              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                <div className="bg-blue-500/20 text-blue-500 rounded-full w-8 h-8 flex items-center justify-center">
                   <Lock size={16} />
                 </div>
               </div>
-              <span>A secured spot for upcoming product launches.</span>
+              <span>Secured spot for launches</span>
             </li>
           </ul>
           <p className="text-sm text-gray-500 italic">
-            We respect your privacy. We only store your wallet address and nothing else.
+            We only store your wallet address. Privacy respected.
           </p>
         </div>
 
-        <div className="card bg-base-200 shadow-xl border border-base-300 max-w-lg mx-auto">
-          <div className="card-body text-center space-y-6">
+        <Card className="max-w-lg mx-auto">
+          <div className="text-center space-y-6">
             {!connected ? (
               <>
                 <p className="text-lg">Connect your wallet to get started.</p>
-                <button 
+                <Button 
                   onClick={handleConnectClick} 
-                  className="btn btn-primary btn-lg gap-2"
+                  variant="primary"
+                  size="lg"
+                  className="gap-2"
                 >
                   <Wallet size={20} /> Connect Wallet
-                </button>
+                </Button>
               </>
             ) : (
               <>
                 <div className="alert alert-info">
                   <span>Connected as: {shortenAddress(publicKey!.toBase58())}</span>
-                  <button 
+                  <Button 
                     onClick={() => disconnect()} 
-                    className="btn btn-ghost btn-sm"
+                    variant="ghost"
+                    size="sm"
                   >
                     Disconnect
-                  </button>
+                  </Button>
                 </div>
 
                 {!isJoined ? (
-                  <button 
+                  <Button 
                     onClick={handleJoin} 
-                    className="btn btn-primary btn-lg gap-2" 
+                    variant="primary"
+                    size="lg"
+                    className="gap-2" 
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? 'Submitting...' : (
                       <>
-                        <Send size={18} /> Join the Community
+                        <Send size={18} /> Join Community
                       </>
                     )}
-                  </button>
+                  </Button>
                 ) : (
                   <motion.div 
                     initial={{ opacity: 0 }} 
@@ -154,7 +160,7 @@ const WaitlistSection = ({ setModalState }: WaitlistSectionProps) => {
               </>
             )}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
