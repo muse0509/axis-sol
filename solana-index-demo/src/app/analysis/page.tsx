@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import styles from '../../styles/Analysis.module.css';
 
 export default function AnalysisPage() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -54,23 +53,23 @@ export default function AnalysisPage() {
   };
 
   const renderMetrics = (metrics: any[]) => (
-    <div className={styles.metricsGrid}>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {metrics.map((metric, index) => (
         <motion.div
           key={index}
-          className={styles.metricCard}
+          className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <div className={styles.metricHeader}>
-            <h4>{metric.label || metric.metric}</h4>
-            <span className={styles.metricPeriod}>{metric.period}</span>
+          <div className="flex justify-between items-start mb-3">
+            <h4 className="text-lg font-semibold text-white">{metric.label || metric.metric}</h4>
+            <span className="text-sm text-gray-400">{metric.period}</span>
           </div>
-          <div className={styles.metricValue}>{metric.value}</div>
-          <div className={styles.metricChange}>
+          <div className="text-3xl font-bold text-white mb-2">{metric.value}</div>
+          <div className="text-sm">
             {metric.change && (
-              <span className={metric.change.startsWith('+') ? styles.positive : styles.negative}>
+              <span className={metric.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
                 {metric.change}
               </span>
             )}
@@ -81,27 +80,27 @@ export default function AnalysisPage() {
   );
 
   const renderSectors = (sectors: any[]) => (
-    <div className={styles.sectorsContainer}>
+    <div className="space-y-4">
       {sectors.map((sector, index) => (
         <motion.div
           key={index}
-          className={styles.sectorCard}
+          className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <div className={styles.sectorHeader}>
-            <h4>{sector.name}</h4>
-            <span className={styles.sectorAllocation}>{sector.allocation}%</span>
+          <div className="flex justify-between items-center mb-3">
+            <h4 className="text-lg font-semibold text-white">{sector.name}</h4>
+            <span className="text-sm text-gray-400">{sector.allocation}%</span>
           </div>
-          <div className={styles.sectorPerformance}>
-            <span className={sector.performance.startsWith('+') ? styles.positive : styles.negative}>
+          <div className="text-lg mb-3">
+            <span className={sector.performance.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
               {sector.performance}
             </span>
           </div>
-          <div className={styles.sectorBar}>
+          <div className="w-full bg-gray-700 rounded-full h-2">
             <div 
-              className={styles.sectorBarFill} 
+              className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
               style={{ width: `${sector.allocation}%` }}
             ></div>
           </div>
@@ -111,24 +110,24 @@ export default function AnalysisPage() {
   );
 
   const renderBenchmarks = (benchmarks: any[]) => (
-    <div className={styles.benchmarksContainer}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {benchmarks.map((benchmark, index) => (
         <motion.div
           key={index}
-          className={styles.benchmarkCard}
+          className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
         >
-          <div className={styles.benchmarkName}>{benchmark.name}</div>
-          <div className={styles.benchmarkPerformance}>
-            <span className={benchmark.performance.startsWith('+') ? styles.positive : styles.negative}>
+          <div className="text-lg font-semibold text-white mb-2">{benchmark.name}</div>
+          <div className="text-2xl font-bold mb-2">
+            <span className={benchmark.performance.startsWith('+') ? 'text-green-400' : 'text-red-400'}>
               {benchmark.performance}
             </span>
           </div>
-          <div className={styles.benchmarkVsAxis}>
+          <div className="text-sm text-gray-400">
             vs Axis: 
-            <span className={benchmark.vsAxis.startsWith('+') ? styles.positive : styles.negative}>
+            <span className={`ml-1 ${benchmark.vsAxis.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
               {benchmark.vsAxis}
             </span>
           </div>
@@ -144,28 +143,28 @@ export default function AnalysisPage() {
       case 'overview':
         return (
           <div>
-            <p className={styles.sectionDescription}>{currentData.description}</p>
+            <p className="text-gray-300 text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto">{currentData.description}</p>
             {renderMetrics((currentData as any).metrics)}
           </div>
         );
       case 'composition':
         return (
           <div>
-            <p className={styles.sectionDescription}>{currentData.description}</p>
+            <p className="text-gray-300 text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto">{currentData.description}</p>
             {renderSectors((currentData as any).sectors)}
           </div>
         );
       case 'risk':
         return (
           <div>
-            <p className={styles.sectionDescription}>{currentData.description}</p>
+            <p className="text-gray-300 text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto">{currentData.description}</p>
             {renderMetrics((currentData as any).riskMetrics)}
           </div>
         );
       case 'comparison':
         return (
           <div>
-            <p className={styles.sectionDescription}>{currentData.description}</p>
+            <p className="text-gray-300 text-lg leading-relaxed mb-8 text-center max-w-3xl mx-auto">{currentData.description}</p>
             {renderBenchmarks((currentData as any).benchmarks)}
           </div>
         );
@@ -175,12 +174,12 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
+    <div className="px-16 bg-black text-white min-h-screen md:px-6">
+      <div className="text-center mb-12">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={styles.title}
+          className="text-6xl font-bold m-0 md:text-5xl"
         >
           Index Analysis & Performance
         </motion.h1>
@@ -188,21 +187,23 @@ export default function AnalysisPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={styles.subtitle}
+          className="mt-4 mb-12 leading-relaxed text-xl text-gray-400 text-center max-w-2xl mx-auto md:text-base"
         >
           Deep dive into the performance metrics, risk analysis, and comparative insights
         </motion.p>
       </div>
 
-      <div className={styles.timeframeSelector}>
-        <span className={styles.timeframeLabel}>Timeframe:</span>
-        <div className={styles.timeframeButtons}>
+      <div className="flex items-center justify-center mb-8 gap-4">
+        <span className="text-gray-400">Timeframe:</span>
+        <div className="flex gap-2">
           {timeframes.map((timeframe) => (
             <button
               key={timeframe}
               onClick={() => setSelectedTimeframe(timeframe)}
-              className={`${styles.timeframeButton} ${
-                selectedTimeframe === timeframe ? styles.active : ''
+              className={`px-4 py-2 rounded-lg border transition-colors ${
+                selectedTimeframe === timeframe 
+                  ? 'bg-blue-600 border-blue-600 text-white' 
+                  : 'bg-transparent border-gray-600 text-gray-400 hover:border-gray-500'
               }`}
             >
               {timeframe}
@@ -211,46 +212,52 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      <div className={styles.tabContainer}>
-        <div className={styles.tabs}>
-          {Object.keys(analysisData).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`${styles.tab} ${activeTab === tab ? styles.active : ''}`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-center mb-8">
+          <div className="flex gap-2 bg-white/5 rounded-xl p-2 backdrop-blur-sm">
+            {Object.keys(analysisData).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-3 rounded-lg transition-colors ${
+                  activeTab === tab 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className={styles.tabContent}
+          className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm"
         >
-          <h2 className={styles.sectionTitle}>
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
             {analysisData[activeTab as keyof typeof analysisData].title}
           </h2>
           {renderContent()}
         </motion.div>
       </div>
 
-      <div className={styles.insights}>
-        <h3>Key Insights</h3>
-        <div className={styles.insightsGrid}>
-          <div className={styles.insightCard}>
-            <h4>Strong Outperformance</h4>
-            <p>The Axis Index has consistently outperformed traditional market indices, demonstrating the growth potential of the Solana ecosystem.</p>
+      <div className="max-w-6xl mx-auto mt-16">
+        <h3 className="text-2xl font-bold text-white mb-8 text-center">Key Insights</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
+            <h4 className="text-xl font-semibold text-white mb-3">Strong Outperformance</h4>
+            <p className="text-gray-300 leading-relaxed">The Axis Index has consistently outperformed traditional market indices, demonstrating the growth potential of the Solana ecosystem.</p>
           </div>
-          <div className={styles.insightCard}>
-            <h4>Risk Management</h4>
-            <p>Our diversified approach and regular rebalancing help manage volatility while maintaining strong returns.</p>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
+            <h4 className="text-xl font-semibold text-white mb-3">Risk Management</h4>
+            <p className="text-gray-300 leading-relaxed">Our diversified approach and regular rebalancing help manage volatility while maintaining strong returns.</p>
           </div>
-          <div className={styles.insightCard}>
-            <h4>Market Correlation</h4>
-            <p>Moderate correlation with Bitcoin provides diversification benefits while maintaining exposure to crypto growth.</p>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
+            <h4 className="text-xl font-semibold text-white mb-3">Market Correlation</h4>
+            <p className="text-gray-300 leading-relaxed">Moderate correlation with Bitcoin provides diversification benefits while maintaining exposure to crypto growth.</p>
           </div>
         </div>
       </div>

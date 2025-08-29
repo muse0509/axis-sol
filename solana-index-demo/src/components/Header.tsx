@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 
-// 1. 作成したCSS Modulesファイルをインポート
-import styles from '../styles/Header.module.css';
-
 const navItems = [
   { name: 'Home', href: '#hero' },
   { name: 'Risks', href: '#risks' },
@@ -24,26 +21,23 @@ export const Header = () => {
 
   return (
     <>
-      {/* 2. ▼▼▼ すべての className を {styles.クラス名} の形式に書き換え ▼▼▼ */}
-
       {/* ---------- PC用ヘッダー (ガラス板) ---------- */}
-      <div className={styles.wrapper}>
-        <div className={styles.pill}>
-        <a href="#hero" className={styles.logoLink}>
+      <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] flex justify-center pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-8 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg shadow-black/30 shadow-white/10 relative isolate after:content-[''] after:absolute after:inset-0 after:bg-[url('/noise-8x8.png')] after:opacity-[var(--noise-opacity)] after:pointer-events-none after:animate-[drift_6s_infinite_alternate_ease-in-out] after:bg-repeat">
+          <a href="#hero" className="block">
             <Image
               src="/logo.png"  // ★ publicフォルダからのパス。ご自身のファイル名に変更してください。
               alt="Axis Protocol Logo" // ロゴの説明
               width={60} // ★ ロゴの実際の幅に合わせて調整
-              height=
-              {60} // ★ ロゴの実際の高さに合わせて調整
+              height={60} // ★ ロゴの実際の高さに合わせて調整
               priority // ページの最初に読み込む重要な画像であることを示す
             />
           </a>
-          <nav className={styles.nav}>
+          <nav className="flex items-center gap-4">
             {navItems.map((item) => (
               <a key={item.name} href={item.href}>
                 {/* button自体にはクラス名は不要 (親の.navから指定されているため) */}
-                <button>{item.name}</button>
+                <button className="bg-none border-none px-2.5 py-1.5 text-sm font-bold text-white cursor-pointer transition-colors duration-200 hover:bg-white/20 hover:rounded-lg">{item.name}</button>
               </a>
             ))}
           </nav>
@@ -52,7 +46,7 @@ export const Header = () => {
 
       {/* ---------- ハンバーガーボタン (SP用) ---------- */}
       <button 
-        className={styles.hamburger} 
+        className="fixed right-5 top-5 bg-none border-none z-[110] hidden md:hidden cursor-pointer" 
         onClick={() => setIsDrawerOpen(!isDrawerOpen)}
         aria-label="メニューを開く"
       >
@@ -65,7 +59,7 @@ export const Header = () => {
       <AnimatePresence>
         {isDrawerOpen && (
           <motion.div
-            className={styles.drawer}
+            className="fixed top-0 right-0 bottom-0 w-4/5 p-12 pt-12 bg-white/90 backdrop-blur-[calc(var(--blur-strength)+6px)] shadow-[-6px_0_20px_rgba(0,0,0,0.15)] flex flex-col gap-5 z-[105]"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -74,7 +68,7 @@ export const Header = () => {
             {navItems.map((item) => (
               <a key={item.name} href={item.href} onClick={handleLinkClick}>
                  {/* button自体にはクラス名は不要 (親の.drawerから指定されているため) */}
-                <button>{item.name}</button>
+                <button className="bg-none border-none text-xl text-left text-gray-900 cursor-pointer">{item.name}</button>
               </a>
             ))}
           </motion.div>
