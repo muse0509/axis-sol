@@ -119,8 +119,8 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
     return (
       <div className="px-6 md:px-16 bg-black text-white min-h-screen overflow-x-hidden relative">
         <main className="min-h-screen py-8 md:py-16 flex flex-col items-center z-10 relative">
-          <h1 className="m-0 leading-tight text-4xl md:text-6xl font-bold tracking-tighter flex items-center gap-4 md:gap-6">Error</h1>
-          <p>{error || 'No data available.'}</p>
+          <h1 className="m-0 leading-tight text-4xl md:text-6xl font-bold tracking-tighter flex items-center gap-4 md:gap-6 text-white">Error</h1>
+          <p className="text-gray-400">{error || 'No data available.'}</p>
         </main>
       </div>
     )

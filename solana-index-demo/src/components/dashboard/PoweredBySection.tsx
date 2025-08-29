@@ -11,7 +11,7 @@ export default function PoweredBySection() {
       animate={{ opacity: 1 }} 
       transition={{ duration: 0.8, delay: 0.6 }}
     >
-      <p className="text-base-content/70">Powered by&nbsp;</p>
+      <p className="text-gray-400">Powered by&nbsp;</p>
       <Image src="/magicblock-logo.png" alt="MagicBlock" width={180} height={32} />
     </motion.div>
   );

@@ -2,6 +2,7 @@
 
 import { motion, Variants } from 'framer-motion';
 import CountUp from 'react-countup';
+import { DashboardCard, DashboardGrid } from '../common';
 
 interface RealTimeAsset {
   symbol: string;
@@ -29,43 +30,41 @@ export default function ConstituentsGrid({ assets, loading }: ConstituentsGridPr
       viewport={{ once: true, amount: 0.2 }}
     >
       <div className="mb-6 text-center">
-        <h2 className="text-2xl md:text-3xl font-semibold m-0">Index Constituents</h2>
-        <p className="text-base-content/70 max-w-[450px] mx-auto mt-2">
+        <h2 className="text-2xl md:text-3xl font-semibold m-0 text-white">Index Constituents</h2>
+        <p className="text-gray-400 max-w-[450px] mx-auto mt-2">
           Each asset is equally weighted at 10% to ensure a balanced market representation.
         </p>
-        <p className="text-base-content/50 text-sm max-w-[450px] mx-auto mt-4 italic">
+        <p className="text-gray-500 text-sm max-w-[450px] mx-auto mt-4 italic">
           Prices are updated every five seconds via Pyth oracle feeds.
         </p>
       </div>
 
       {loading ? (
         <div className="text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-lg">Loading real-time prices…</p>
+          <span className="loading loading-spinner loading-lg text-blue-500"></span>
+          <p className="mt-4 text-lg text-gray-300">Loading real-time prices…</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <DashboardGrid cols={5} gap="sm">
           {assets.map(asset => (
-            <div key={asset.symbol} className="card bg-base-200 border border-base-300 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
-              <div className="card-body p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-2xl md:text-3xl font-semibold">{asset.symbol}</span>
-                  <div className="badge badge-primary badge-sm">10%</div>
-                </div>
-                <div className="text-2xl md:text-3xl font-medium text-left">
-                  <CountUp 
-                    key={`${asset.symbol}-price`} 
-                    end={asset.currentPrice} 
-                    decimals={asset.currentPrice < 1 ? 5 : 2} 
-                    duration={0.5} 
-                    separator="," 
-                    prefix="$" 
-                  />
-                </div>
+            <DashboardCard key={asset.symbol} className="p-4 hover:-translate-y-1">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-2xl md:text-3xl font-semibold text-white">{asset.symbol}</span>
+                <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">10%</div>
               </div>
-            </div>
+              <div className="text-2xl md:text-3xl font-medium text-left text-gray-300">
+                <CountUp 
+                  key={`${asset.symbol}-price`} 
+                  end={asset.currentPrice} 
+                  decimals={asset.currentPrice < 1 ? 5 : 2} 
+                  duration={0.5} 
+                  separator="," 
+                  prefix="$" 
+                />
+              </div>
+            </DashboardCard>
           ))}
-        </div>
+        </DashboardGrid>
       )}
     </motion.div>
   );

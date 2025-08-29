@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { DashboardButton } from '../common';
 
 interface ActionButtonsProps {
   onBuyClick: () => void;
@@ -15,37 +16,38 @@ export default function ActionButtons({ onBuyClick, onBurnClick }: ActionButtons
       animate={{ opacity: 1 }} 
       transition={{ duration: 0.8, delay: 0.4 }}
     >
-      <button 
+      <DashboardButton 
         onClick={onBuyClick} 
-        className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all duration-200"
+        variant="primary"
+        size="lg"
       >
         Buy Index Token
-      </button>
+      </DashboardButton>
       
-      <button 
+      <DashboardButton 
         onClick={onBurnClick} 
-        className="btn btn-outline btn-lg hover:btn-primary transition-all duration-200"
+        variant="outline"
+        size="lg"
       >
         Burn Index Token
-      </button>
+      </DashboardButton>
       
-      <a 
+      <DashboardButton 
         href="https://muse-7.gitbook.io/axiswhitepaper/" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="btn btn-outline btn-lg hover:btn-primary transition-all duration-200"
+        variant="outline"
+        size="lg"
+        external
       >
         Read WhitePaper
-      </a>
+      </DashboardButton>
       
-      <a 
+      <DashboardButton 
         href="/challenge" 
-        target="_blank" 
-        rel="noopener noreferrer" 
-        className="btn btn-outline btn-lg hover:btn-primary transition-all duration-200"
+        variant="outline"
+        size="lg"
       >
         Create Challenge Image
-      </a>
+      </DashboardButton>
     </motion.div>
   );
 }

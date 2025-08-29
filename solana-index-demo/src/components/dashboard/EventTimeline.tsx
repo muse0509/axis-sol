@@ -26,14 +26,14 @@ export default function EventTimeline({ events }: EventTimelineProps) {
       whileInView="visible" 
       viewport={{ once: true, amount: 0.2 }}
     >
-      <h2 className="text-2xl md:text-3xl mb-6 border-l-4 border-primary pl-4">Event Timeline</h2>
+      <h2 className="text-2xl md:text-3xl mb-6 border-l-4 border-blue-500 pl-4 text-white">Event Timeline</h2>
       
       <div className="space-y-8">
         {events.map((event, index) => (
-          <div key={event.title} className="flex flex-col md:flex-row gap-3 md:gap-6 border-l-2 border-base-300 pl-4 md:pl-6 relative">
-            <div className="absolute left-[-7px] top-[5px] w-3 h-3 bg-primary rounded-full border-2 border-base-100 shadow-lg"></div>
+          <div key={event.title} className="flex flex-col md:flex-row gap-3 md:gap-6 border-l-2 border-gray-700 pl-4 md:pl-6 relative">
+            <div className="absolute left-[-7px] top-[5px] w-3 h-3 bg-blue-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
             
-            <div className="font-semibold text-base-content/70 min-w-[130px] pt-1">
+            <div className="font-semibold text-gray-400 min-w-[130px] pt-1">
               {new Date(event.event_date).toLocaleDateString('en-US', { 
                 year: 'numeric', 
                 month: 'short', 
@@ -42,10 +42,10 @@ export default function EventTimeline({ events }: EventTimelineProps) {
             </div>
             
             <div className="flex flex-col">
-              <h3 className="text-lg md:text-xl font-semibold m-0 mb-2 text-base-content">
+              <h3 className="text-lg md:text-xl font-semibold m-0 mb-2 text-white">
                 {event.title}
               </h3>
-              <p className="text-sm md:text-base text-base-content/70 leading-relaxed m-0">
+              <p className="text-sm md:text-base text-gray-300 leading-relaxed m-0">
                 {event.description}
               </p>
             </div>
