@@ -2,13 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import { AnimatePresence } from 'framer-motion';
-import { useWallet } from '@solana/wallet-adapter-react';
-
 // Components
-import { Header } from '../components/Header';
+import { Header } from '../components/common/Header';
 import { Background } from '../components/Background';
 import { Modal } from '../components/Modal';
-import { Footer } from '../components/Footer';
+import { Footer } from '../components/common/Footer';
 import {
   Section,
   HeroSection,
