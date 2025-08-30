@@ -171,12 +171,12 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
         </main>
       </div>
 
-      <BuyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} indexPrice={currentIdx ?? latestClose} />
+      {/* <BuyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} indexPrice={currentIdx ?? latestClose} />
       <BurnModal
         isOpen={burnOpen}
         onClose={() => setBurnOpen(false)}
         indexPrice={currentIdx ?? latestClose}
-      />
+      /> */}
     </>
   )
 }
