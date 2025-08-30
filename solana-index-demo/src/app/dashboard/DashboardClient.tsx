@@ -12,7 +12,7 @@ import { loadSlim } from 'tsparticles-slim'
 
 import { particlesOptions } from '../../utils/particles'
 import type { EChartProps } from '../../components/charts/EChartsChart'
-import BuyModal from '../../components/dashboard/BuyModal'
+const BuyModal = dynamic(() => import('@/components/dashboard/BuyModal'), { ssr: false })
 import Header from '../../components/dashboard/Header'
 import ActionButtons from '../../components/dashboard/ActionButtons'
 import IndexValueCard from '../../components/dashboard/IndexValueCard'
@@ -171,12 +171,20 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
         </main>
       </div>
 
-      {/* <BuyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} indexPrice={currentIdx ?? latestClose} />
-      <BurnModal
-        isOpen={burnOpen}
-        onClose={() => setBurnOpen(false)}
-        indexPrice={currentIdx ?? latestClose}
-      /> */}
+      {modalOpen && (
+        <BuyModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          indexPrice={currentIdx ?? latestClose}
+        />
+      )}
+      {burnOpen && (
+        <BurnModal
+          isOpen={burnOpen}
+          onClose={() => setBurnOpen(false)}
+          indexPrice={currentIdx ?? latestClose}
+        />
+      )}
     </>
   )
 }
