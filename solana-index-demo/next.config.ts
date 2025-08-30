@@ -1,4 +1,8 @@
 import type { NextConfig } from 'next'
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+// Initialize OpenNext for Cloudflare compatibility
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

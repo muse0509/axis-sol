@@ -42,9 +42,8 @@ const DashboardButton: React.FC<DashboardButtonProps> = ({
   const buttonContent = (
     <motion.div
       className={classes}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      disabled={disabled}
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
     >
       {children}
     </motion.div>

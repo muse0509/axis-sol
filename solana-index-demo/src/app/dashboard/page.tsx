@@ -18,8 +18,13 @@ interface LatestEntry  { created_at: string; index_value: number }
 
 async function loadData() {
   try {
+    console.log('Loading dashboard data...')
+    
     const csvPath = path.join(process.cwd(), './src/lib/data/data.csv')
+    console.log('CSV path:', csvPath)
+    
     const csvText = await fs.readFile(csvPath, 'utf8')
+    console.log('CSV loaded, length:', csvText.length)
 
     const rows = csvText.trim().split('\n')
     const header = rows[0].split(',').map(h => h.trim())
@@ -35,6 +40,7 @@ async function loadData() {
     })
 
     if (!data.length) throw new Error('CSV is empty')
+    console.log('Data processed, rows:', data.length)
 
     const dayMap = new Map<string, { open: number; high: number; low: number; close: number }>()
     data.forEach((r: any) => {
@@ -58,6 +64,7 @@ async function loadData() {
       ? ((echartsData.at(-1)![2] as number) - (echartsData.at(-2)![2] as number)) / (echartsData.at(-2)![2] as number) * 100
       : null
 
+    console.log('Data loaded successfully')
     return {
       initialLatestEntry: JSON.parse(JSON.stringify((data as any[]).at(-1))) as LatestEntry,
         echartsData,
@@ -66,6 +73,7 @@ async function loadData() {
       error: undefined as string | undefined,
     }
   } catch (err: any) {
+    console.error('Error loading dashboard data:', err)
     return {
         initialLatestEntry: null,
         echartsData: null,
@@ -77,7 +85,10 @@ async function loadData() {
 }
 
 export default async function Page() {
+  console.log('Dashboard page rendering...')
   const props = await loadData()
+  console.log('Props loaded:', props)
+  
   return (
     <DashboardClient
       initialLatestEntry={props.initialLatestEntry}
