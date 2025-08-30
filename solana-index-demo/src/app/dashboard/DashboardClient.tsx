@@ -12,7 +12,7 @@ import { loadSlim } from 'tsparticles-slim'
 
 import { particlesOptions } from '../../utils/particles'
 import type { EChartProps } from '../../components/charts/EChartsChart'
-const BuyModal = dynamic(() => import('@/components/dashboard/BuyModal'), { ssr: false })
+const BuyModal = dynamic(() => import('@/components/dashboard/Modal/BuyModal'), { ssr: false })
 import Header from '../../components/dashboard/Header'
 import ActionButtons from '../../components/dashboard/ActionButtons'
 import IndexValueCard from '../../components/dashboard/IndexValueCard'
@@ -22,7 +22,7 @@ import EventTimeline from '../../components/dashboard/EventTimeline'
 import PoweredBySection from '../../components/dashboard/PoweredBySection'
 
 const WalletBar = dynamic(() => import('@/components/crypto/WalletBar'), { ssr: false })
-const BurnModal = dynamic(() => import('@/components/dashboard/BurnModal'), { ssr: false })
+const BurnModal = dynamic(() => import('@/components/dashboard/Modal/BurnModal'), { ssr: false })
 
 const API_BASE = 'https://axis-trigger.kidneyweakx.workers.dev'
 
