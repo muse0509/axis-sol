@@ -9,7 +9,8 @@
     "lint": "next lint",
     "preview": "OPEN_NEXT_DEBUG=true opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+    "test:webhook": "ts-node scripts/test-webhook.ts"
   },
   "dependencies": {
     "@axis-protocol/sdk": "^1.0.2",
