@@ -46,6 +46,15 @@ const AxisLandingPage: NextPage = () => {
   ];
 
   useEffect(() => {
+    // Check if user has seen the intro before
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    
+    if (hasSeenIntro) {
+      // Skip loading screen if user has seen it before
+      setIsLoading(false);
+      return;
+    }
+
     let index = 0;
     const timer = setInterval(() => {
       if (index < fullText.length) {
@@ -53,11 +62,21 @@ const AxisLandingPage: NextPage = () => {
         index++;
       } else {
         clearInterval(timer);
-        setTimeout(() => setIsLoading(false), 1000);
+        setTimeout(() => {
+          setIsLoading(false);
+          sessionStorage.setItem('hasSeenIntro', 'true');
+        }, 1000);
       }
     }, 100);
+
     return () => clearInterval(timer);
   }, []); // Remove fullText dependency to prevent re-running
+
+  // Function to skip the intro
+  const skipIntro = () => {
+    setIsLoading(false);
+    sessionStorage.setItem('hasSeenIntro', 'true');
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
@@ -76,7 +95,11 @@ const AxisLandingPage: NextPage = () => {
       />
       
       <AnimatePresence>
-        {isLoading && <LoadingScreen typewriterText={typewriterText} />}
+        {isLoading && (
+          <div onClick={skipIntro} className="cursor-pointer">
+            <LoadingScreen typewriterText={typewriterText} />
+          </div>
+        )}
       </AnimatePresence>
 
       {!isLoading && (
