@@ -150,6 +150,15 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
             onBurnClick={() => setBurnOpen(true)}
           />
 
+          <div className="flex justify-center mt-8">
+            <a
+              href="/portfolio"
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-green-500 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              View Portfolio
+            </a>
+          </div>
+
           <PoweredBySection />
 
           <IndexValueCard 
