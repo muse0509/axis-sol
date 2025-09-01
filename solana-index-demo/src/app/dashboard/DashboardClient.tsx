@@ -1,28 +1,19 @@
 'use client';
 
-/* =====================================================
- * DashboardClient ― Client-side UI for Market Pulse Index
- * ===================================================== */
-
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState } from 'react'
-import Particles from 'react-tsparticles'
-import type { Engine } from 'tsparticles-engine'
-import { loadSlim } from 'tsparticles-slim'
+import { motion } from 'framer-motion'
 
-import { particlesOptions } from '../../utils/particles'
+import { PageLayout, ModernCard, GridLayout } from '../../components/common'
 import type { EChartProps } from '../../components/charts/EChartsChart'
-const BuyModal = dynamic(() => import('@/components/dashboard/Modal/BuyModal'), { ssr: false })
-import Header from '../../components/dashboard/Header'
-import ActionButtons from '../../components/dashboard/ActionButtons'
-import IndexValueCard from '../../components/dashboard/IndexValueCard'
-import ConstituentsGrid from '../../components/dashboard/ConstituentsGrid'
-import ChartSection from '../../components/dashboard/ChartSection'
-import EventTimeline from '../../components/dashboard/EventTimeline'
-import PoweredBySection from '../../components/dashboard/PoweredBySection'
 
-const WalletBar = dynamic(() => import('@/components/crypto/WalletBar'), { ssr: false })
+const BuyModal = dynamic(() => import('@/components/dashboard/Modal/BuyModal'), { ssr: false })
 const BurnModal = dynamic(() => import('@/components/dashboard/Modal/BurnModal'), { ssr: false })
+const WalletBar = dynamic(() => import('@/components/crypto/WalletBar'), { ssr: false })
+const IndexValueCard = dynamic(() => import('@/components/dashboard/IndexValueCard'), { ssr: false })
+const ConstituentsGrid = dynamic(() => import('@/components/dashboard/ConstituentsGrid'), { ssr: false })
+const ChartSection = dynamic(() => import('@/components/dashboard/ChartSection'), { ssr: false })
+const EventTimeline = dynamic(() => import('@/components/dashboard/EventTimeline'), { ssr: false })
 
 const API_BASE = 'https://axis-trigger.kidneyweakx.workers.dev'
 
@@ -64,8 +55,6 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
   const [modalOpen,   setModalOpen]   = useState(false)
   const [burnOpen,    setBurnOpen]    = useState(false)
   const [currentIdx,  setCurrentIdx]  = useState<number | null>(null)
-
-  const particlesInit = useCallback(async (engine: Engine) => { await loadSlim(engine) }, [])
 
   useEffect(() => {
     const es = new EventSource('/api/price-stream')
@@ -117,12 +106,11 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
 
   if (error || !initialLatestEntry || !echartsData?.length) {
     return (
-      <div className="px-6 md:px-16 bg-black text-white min-h-screen overflow-x-hidden relative">
-        <main className="min-h-screen py-8 md:py-16 flex flex-col items-center z-10 relative">
-          <h1 className="m-0 leading-tight text-4xl md:text-6xl font-bold tracking-tighter flex items-center gap-4 md:gap-6 text-white">Error</h1>
-          <p className="text-gray-400">{error || 'No data available.'}</p>
-        </main>
-      </div>
+      <PageLayout title="Error" description="Something went wrong">
+        <div className="text-center">
+          <p className="text-gray-400 text-xl">{error || 'No data available.'}</p>
+        </div>
+      </PageLayout>
     )
   }
 
@@ -133,52 +121,74 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
 
   return (
     <>
-      <div className="px-6 md:px-16 bg-black text-white min-h-screen overflow-x-hidden relative">
-        <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className="fixed inset-0 w-full h-full z-0 pointer-events-none" />
-
-        <main className="min-h-screen py-8 md:py-16 flex flex-col items-center z-10 relative">
-          <Header 
-            title="Market Pulse Index"
-            description="An equally weighted index designed to capture the true sentiment of the crypto market, moving beyond the bias of major assets."
-            logoSrc="/logo.png"
-          />
-
-          <WalletBar />
-
-          <ActionButtons 
-            onBuyClick={() => setModalOpen(true)}
-            onBurnClick={() => setBurnOpen(true)}
-          />
-
-          <div className="flex justify-center mt-8">
-            <a
-              href="/portfolio"
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-green-500 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              View Portfolio
-            </a>
+      <PageLayout 
+        title="Market Pulse Index"
+        description="An equally weighted index designed to capture the true sentiment of the crypto market, moving beyond the bias of major assets."
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          {/* Wallet Bar */}
+          <div className="flex justify-center">
+            <WalletBar />
           </div>
 
-          <PoweredBySection />
+          {/* Action Buttons */}
+          <div className="flex justify-center space-x-4">
+            <motion.button
+              onClick={() => setModalOpen(true)}
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-green-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Buy Index
+            </motion.button>
+            <motion.button
+              onClick={() => setBurnOpen(true)}
+              className="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-200 hover:scale-105"
+            >
+              Burn Index
+            </motion.button>
+          </div>
 
-          <IndexValueCard 
-            indexValue={displayedIdx}
-            dailyChange={initialDailyChange}
-          />
+          {/* Portfolio Link */}
+          <div className="flex justify-center">
+            <motion.a
+              href="/portfolio"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              View Portfolio
+            </motion.a>
+          </div>
 
-          <ConstituentsGrid 
-            assets={assets}
-            loading={loading}
-          />
+          {/* Index Value Card */}
+          <div className="flex justify-center">
+            <IndexValueCard 
+              indexValue={displayedIdx}
+              dailyChange={initialDailyChange}
+            />
+          </div>
 
-          <ChartSection 
-            echartsData={echartsData}
-            events={events}
-          />
+          {/* Constituents Grid */}
+          <ModernCard className="p-8">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Index Constituents</h2>
+            <ConstituentsGrid 
+              assets={assets}
+              loading={loading}
+            />
+          </ModernCard>
 
-          <EventTimeline events={events} />
-        </main>
-      </div>
+          {/* Chart Section */}
+          <ModernCard className="p-8">
+            <ChartSection 
+              echartsData={echartsData}
+              events={events}
+            />
+          </ModernCard>
+
+          {/* Event Timeline */}
+          <ModernCard className="p-8">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Market Events</h2>
+            <EventTimeline events={events} />
+          </ModernCard>
+        </div>
+      </PageLayout>
 
       {modalOpen && (
         <BuyModal

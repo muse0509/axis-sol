@@ -10,7 +10,7 @@ export const Footer = () => {
           © {new Date().getFullYear()} Axis Protocol. All rights reserved.
         </p>
         <div className="flex gap-6">
-        <a href="https://github.com/muse0509/axis-sol" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-gray-400 text-xl transition-all duration-300 hover:text-white hover:scale-110">
+        <a href="https://github.com/AxisProtocol/axis-sol" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-gray-400 text-xl transition-all duration-300 hover:text-white hover:scale-110">
         <FaGithub />
         </a>
 

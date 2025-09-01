@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
     '0351cfe3887d.ngrok-free.app',
   ],
 
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.coingecko.com',
+        port: '',
+        pathname: '/coins/images/**',
+      },
+    ],
+  },
+
   webpack: (config: any, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
       // fs モジュールをクライアント側で解決しない

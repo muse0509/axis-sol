@@ -4,13 +4,10 @@ import Head from 'next/head'
 import { useCallback, useRef, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { motion, AnimatePresence } from 'framer-motion'
-import Particles from 'react-tsparticles'
-import type { Engine } from 'tsparticles-engine'
-import { loadSlim } from 'tsparticles-slim'
 import { FiDownload, FiPlus, FiX } from 'react-icons/fi'
 import { FaXTwitter } from 'react-icons/fa6'
-import { particlesOptions } from '../../utils/particles'
 import { CURRENT_CONSTITUENTS } from '../../lib/constituents'
+import { PageLayout, ModernCard, ModernButton, GridLayout } from '../../components/common'
 
 type TokenInfo = {
   id: string
@@ -20,23 +17,23 @@ type TokenInfo = {
 
 const ImagePreviewModal = ({ imageUrl, onClose }: { imageUrl: string; onClose: () => void }) => {
   return (
-    <motion.div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1000] p-4"
+          <motion.div
+        className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1000] p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
     >
       <motion.div
-        className="relative bg-base-300 p-8 pt-10 rounded-2xl flex flex-col items-center gap-4 max-w-full max-h-[90vh]"
+        className="relative bg-gray-800 p-8 pt-10 rounded-2xl flex flex-col items-center gap-4 max-w-full max-h-[90vh] border border-gray-700/30"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-2.5 right-2.5 bg-transparent border-none text-white text-2xl cursor-pointer z-10"><FiX /></button>
+        <button onClick={onClose} className="absolute top-2.5 right-2.5 bg-transparent border-none text-white text-2xl cursor-pointer z-10 hover:text-gray-400 transition-colors"><FiX /></button>
         <img src={imageUrl} alt="Generated Challenge Preview" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
-        <p className="text-base-content/70 text-center text-sm">
+        <p className="text-gray-400 text-center text-sm">
           Press and hold (or right-click) the image to save.
         </p>
       </motion.div>
@@ -64,9 +61,6 @@ const ChallengePage: NextPage = () => {
     // クライアントサイドでのみ実行
     setIsTouchDevice(('ontouchstart' in window) || navigator.maxTouchPoints > 0);
   }, []);
-
-
-  const particlesInit = useCallback(async (engine: Engine) => { await loadSlim(engine) }, [])
 
   // --- LOGIC ---
   const handleRemove = (symbol: string) => {
@@ -98,516 +92,354 @@ const ChallengePage: NextPage = () => {
 
   const startDownloadProcess = () => {
     if(isDownloading) return;
-    setIsPreparing(true)
-  }
-
-  // --- IMAGE GENERATION ---
-  useEffect(() => {
-    if (!isPreparing) return;
-  
-    const generateImage = async () => {
-      const el = previewRef.current;
-      if (!el) { setIsPreparing(false); return; }
-  
+    setIsPreparing(true);
+    setTimeout(() => {
+      setIsPreparing(false);
       setIsDownloading(true);
-      // このtry...finallyブロックはPC/スマホ共通
-      try {
-        if ((document as any).fonts?.ready) {
-            try { await (document as any).fonts.ready; } catch(e) { console.warn('Font ready API failed.', e) }
-        }
-        window.scrollTo(0, 0);
+      generateAndDownloadImage();
+    }, 1000);
+  };
 
-        // (この部分のスタイル操作は元のコードと同じです)
-        const originalStyle = {
-            transform: el.style.transform, maxHeight: el.style.maxHeight,
-            height: el.style.height, overflow: el.style.overflow
-        };
-        el.style.transform = 'none'; el.style.maxHeight = 'none';
-        el.style.height = 'auto'; el.style.overflow = 'visible';
-        await new Promise(res => requestAnimationFrame(res));
-  
-        const handleEl = el.querySelector('#handle-preview') as HTMLElement | null;
-        const originalText = handleEl?.textContent ?? '';
-        if (handleEl) handleEl.textContent = twitterHandle || '@your_handle';
-        const now = new Date();
-        const tsText = new Intl.DateTimeFormat('ja-JP', {
-            timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short', hour12: false,
-        }).format(now);
-
-        const canvas = await html2canvas(el, {
-          scale: 2, useCORS: true, backgroundColor: null, scrollX: -window.scrollX,
-          scrollY: -window.scrollY, windowWidth: document.documentElement.offsetWidth,
-          windowHeight: document.documentElement.offsetHeight,
-          onclone: (doc) => {
-            const hNode = doc.getElementById('handle-preview');
-            if (hNode) hNode.textContent = twitterHandle || '@your_handle';
-            const p = doc.getElementById('preview-particles');
-            if (p) (p as HTMLElement).style.visibility = 'hidden';
-            const tsNode = doc.getElementById('timestamp') as HTMLElement | null;
-            if (tsNode) {
-              tsNode.textContent = `Created: ${tsText}`;
-              tsNode.style.display = 'block';
+  const generateAndDownloadImage = async () => {
+    if (!previewRef.current) return;
+    
+    try {
+      // Temporarily show the preview element for html2canvas
+      const previewElement = previewRef.current;
+      const originalDisplay = previewElement.style.display;
+      const originalPosition = previewElement.style.position;
+      const originalLeft = previewElement.style.left;
+      const originalTop = previewElement.style.top;
+      const originalVisibility = previewElement.style.visibility;
+      const originalZIndex = previewElement.style.zIndex;
+      
+      // Make element visible but off-screen for html2canvas
+      previewElement.style.display = 'block';
+      previewElement.style.position = 'absolute';
+      previewElement.style.left = '-9999px';
+      previewElement.style.top = '-9999px';
+      previewElement.style.visibility = 'visible';
+      previewElement.style.zIndex = '-1';
+      
+      // Wait a bit for the element to be properly positioned
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(previewElement, {
+        backgroundColor: '#000000',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        width: 400,
+        height: 600,
+        scrollX: 0,
+        scrollY: 0,
+        logging: false,
+        foreignObjectRendering: false,
+        ignoreElements: (element) => {
+          // Ignore any elements that might cause issues
+          const htmlElement = element as HTMLElement;
+          return htmlElement.classList.contains('hidden') || htmlElement.style.display === 'none';
+        },
+        onclone: (clonedDoc) => {
+          // Fix unsupported color functions in the cloned document
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+            * {
+              color: inherit !important;
+              background-color: inherit !important;
+              border-color: inherit !important;
             }
-          },
-        });
-        
-        // ★★★ ここでPCとスマホの処理を分岐 ★★★
-        if (isTouchDevice) {
-          // 【スマホの場合】モーダルで画像を表示
-          const imageUrl = canvas.toDataURL('image/png');
-          setGeneratedImageUrl(imageUrl);
-        } else {
-          // 【PCの場合】画像を直接ダウンロード
-          const image = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.href = image;
-          link.download = 'AxisAnalystChallenge.png';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+            .bg-black { background-color: #000000 !important; }
+            .text-white { color: #ffffff !important; }
+            .text-gray-400 { color: #9ca3af !important; }
+            .text-gray-300 { color: #d1d5db !important; }
+            .text-red-400 { color: #f87171 !important; }
+            .text-green-400 { color: #4ade80 !important; }
+            .bg-red-500\\/10 { background-color: rgba(239, 68, 68, 0.1) !important; }
+            .bg-green-500\\/10 { background-color: rgba(34, 197, 94, 0.1) !important; }
+            .border-red-500\\/20 { border-color: rgba(239, 68, 68, 0.2) !important; }
+            .border-green-500\\/20 { border-color: rgba(34, 197, 94, 0.2) !important; }
+            .border-gray-700\\/30 { border-color: rgba(55, 65, 81, 0.3) !important; }
+          `;
+          clonedDoc.head.appendChild(style);
         }
-  
-        // スタイルを元に戻す
-        if (handleEl) handleEl.textContent = originalText;
-        el.style.transform = originalStyle.transform; el.style.maxHeight = originalStyle.maxHeight;
-        el.style.height = originalStyle.height; el.style.overflow = originalStyle.overflow;
-
-      } catch (e) {
-        console.error(e);
-        alert('An error occurred while generating the image. Please try again.');
-      } finally {
-        setIsDownloading(false);
-        setIsPreparing(false);
+      });
+      
+      // Restore original styles
+      previewElement.style.display = originalDisplay;
+      previewElement.style.position = originalPosition;
+      previewElement.style.left = originalLeft;
+      previewElement.style.top = originalTop;
+      previewElement.style.visibility = originalVisibility;
+      previewElement.style.zIndex = originalZIndex;
+      
+      const imageUrl = canvas.toDataURL('image/png');
+      setGeneratedImageUrl(imageUrl);
+      
+      // Auto-download
+      const link = document.createElement('a');
+      link.download = `axis-challenge-${Date.now()}.png`;
+      link.href = imageUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setIsDownloading(false);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      setIsDownloading(false);
+      
+      // More specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('canvas')) {
+          alert('Canvas rendering failed. Please try again or refresh the page.');
+        } else if (error.message.includes('CORS')) {
+          alert('Image generation failed due to security restrictions. Please try again.');
+        } else if (error.message.includes('oklab') || error.message.includes('color function')) {
+          alert('Color parsing error detected. Please try again - this has been fixed.');
+        } else {
+          alert(`Error generating image: ${error.message}`);
+        }
+      } else {
+        alert('Error generating image. Please try again.');
       }
-    };
-  
-    generateImage();
-  }, [isPreparing, twitterHandle, isTouchDevice]); // ★★★ 依存配列に isTouchDevice を追加 ★★★
+    }
+  };
 
-
-  // --- X SHARE URL ---
-  const shareText = `Here's my entry for the #AxisAnalystChallenge! What do you think? @Axis__Solana`
-  const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
-
-  // --- RENDERING ---
   return (
-    <div className="bg-black text-white min-h-screen min-h-dvh relative">
+    <>
       <Head>
-        <title>Axis Analyst Challenge - Image Generator</title>
-        <meta name="description" content="Create your custom image for the #AxisAnalystChallenge" />
+        <title>Axis Index Challenge - Customize Your Index</title>
+        <meta name="description" content="Challenge the current Axis Index composition. Remove up to 3 tokens and add up to 3 new ones with your reasoning." />
       </Head>
 
-      {/* モーダルは isTouchDevice で表示/非表示を制御する必要はない */}
-      {/* generatedImageUrl がセットされた時だけ表示されるため、スマホの時しか表示されない */}
-      <AnimatePresence>
-        {generatedImageUrl && (
-            <ImagePreviewModal
-                imageUrl={generatedImageUrl}
-                onClose={() => setGeneratedImageUrl(null)}
-            />
-        )}
-      </AnimatePresence>
+      <PageLayout 
+        title="Axis Index Challenge"
+        description="Challenge the current index composition. Remove up to 3 tokens and add up to 3 new ones with your reasoning."
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          {/* Challenge Rules */}
+          <ModernCard className="p-8" gradient>
+            <h2 className="text-2xl font-bold text-white mb-4 text-center">Challenge Rules</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-orange-400 mb-2">3</div>
+                <div className="text-gray-300">Remove up to 3 tokens</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-blue-400 mb-2">3</div>
+                <div className="text-gray-300">Add up to 3 new tokens</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-2">∞</div>
+                <div className="text-gray-300">Unlimited creativity</div>
+              </div>
+            </div>
+          </ModernCard>
 
-      <Particles id="tsparticles" init={particlesInit} options={particlesOptions} className="fixed inset-0 w-full h-full -z-10" />
+          {/* Current Constituents */}
+          <ModernCard className="p-8" dark>
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Current Index Constituents</h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {constituents.map((symbol) => (
+                <motion.button
+                  key={symbol}
+                  onClick={() => handleRemove(symbol)}
+                  className="p-4 bg-gray-800/30 rounded-xl border border-gray-700/30 hover:bg-gray-700/30 transition-all duration-200 hover:scale-105"
+                  whileHover={{ y: -2 }}
+                >
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white">{symbol}</div>
+                    <div className="text-xs text-gray-400">Click to remove</div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </ModernCard>
 
-      <main className="flex flex-col items-center gap-8 w-full p-4 sm:p-6 lg:h-screen lg:dvh lg:p-0 lg:m-0 lg:gap-0">
-        {/* Preview Section */}
-        <div className="w-full flex justify-center items-center lg:flex-grow lg:p-4 lg:overflow-hidden">
+          {/* Removed Tokens */}
+          {removedTokens.length > 0 && (
+            <ModernCard className="p-8" dark>
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">Removed Tokens</h2>
+              <GridLayout cols={3} gap="md">
+                {removedTokens.map((token) => (
+                  <div key={token.id} className="p-4 bg-red-500/10 rounded-xl border border-red-500/20">
+                    <div className="text-center mb-3">
+                      <div className="text-xl font-bold text-red-400">{token.symbol}</div>
+                    </div>
+                    <textarea
+                      value={token.reason}
+                      onChange={(e) => handleReasonChange(token.id, e.target.value)}
+                      placeholder="Why did you remove this token?"
+                      className="w-full p-2 bg-gray-800/30 rounded-lg border border-gray-700/30 text-white text-sm resize-none placeholder-gray-400"
+                      rows={3}
+                    />
+                    <div className="mt-3 text-center">
+                      <ModernButton
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleRevertRemove(token)}
+                        className="w-full"
+                      >
+                        Revert
+                      </ModernButton>
+                    </div>
+                  </div>
+                ))}
+              </GridLayout>
+            </ModernCard>
+          )}
+
+          {/* Add New Tokens */}
+          <ModernCard className="p-8" dark>
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Add New Tokens</h2>
+            <div className="max-w-md mx-auto space-y-4">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newTokenSymbol}
+                  onChange={(e) => setNewTokenSymbol(e.target.value)}
+                  placeholder="Token Symbol (e.g., BTC)"
+                  className="flex-1 p-3 bg-gray-800/30 rounded-lg border border-gray-700/30 text-white placeholder-gray-400"
+                />
+                <ModernButton
+                  variant="primary"
+                  size="sm"
+                  onClick={handleAddToken}
+                  disabled={!newTokenSymbol.trim() || addedTokens.length >= 3}
+                >
+                  <FiPlus />
+                  Add
+                </ModernButton>
+              </div>
+              <textarea
+                value={newTokenReason}
+                onChange={(e) => setNewTokenReason(e.target.value)}
+                placeholder="Why should this token be added to the index?"
+                className="w-full p-3 bg-gray-800/30 rounded-lg border border-gray-700/30 text-white placeholder-gray-400 resize-none"
+                rows={3}
+              />
+            </div>
+          </ModernCard>
+
+          {/* Added Tokens */}
+          {addedTokens.length > 0 && (
+            <ModernCard className="p-8" dark>
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">Added Tokens</h2>
+              <GridLayout cols={3} gap="md">
+                {addedTokens.map((token) => (
+                  <div key={token.id} className="p-4 bg-green-500/10 rounded-xl border border-green-500/20">
+                    <div className="text-center mb-3">
+                      <div className="text-xl font-bold text-green-400">{token.symbol}</div>
+                    </div>
+                    <div className="text-sm text-gray-300 mb-3">{token.reason}</div>
+                    <div className="text-center">
+                      <ModernButton
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteAdded(token.id)}
+                        className="w-full"
+                      >
+                        Remove
+                      </ModernButton>
+                    </div>
+                  </div>
+                ))}
+              </GridLayout>
+            </ModernCard>
+          )}
+
+          {/* Twitter Handle */}
+          <ModernCard className="p-8" dark>
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Share Your Challenge</h2>
+            <div className="max-w-md mx-auto space-y-4">
+              <div className="flex items-center space-x-2">
+                <FaXTwitter className="text-blue-400 text-xl" />
+                <input
+                  type="text"
+                  value={twitterHandle}
+                  onChange={(e) => setTwitterHandle(e.target.value)}
+                  placeholder="@your_handle"
+                  className="flex-1 p-3 bg-gray-800/30 rounded-lg border border-gray-700/30 text-white placeholder-gray-400"
+                />
+              </div>
+              <div className="text-center text-sm text-gray-400">
+                Your Twitter handle will be included in the generated image
+              </div>
+            </div>
+          </ModernCard>
+
+          {/* Generate Challenge */}
+          <div className="text-center">
+            <ModernButton
+              variant="primary"
+              size="lg"
+              gradient
+              onClick={startDownloadProcess}
+              loading={isDownloading || isPreparing}
+              disabled={removedTokens.length === 0 && addedTokens.length === 0}
+            >
+              {isPreparing ? 'Preparing...' : isDownloading ? 'Generating...' : 'Generate Challenge Image'}
+            </ModernButton>
+          </div>
+
+          {/* Preview */}
           <div 
             ref={previewRef} 
-            className="w-full max-w-[600px] aspect-[1200/675] border border-white/10 rounded-2xl p-4 sm:p-6 relative overflow-hidden flex flex-col bg-[#0d0d0d] lg:w-[1200px] lg:h-[675px] lg:max-w-none lg:scale-[0.65] lg:origin-center lg:rounded-lg lg:bg-black lg:p-12"
+            className="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none"
+            style={{ visibility: 'hidden' }}
           >
-            <Particles 
-              id="preview-particles" 
-              options={{ ...particlesOptions, background: { color: { value: '#000' } } }} 
-              className="absolute inset-0 w-full h-full z-0" 
-            />
-            
-            {/* Header */}
-            <div className="text-center mb-4 z-10 relative lg:mb-5">
-              <h1 className="text-xl sm:text-2xl italic font-bold lg:text-5xl lg:font-extrabold lg:tracking-tight lg:drop-shadow-lg">
-                My #AxisAnalystChallenge 🏆
-              </h1>
-              <p className="text-sm sm:text-base text-gray-400 lg:text-2xl">Index Rebalance Thesis</p>
-            </div>
-            
-            {/* Content Grid */}
-            <div className="flex gap-3 sm:gap-4 flex-grow lg:grid lg:grid-cols-2 lg:gap-10 lg:px-5">
-              {/* Remove Section */}
-              <div className="flex-1 flex flex-col gap-2 sm:gap-3 lg:gap-5">
-                <h3 className="text-lg sm:text-xl mb-2 text-red-500 lg:text-3xl lg:font-bold lg:mb-5 lg:pb-2.5 lg:border-b-2 lg:border-red-500">
-                  REMOVE
-                </h3>
-                {removedTokens.map((token) => (
-                  <div 
-                    key={`remove-prev-${token.id}`} 
-                    className="p-3 rounded-lg border border-red-500/50 bg-red-500/10 lg:bg-black/40 lg:border-white/10 lg:backdrop-blur-sm lg:rounded-xl lg:p-5 lg:min-h-[100px] lg:flex lg:flex-col lg:justify-center lg:mb-4"
-                  >
-                    <h4 className="text-sm sm:text-base font-semibold mb-1 lg:text-2xl lg:font-semibold lg:uppercase">
-                      {token.symbol}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed lg:text-base lg:leading-relaxed lg:m-0 lg:break-words lg:whitespace-pre-wrap">
-                      {token.reason || 'Reasoning not provided.'}
-                    </p>
-                  </div>
-                ))}
+            <div className="bg-black text-white p-8 rounded-2xl max-w-md mx-auto border border-gray-700/30">
+              <div className="text-center mb-6">
+                <h1 className="text-3xl font-bold text-white mb-2">Axis Index Challenge</h1>
+                <p className="text-gray-400">By {twitterHandle}</p>
               </div>
               
-              {/* Add Section */}
-              <div className="flex-1 flex flex-col gap-2 sm:gap-3 lg:gap-5">
-                <h3 className="text-lg sm:text-xl mb-2 text-green-500 lg:text-3xl lg:font-bold lg:mb-5 lg:pb-2.5 lg:border-b-2 lg:border-green-500">
-                  ADD
-                </h3>
-                {addedTokens.map((token) => (
-                  <div 
-                    key={`add-prev-${token.id}`} 
-                    className="p-3 rounded-lg border border-green-500/50 bg-green-500/10 lg:bg-black/40 lg:border-white/10 lg:backdrop-blur-sm lg:rounded-xl lg:p-5 lg:min-h-[100px] lg:flex lg:flex-col lg:justify-center lg:mb-4"
-                  >
-                    <h4 className="text-sm sm:text-base font-semibold mb-1 lg:text-2xl lg:font-semibold lg:uppercase">
-                      {token.symbol}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed lg:text-base lg:leading-relaxed lg:m-0 lg:break-words lg:whitespace-pre-wrap">
-                      {token.reason || 'No reason provided.'}
-                    </p>
+              {removedTokens.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-red-400 mb-3">Removed Tokens</h2>
+                  <div className="space-y-2">
+                    {removedTokens.map((token) => (
+                      <div key={token.id} className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                        <div className="font-bold text-red-400">{token.symbol}</div>
+                        {token.reason && <div className="text-sm text-gray-300">{token.reason}</div>}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Footer */}
-            <div className="mt-4 pt-4 border-t border-gray-600 flex flex-col sm:flex-row sm:justify-between gap-2 text-xs sm:text-sm text-gray-400 lg:mt-5 lg:pt-5 lg:border-t lg:border-gray-700 lg:text-lg lg:text-gray-500 lg:flex-row">
-              <span>
-                Analysis by: <span id="handle-preview" className="text-white font-semibold">
-                  {twitterHandle || '@your_handle'}
-                </span>
-              </span>
-              <span>Tag @Axis__Solana to participate!</span>
-            </div>
-            
-            {/* Timestamp */}
-            <div 
-              id="timestamp" 
-              className="hidden lg:absolute lg:right-5 lg:bottom-3.5 lg:text-xs lg:text-gray-500 lg:tracking-wide lg:z-10 lg:pointer-events-none lg:select-none" 
-              aria-hidden="true"
-            ></div>
-          </div>
-        </div>
-
-        {/* Control Panel */}
-        <div className="w-full max-w-[700px] p-4 sm:p-6 bg-base-300/50 border border-white/10 backdrop-blur-xl rounded-2xl lg:w-[calc(100%-4rem)] lg:max-w-[1800px] lg:h-auto lg:flex-none lg:mx-auto lg:mb-8 lg:p-6">
-          {/* Mobile Layout */}
-          <div className="lg:hidden space-y-8">
-            {/* Panel 1: Select Tokens to Remove */}
-            <div>
-              <h2 className="mb-4 pb-2 text-xl border-b border-gray-600">1. Select Tokens to Remove</h2>
-              <motion.div layout className="flex flex-wrap gap-2">
-                <AnimatePresence>
-                  {constituents.map(symbol => (
-                    <motion.div 
-                      key={symbol} 
-                      layoutId={symbol} 
-                      initial={{ opacity: 0, scale: 0.5 }} 
-                      animate={{ opacity: 1, scale: 1 }} 
-                      exit={{ opacity: 0, scale: 0.5 }} 
-                      onClick={() => handleRemove(symbol)} 
-                      className="px-4 py-2 bg-gray-800 rounded-full cursor-pointer border border-gray-600 hover:bg-gray-700 hover:scale-110 transition-all duration-200" 
-                      whileHover={{ scale: 1.1, backgroundColor: '#333' }}
-                    >
-                      {symbol}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            </div>
-
-            {/* Panel 2: Reason for Removal */}
-            <div>
-              <h2 className="mb-4 pb-2 text-xl text-red-400 border-b border-gray-600">2. Reason for Removal ({removedTokens.length}/3)</h2>
-              <div className="space-y-4">
-                <AnimatePresence>
-                  {removedTokens.map(token => (
-                    <motion.div 
-                      key={token.id} 
-                      layoutId={token.id} 
-                      initial={{ opacity: 0, y: -20 }} 
-                      animate={{ opacity: 1, y: 0 }} 
-                      exit={{ opacity: 0, x: -50 }} 
-                      className="bg-black/20 p-4 rounded-lg"
-                    >
-                      <div className="flex justify-between items-center font-semibold mb-2">
-                        <span>{token.symbol}</span>
-                        <button 
-                          onClick={() => handleRevertRemove(token)} 
-                          className="bg-none border-none text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
-                        >
-                          <FiX />
-                        </button>
-                      </div>
-                      <textarea 
-                        placeholder="Your reasoning..." 
-                        value={token.reason} 
-                        onChange={(e) => handleReasonChange(token.id, e.target.value)} 
-                        rows={2} 
-                        className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-2 resize-y focus:border-blue-500 focus:outline-none"
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* Panel 3: Add New Tokens */}
-            <div>
-              <h2 className="mb-4 pb-2 text-xl text-green-400 border-b border-gray-600">3. Add New Tokens ({addedTokens.length}/3)</h2>
-              {addedTokens.length < 3 && (
-                <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                  <input 
-                    type="text" 
-                    placeholder="Symbol" 
-                    value={newTokenSymbol} 
-                    onChange={(e) => setNewTokenSymbol(e.target.value)} 
-                    maxLength={10} 
-                    className="flex-grow bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-green-500 focus:outline-none"
-                  />
-                  <input 
-                    type="text" 
-                    placeholder="Reasoning (optional)" 
-                    value={newTokenReason} 
-                    onChange={(e) => setNewTokenReason(e.target.value)} 
-                    className="flex-grow bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-green-500 focus:outline-none"
-                  />
-                  <button 
-                    onClick={handleAddToken} 
-                    className="px-4 py-3 bg-green-500 border-none rounded cursor-pointer hover:bg-green-600 transition-colors"
-                  >
-                    <FiPlus />
-                  </button>
                 </div>
               )}
-              <div className="space-y-4">
-                {addedTokens.map(token => (
-                  <motion.div 
-                    key={token.id} 
-                    layout 
-                    initial={{ opacity: 0, scale: 0.8 }} 
-                    animate={{ opacity: 1, scale: 1 }} 
-                    exit={{ opacity: 0, scale: 0.5 }} 
-                    className="bg-black/20 p-4 rounded-lg"
-                  >
-                    <div className="flex justify-between items-center font-semibold mb-2">
-                      <span>{token.symbol}</span>
-                      <button 
-                        onClick={() => handleDeleteAdded(token.id)} 
-                        className="bg-none border-none text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
-                      >
-                        <FiX />
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-300">{token.reason || 'No reason provided.'}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Panel 4: Finalize & Share */}
-            <div className="pt-6 border-t border-gray-600">
-              <h2 className="mb-4 pb-2 text-xl border-b border-gray-600">4. Finalize & Share</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-300 mb-2">Your X Handle</label>
-                  <input 
-                    type="text" 
-                    placeholder="@your_handle" 
-                    value={twitterHandle} 
-                    onChange={(e) => setTwitterHandle(e.target.value)} 
-                    className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                
-                <button 
-                  onClick={startDownloadProcess} 
-                  className="w-full flex justify-center items-center gap-3 px-6 py-3 rounded-lg text-white font-bold cursor-pointer border-none bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200" 
-                  disabled={isDownloading}
-                >
-                  <FiDownload />
-                  <span>{isDownloading ? 'Generating...' : (isTouchDevice ? 'Generate Image' : 'Download Image')}</span>
-                </button>
-                
-                <p className="text-center text-gray-400 text-sm">
-                  {isTouchDevice ? 'Generate image first, then post it!' : 'Download the image and then post it!'}
-                </p>
-                
-                <a 
-                  href={shareUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-full flex justify-center items-center gap-3 px-6 py-3 rounded-lg text-white font-bold cursor-pointer border-none bg-[#1DA1F2] hover:bg-[#1a91da] transition-all duration-200"
-                >
-                  <FaXTwitter />
-                  <span>Post on X</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop Layout */}
-          <div className="hidden lg:grid lg:grid-cols-4 lg:gap-6">
-            {/* Panel 1: Select Tokens to Remove */}
-            <div className="flex flex-col gap-4 px-6 border-r border-white/10 overflow-y-auto">
-              <h2 className="text-xl font-semibold">1. Select Tokens to Remove</h2>
-              <motion.div layout className="flex flex-wrap gap-2">
-                <AnimatePresence>
-                  {constituents.map(symbol => (
-                    <motion.div 
-                      key={symbol} 
-                      layoutId={symbol} 
-                      initial={{ opacity: 0, scale: 0.5 }} 
-                      animate={{ opacity: 1, scale: 1 }} 
-                      exit={{ opacity: 0, scale: 0.5 }} 
-                      onClick={() => handleRemove(symbol)} 
-                      className="px-4 py-2 bg-gray-800 rounded-full cursor-pointer border border-gray-600 hover:bg-gray-700 hover:scale-110 transition-all duration-200" 
-                      whileHover={{ scale: 1.1, backgroundColor: '#333' }}
-                    >
-                      {symbol}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            </div>
-
-            {/* Panel 2: Reason for Removal */}
-            <div className="flex flex-col gap-4 px-6 border-r border-white/10 overflow-y-auto">
-              <h2 className="text-xl font-semibold text-red-400">2. Reason for Removal ({removedTokens.length}/3)</h2>
-              <div className="space-y-4">
-                <AnimatePresence>
-                  {removedTokens.map(token => (
-                    <motion.div 
-                      key={token.id} 
-                      layoutId={token.id} 
-                      initial={{ opacity: 0, y: -20 }} 
-                      animate={{ opacity: 1, y: 0 }} 
-                      exit={{ opacity: 0, x: -50 }} 
-                      className="bg-black/20 p-3 rounded-lg"
-                    >
-                      <div className="flex justify-between items-center font-semibold mb-2">
-                        <span>{token.symbol}</span>
-                        <button 
-                          onClick={() => handleRevertRemove(token)} 
-                          className="bg-none border-none text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
-                        >
-                          <FiX />
-                        </button>
+              
+              {addedTokens.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-green-400 mb-3">Added Tokens</h2>
+                  <div className="space-y-2">
+                    {addedTokens.map((token) => (
+                      <div key={token.id} className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <div className="font-bold text-green-400">{token.symbol}</div>
+                        <div className="text-sm text-gray-300">{token.reason}</div>
                       </div>
-                      <textarea 
-                        placeholder="Your reasoning..." 
-                        value={token.reason} 
-                        onChange={(e) => handleReasonChange(token.id, e.target.value)} 
-                        rows={2} 
-                        className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-2 resize-y focus:border-blue-500 focus:outline-none"
-                      />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* Panel 3: Add New Tokens */}
-            <div className="flex flex-col gap-4 px-6 border-r border-white/10 overflow-y-auto">
-              <h2 className="text-xl font-semibold text-green-400">3. Add New Tokens ({addedTokens.length}/3)</h2>
-              {addedTokens.length < 3 && (
-                <div className="flex flex-col gap-2 mb-4">
-                  <input 
-                    type="text" 
-                    placeholder="Symbol" 
-                    value={newTokenSymbol} 
-                    onChange={(e) => setNewTokenSymbol(e.target.value)} 
-                    maxLength={10} 
-                    className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-green-500 focus:outline-none"
-                  />
-                  <input 
-                    type="text" 
-                    placeholder="Reasoning (optional)" 
-                    value={newTokenReason} 
-                    onChange={(e) => setNewTokenReason(e.target.value)} 
-                    className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-green-500 focus:outline-none"
-                  />
-                  <button 
-                    onClick={handleAddToken} 
-                    className="px-4 py-3 bg-green-500 border-none rounded cursor-pointer hover:bg-green-600 transition-colors"
-                  >
-                    <FiPlus />
-                  </button>
+                    ))}
+                  </div>
                 </div>
               )}
-              <div className="space-y-4">
-                {addedTokens.map(token => (
-                  <motion.div 
-                    key={token.id} 
-                    layout 
-                    initial={{ opacity: 0, scale: 0.8 }} 
-                    animate={{ opacity: 1, scale: 1 }} 
-                    exit={{ opacity: 0, scale: 0.5 }} 
-                    className="bg-black/20 p-3 rounded-lg"
-                  >
-                    <div className="flex justify-between items-center font-semibold mb-2">
-                      <span>{token.symbol}</span>
-                      <button 
-                        onClick={() => handleDeleteAdded(token.id)} 
-                        className="bg-none border-none text-gray-400 cursor-pointer p-1 hover:text-white transition-colors"
-                      >
-                        <FiX />
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-300">{token.reason || 'No reason provided.'}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Panel 4: Finalize & Share */}
-            <div className="flex flex-col gap-4 px-6 overflow-y-auto">
-              <h2 className="text-xl font-semibold">4. Finalize & Share</h2>
-              <div className="space-y-4 mt-auto">
-                <div>
-                  <label className="block text-sm text-gray-400 mb-1">Your X Handle</label>
-                  <input 
-                    type="text" 
-                    placeholder="@your_handle" 
-                    value={twitterHandle} 
-                    onChange={(e) => setTwitterHandle(e.target.value)} 
-                    className="w-full bg-gray-800 border border-gray-600 rounded-md text-white p-3 focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
-                
-                <button 
-                  onClick={startDownloadProcess} 
-                  className="w-full flex justify-center items-center gap-3 px-6 py-4 rounded-lg text-black font-semibold cursor-pointer border border-white bg-white hover:bg-gray-100 disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:-translate-y-0.5" 
-                  disabled={isDownloading}
-                >
-                  <FiDownload />
-                  <span>{isDownloading ? 'Generating...' : (isTouchDevice ? 'Generate Image' : 'Download Image')}</span>
-                </button>
-                
-                <p className="text-center text-gray-400 text-sm">
-                  {isTouchDevice ? 'Generate image first, then post it!' : 'Download the image and then post it!'}
-                </p>
-                
-                <a 
-                  href={shareUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-full flex justify-center items-center gap-3 px-6 py-4 rounded-lg text-white font-semibold cursor-pointer border border-[#1DA1F2] bg-[#1DA1F2] hover:bg-[#1a91da] transition-all duration-200 shadow-lg hover:-translate-y-0.5"
-                >
-                  <FaXTwitter />
-                  <span>Post on X</span>
-                </a>
+              
+              <div className="text-center text-sm text-gray-400">
+                Generated on {new Date().toLocaleDateString()}
               </div>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </PageLayout>
+
+      <AnimatePresence>
+        {generatedImageUrl && (
+          <ImagePreviewModal
+            imageUrl={generatedImageUrl}
+            onClose={() => setGeneratedImageUrl(null)}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 

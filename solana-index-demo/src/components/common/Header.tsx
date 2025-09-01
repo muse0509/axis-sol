@@ -4,12 +4,14 @@ import Image from 'next/image';
 
 const navItems = [
   { name: 'Home', href: '#hero' },
-  { name: 'Risks', href: '#risks' },
+  { name: 'Why Win', href: '#why-win' },
   { name: 'Product', href: '#product' },
-  { name: 'Why Axis', href: '#why' },
+  { name: 'Traction', href: '#traction' },
+  { name: 'Stats', href: '#stats' },
   { name: 'Roadmap', href: '#roadmap' },
   { name: 'Team', href: '#team' },
-  { name: 'WL', href: '#waitlist' },
+  { name: 'Waitlist', href: '#waitlist' },
+  { name: 'Learn More', href: '#booking' },
 ];
 
 export const Header = () => {

@@ -4,7 +4,7 @@
 
 import { marketEvents } from '../../lib/market-events'
 import { processDashboardData } from '../../lib/dashboard-data'
-import DashboardClient from './DashboardClient'
+import UnifiedDashboard from './UnifiedDashboard'
 
 export const metadata = {
   title: 'Market Pulse Index',
@@ -26,10 +26,8 @@ export default async function Page() {
     error: undefined as string | undefined,
   }
   
-  console.log('Props prepared:', props)
-  
   return (
-    <DashboardClient
+    <UnifiedDashboard
       initialLatestEntry={props.initialLatestEntry}
       echartsData={props.echartsData}
       initialDailyChange={props.initialDailyChange}
