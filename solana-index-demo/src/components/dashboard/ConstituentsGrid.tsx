@@ -11,8 +11,8 @@ interface RealTimeAsset {
 }
 
 interface ConstituentsGridProps {
-  assets: RealTimeAsset[];
-  loading: boolean;
+  assets?: RealTimeAsset[];
+  loading?: boolean;
 }
 
 const sectionVariants: Variants = {
@@ -20,7 +20,20 @@ const sectionVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeInOut' } },
 };
 
-export default function ConstituentsGrid({ assets, loading }: ConstituentsGridProps) {
+const defaultAssets: RealTimeAsset[] = [
+  { symbol: 'BTC', currentPrice: 43520.50, change24h: 2.5 },
+  { symbol: 'ETH', currentPrice: 2640.75, change24h: -1.2 },
+  { symbol: 'SOL', currentPrice: 98.45, change24h: 5.8 },
+  { symbol: 'BNB', currentPrice: 305.20, change24h: 1.1 },
+  { symbol: 'XRP', currentPrice: 0.6245, change24h: -0.8 },
+  { symbol: 'ADA', currentPrice: 0.4825, change24h: 3.2 },
+  { symbol: 'DOGE', currentPrice: 0.0845, change24h: -2.1 },
+  { symbol: 'AVAX', currentPrice: 35.67, change24h: 4.5 },
+  { symbol: 'TRX', currentPrice: 0.1045, change24h: 1.8 },
+  { symbol: 'SUI', currentPrice: 1.85, change24h: 7.2 },
+];
+
+export default function ConstituentsGrid({ assets = defaultAssets, loading = false }: ConstituentsGridProps) {
   return (
     <motion.div 
       className="w-full max-w-[1000px] mb-8 sm:mb-12" 

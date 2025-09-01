@@ -18,9 +18,8 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
     { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'mint', label: 'Mint', icon: '🪙' },
     { id: 'market', label: 'Market', icon: '📊' },
-    { id: 'dashboard', label: 'Index', icon: '📈' },
+    { id: 'dashboard', label: 'Index', icon: '⚡' },
     { id: 'portfolio', label: 'Portfolio', icon: '💼' },
-    { id: 'axis', label: 'AXIS', icon: '⚡' },
     { id: 'challenge', label: 'Challenge', icon: '🎯', external: true },
   ];
 

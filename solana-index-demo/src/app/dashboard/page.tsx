@@ -16,7 +16,6 @@ export default async function Page() {
   
   // Use static data instead of reading CSV file
   const dashboardData = processDashboardData()
-  console.log('Dashboard data processed:', dashboardData)
   
   const props = {
     initialLatestEntry: dashboardData.initialLatestEntry,

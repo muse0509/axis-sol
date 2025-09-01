@@ -15,7 +15,6 @@ import HomeTab from './tabs/HomeTab';
 import MintTab from './tabs/MintTab';
 import MarketTab from './tabs/MarketTab';
 import DashboardTab from './tabs/DashboardTab';
-import AxisTab from './tabs/AxisTab';
 import PortfolioTab from './tabs/PortfolioTab';
 import ChallengeTab from './tabs/ChallengeTab';
 
@@ -70,8 +69,6 @@ const UnifiedDashboard = ({
         return <DashboardTab {...commonProps} />;
       case 'portfolio':
         return <PortfolioTab {...commonProps} />;
-      case 'axis':
-        return <AxisTab {...commonProps} />;
       case 'challenge':
         return <ChallengeTab {...commonProps} />;
       default:

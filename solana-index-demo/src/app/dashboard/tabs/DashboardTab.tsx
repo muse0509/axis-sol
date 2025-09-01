@@ -1,34 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { ModernCard, GridLayout } from '../../../components/common';
+import { ModernCard, GridLayout, ModernButton } from '../../../components/common';
 
 const IndexValueCard = dynamic(() => import('../../../components/dashboard/IndexValueCard'), { ssr: false });
 const ConstituentsGrid = dynamic(() => import('../../../components/dashboard/ConstituentsGrid'), { ssr: false });
 const ChartSection = dynamic(() => import('../../../components/dashboard/ChartSection'), { ssr: false });
 const EventTimeline = dynamic(() => import('../../../components/dashboard/EventTimeline'), { ssr: false });
-
-interface RealTimeAsset {
-  symbol: string;
-  currentPrice: number;
-  change24h: number | null;
-}
-
-const ID_TO_SYMBOL: Record<string, string> = {
-  'e62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43': 'BTC',
-  'ff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace': 'ETH',
-  'ef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d': 'SOL',
-  '2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f': 'BNB',
-  'ec5d399846a9209f3fe5881d70aae9268c94339ff9817e8d18ff19fa05eea1c8': 'XRP',
-  'dcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c': 'DOGE',
-  '2a01deaec9e51a579277b34b122399984d0bbf57e2458a7e42fecd2829867a0d': 'ADA',
-  '93da3352f9f1d105fdfe4971cfa80e9dd777bfc5d0f683ebb6e1294b92137bb7': 'AVAX',
-  '67aed5a24fdad045475e7195c98a98aea119c763f272d4523f5bac93a4f33c2b': 'TRX',
-  '23d7315113f5b1d3ba7a83604c44b94d79f4fd69af77f804fc7f920a6dc65744': 'SUI',
-};
-
-const API_BASE = 'https://axis-trigger.kidneyweakx.workers.dev';
 
 interface DashboardTabProps {
   initialLatestEntry: any;
@@ -44,57 +23,136 @@ const DashboardTab = ({
   initialDailyChange, 
   events 
 }: DashboardTabProps) => {
-  const [assets, setAssets] = useState<RealTimeAsset[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentIdx, setCurrentIdx] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState<'index' | 'axis'>('index');
 
-  useEffect(() => {
-    const es = new EventSource('/api/price-stream');
-    es.onmessage = (ev) => {
-      try {
-        const msg = JSON.parse(ev.data);
-        if (msg.type !== 'prices') return;
-        const latest: Record<string, number> = {};
-        (msg.payload as any[]).forEach(({ id, price }) => {
-          const canon = String(id).toLowerCase().replace(/^0x/, '');
-          const expo = (price as any).expo ?? (price as any).exponent ?? 0;
-          const p = Number((price as any).price);
-          latest[canon] = p * Math.pow(10, expo);
-        });
-        const mapped: RealTimeAsset[] = Object.entries(ID_TO_SYMBOL).map(([id, sym]) => ({
-          symbol: sym,
-          currentPrice: latest[id] ?? 0,
-          change24h: null,
-        }));
-        setAssets(prev => {
-          const same = prev.length === mapped.length && prev.every((p, i) =>
-            p.symbol === mapped[i].symbol && p.currentPrice === mapped[i].currentPrice
-          );
-          return same ? prev : mapped;
-        });
-        setLoading(false);
-      } catch {}
-    };
-    es.onerror = () => { /* rely on auto-reconnect */ };
-    return () => es.close();
-  }, []);
+  const tokenomics = [
+    { label: 'Total Supply', value: '100M', icon: '🪙' },
+    { label: 'Circulating', value: '25M', icon: '🔄' },
+    { label: 'Market Cap', value: '$12.5M', icon: '💰' },
+    { label: 'Treasury', value: '15M', icon: '🏛️' },
+  ];
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchIndex = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/famcindexprice`);
-        if (!res.ok) return;
-        const data: { indexPrice: number } = await res.json();
-        if (!cancelled && typeof data.indexPrice === 'number') {
-          setCurrentIdx(data.indexPrice);
-        }
-      } catch {}
-    };
-    fetchIndex();
-    const id = setInterval(fetchIndex, 5000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
+  const stakingStats = [
+    { label: 'Total Staked', value: '8.5M AXIS', icon: '🔒' },
+    { label: 'APY', value: '12.5%', icon: '📈' },
+    { label: 'Your Stake', value: '0 AXIS', icon: '👤' },
+  ];
+
+  const renderAxisContent = () => (
+    <div className="space-y-4">
+      {/* Token Overview */}
+      <ModernCard className="p-4 text-center" gradient>
+        <div className="text-3xl mb-2">⚡</div>
+        <h2 className="text-xl font-bold text-white mb-3">$AXIS Token</h2>
+        
+        <div className="flex justify-center space-x-4">
+          <ModernButton variant="primary" size="sm" gradient>
+            Get AXIS
+          </ModernButton>
+        </div>
+      </ModernCard>
+
+      {/* Tokenomics */}
+      <ModernCard className="p-4">
+        <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
+          <span className="text-xl">📈</span>
+          <span>Tokenomics</span>
+        </h3>
+        
+        <GridLayout cols={4} gap="md">
+          {tokenomics.map((item) => (
+            <div
+              key={item.label}
+              className="text-center p-3 bg-white/10 rounded border border-white/20"
+            >
+              <div className="text-lg mb-1">{item.icon}</div>
+              <div className="text-lg font-bold text-white mb-1">{item.value}</div>
+              <div className="text-white/70 text-xs">{item.label}</div>
+            </div>
+          ))}
+        </GridLayout>
+      </ModernCard>
+
+      {/* Staking Stats */}
+      <ModernCard className="p-4">
+        <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
+          <span className="text-xl">🔒</span>
+          <span>Staking</span>
+        </h3>
+        
+        <GridLayout cols={3} gap="md">
+          {stakingStats.map((stat) => (
+            <ModernCard key={stat.label} className="text-center p-3" gradient>
+              <div className="text-lg mb-1">{stat.icon}</div>
+              <div className="text-lg font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-white/70 text-xs">{stat.label}</div>
+            </ModernCard>
+          ))}
+        </GridLayout>
+      </ModernCard>
+
+      {/* Governance */}
+      <ModernCard className="p-4">
+        <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
+          <span className="text-xl">🗳️</span>
+          <span>Governance</span>
+        </h3>
+        
+        <div className="space-y-2">
+          {[
+            {
+              title: 'Add MATIC to Index',
+              status: 'active',
+              votes: { for: 1250000, against: 340000 },
+            },
+            {
+              title: 'Rebalancing Frequency',
+              status: 'passed',
+              votes: { for: 2100000, against: 180000 },
+            },
+          ].map((proposal) => (
+            <div
+              key={proposal.title}
+              className="p-3 bg-white/10 rounded border border-white/20"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <h5 className="font-semibold text-white text-sm">{proposal.title}</h5>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  proposal.status === 'active' ? 'bg-green-500/20 text-green-300' :
+                  'bg-blue-500/20 text-blue-300'
+                }`}>
+                  {proposal.status}
+                </span>
+              </div>
+              
+              {proposal.status === 'active' && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-green-300">For: {proposal.votes.for.toLocaleString()}</span>
+                    <span className="text-red-300">Against: {proposal.votes.against.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-1.5">
+                    <div 
+                      className="bg-green-500 h-1.5 rounded-full"
+                      style={{ 
+                        width: `${(proposal.votes.for / (proposal.votes.for + proposal.votes.against)) * 100}%` 
+                      }}
+                    />
+                  </div>
+                  <div className="flex space-x-2 mt-2">
+                    <ModernButton variant="primary" size="sm" className="flex-1 text-xs">Vote For</ModernButton>
+                    <ModernButton variant="outline" size="sm" className="flex-1 text-xs">Vote Against</ModernButton>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </ModernCard>
+    </div>
+  );
+
+
 
   if (!initialLatestEntry || !echartsData?.length) {
     return (
@@ -107,10 +165,36 @@ const DashboardTab = ({
   const latestClose = echartsData.at(-1)![2] as number;
   const baseOpen = echartsData[0][1] as number;
   const fallbackIdx = baseOpen ? (latestClose / baseOpen) * 100 : 0;
-  const displayedIdx = currentIdx ?? fallbackIdx;
+  const displayedIdx = fallbackIdx;
 
   return (
     <div className="space-y-4">
+      {/* Section Tabs */}
+      <div className="flex justify-center">
+        <div className="flex bg-white/10 rounded-lg p-1 border border-white/20">
+          {[
+            { key: 'index', label: 'Index', icon: '📈' },
+            { key: 'axis', label: 'AXIS', icon: '⚡' },
+          ].map((section) => (
+            <button
+              key={section.key}
+              onClick={() => setActiveSection(section.key as any)}
+              className={`flex items-center space-x-2 px-4 py-2 rounded text-sm font-medium transition-colors ${
+                activeSection === section.key
+                  ? 'bg-white/20 text-white border border-white/30'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <span className="text-sm">{section.icon}</span>
+              <span>{section.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Section Content */}
+      {activeSection === 'index' ? (
+        <>
       {/* Index Value Card */}
       <div className="flex justify-center">
         <IndexValueCard 
@@ -123,10 +207,7 @@ const DashboardTab = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Constituents Grid */}
         <ModernCard className="p-3 sm:p-4" gradient>
-          <ConstituentsGrid 
-            assets={assets}
-            loading={loading}
-          />
+              <ConstituentsGrid />
         </ModernCard>
 
         {/* Chart Section */}
@@ -142,6 +223,10 @@ const DashboardTab = ({
       <ModernCard className="p-3 sm:p-4" dark>
         <EventTimeline events={events} />
       </ModernCard>
+        </>
+      ) : (
+        renderAxisContent()
+      )}
     </div>
   );
 };
