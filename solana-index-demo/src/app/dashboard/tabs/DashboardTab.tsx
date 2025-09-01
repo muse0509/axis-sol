@@ -120,9 +120,9 @@ const DashboardTab = ({
       </div>
 
       {/* Main Content Grid */}
-      <GridLayout cols={2} gap="md">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Constituents Grid */}
-        <ModernCard className="p-4" gradient>
+        <ModernCard className="p-3 sm:p-4" gradient>
           <ConstituentsGrid 
             assets={assets}
             loading={loading}
@@ -130,16 +130,16 @@ const DashboardTab = ({
         </ModernCard>
 
         {/* Chart Section */}
-        <ModernCard className="p-4" dark>
+        <ModernCard className="p-3 sm:p-4" dark>
           <ChartSection 
             echartsData={echartsData}
             events={events}
           />
         </ModernCard>
-      </GridLayout>
+      </div>
 
       {/* Event Timeline - Compact */}
-      <ModernCard className="p-4" dark>
+      <ModernCard className="p-3 sm:p-4" dark>
         <EventTimeline events={events} />
       </ModernCard>
     </div>

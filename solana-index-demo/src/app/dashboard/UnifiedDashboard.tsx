@@ -85,8 +85,8 @@ const UnifiedDashboard = ({
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
       {/* Main Content */}
-      <div className="flex-1 ml-64">
-        <div className="p-8">
+      <div className="flex-1 lg:ml-64">
+        <div className="p-4 sm:p-6 lg:p-8 pt-16 lg:pt-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}

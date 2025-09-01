@@ -49,7 +49,7 @@ const ChallengePage: NextPage = () => {
   const [newTokenReason, setNewTokenReason] = useState('')
   const [twitterHandle, setTwitterHandle] = useState('@your_handle')
 
-  const previewRef = useRef<HTMLDivElement>(null)
+
   const [isDownloading, setIsDownloading] = useState(false)
   const [isPreparing, setIsPreparing] = useState(false)
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
@@ -100,81 +100,178 @@ const ChallengePage: NextPage = () => {
   };
 
   const generateAndDownloadImage = async () => {
-    if (!previewRef.current) return;
-    
     try {
-      // Dynamically import html2canvas to avoid SSR issues
-      const html2canvas = (await import('html2canvas')).default;
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas context not available');
       
-      // Temporarily show the preview element for html2canvas
-      const previewElement = previewRef.current;
-      const originalDisplay = previewElement.style.display;
-      const originalPosition = previewElement.style.position;
-      const originalLeft = previewElement.style.left;
-      const originalTop = previewElement.style.top;
-      const originalVisibility = previewElement.style.visibility;
-      const originalZIndex = previewElement.style.zIndex;
+      // Set canvas dimensions
+      const width = 800;
+      const height = 1000;
+      canvas.width = width;
+      canvas.height = height;
       
-      // Make element visible but off-screen for html2canvas
-      previewElement.style.display = 'block';
-      previewElement.style.position = 'absolute';
-      previewElement.style.left = '-9999px';
-      previewElement.style.top = '-9999px';
-      previewElement.style.visibility = 'visible';
-      previewElement.style.zIndex = '-1';
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, '#0f0f23');
+      gradient.addColorStop(0.5, '#1a1a2e');
+      gradient.addColorStop(1, '#16213e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
       
-      // Wait a bit for the element to be properly positioned
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const canvas = await html2canvas(previewElement, {
-        backgroundColor: '#000000',
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        width: 400,
-        height: 600,
-        scrollX: 0,
-        scrollY: 0,
-        logging: false,
-        foreignObjectRendering: false,
-        ignoreElements: (element) => {
-          // Ignore any elements that might cause issues
-          const htmlElement = element as HTMLElement;
-          return htmlElement.classList.contains('hidden') || htmlElement.style.display === 'none';
-        },
-        onclone: (clonedDoc) => {
-          // Fix unsupported color functions in the cloned document
-          const style = clonedDoc.createElement('style');
-          style.textContent = `
-            * {
-              color: inherit !important;
-              background-color: inherit !important;
-              border-color: inherit !important;
-            }
-            .bg-black { background-color: #000000 !important; }
-            .text-white { color: #ffffff !important; }
-            .text-gray-400 { color: #9ca3af !important; }
-            .text-gray-300 { color: #d1d5db !important; }
-            .text-red-400 { color: #f87171 !important; }
-            .text-green-400 { color: #4ade80 !important; }
-            .bg-red-500\\/10 { background-color: rgba(239, 68, 68, 0.1) !important; }
-            .bg-green-500\\/10 { background-color: rgba(34, 197, 94, 0.1) !important; }
-            .border-red-500\\/20 { border-color: rgba(239, 68, 68, 0.2) !important; }
-            .border-green-500\\/20 { border-color: rgba(34, 197, 94, 0.2) !important; }
-            .border-gray-700\\/30 { border-color: rgba(55, 65, 81, 0.3) !important; }
-          `;
-          clonedDoc.head.appendChild(style);
-        }
+      // Load and draw logo
+      const logo = new Image();
+      await new Promise((resolve, reject) => {
+        logo.onload = resolve;
+        logo.onerror = reject;
+        logo.src = '/logo.png';
       });
       
-      // Restore original styles
-      previewElement.style.display = originalDisplay;
-      previewElement.style.position = originalPosition;
-      previewElement.style.left = originalLeft;
-      previewElement.style.top = originalTop;
-      previewElement.style.visibility = originalVisibility;
-      previewElement.style.zIndex = originalZIndex;
+      // Draw logo at the top
+      const logoSize = 120;
+      const logoX = (width - logoSize) / 2;
+      const logoY = 60;
+      ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
       
+      // Add "AXIS CHALLENGE" title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 48px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('AXIS CHALLENGE', width / 2, logoY + logoSize + 80);
+      
+      // Add subtitle
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillText(`By ${twitterHandle}`, width / 2, logoY + logoSize + 120);
+      
+      // Add date
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '18px Arial, sans-serif';
+      ctx.fillText(`Generated on ${new Date().toLocaleDateString()}`, width / 2, logoY + logoSize + 150);
+      
+      let currentY = logoY + logoSize + 200;
+      
+      // Draw removed tokens section
+      if (removedTokens.length > 0) {
+        ctx.fillStyle = '#f87171';
+        ctx.font = 'bold 28px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('REMOVED TOKENS', 60, currentY);
+        currentY += 50;
+        
+        removedTokens.forEach((token, index) => {
+          // Token box background
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.1)';
+          ctx.fillRect(60, currentY, width - 120, 80);
+          
+          // Token box border
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(60, currentY, width - 120, 80);
+          
+          // Token symbol
+          ctx.fillStyle = '#f87171';
+          ctx.font = 'bold 24px Arial, sans-serif';
+          ctx.fillText(token.symbol, 80, currentY + 30);
+          
+          // Token reason
+          if (token.reason) {
+            ctx.fillStyle = '#d1d5db';
+            ctx.font = '16px Arial, sans-serif';
+            const words = token.reason.split(' ');
+            let line = '';
+            let lineY = currentY + 55;
+            
+            for (let i = 0; i < words.length; i++) {
+              const testLine = line + words[i] + ' ';
+              const metrics = ctx.measureText(testLine);
+              const testWidth = metrics.width;
+              
+              if (testWidth > width - 200 && i > 0) {
+                ctx.fillText(line, 80, lineY);
+                line = words[i] + ' ';
+                lineY += 20;
+              } else {
+                line = testLine;
+              }
+            }
+            ctx.fillText(line, 80, lineY);
+            currentY += Math.max(80, lineY - currentY + 20);
+          } else {
+            currentY += 80;
+          }
+          
+          currentY += 20;
+        });
+        
+        currentY += 30;
+      }
+      
+      // Draw added tokens section
+      if (addedTokens.length > 0) {
+        ctx.fillStyle = '#4ade80';
+        ctx.font = 'bold 28px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ADDED TOKENS', 60, currentY);
+        currentY += 50;
+        
+        addedTokens.forEach((token, index) => {
+          // Token box background
+          ctx.fillStyle = 'rgba(34, 197, 94, 0.1)';
+          ctx.fillRect(60, currentY, width - 120, 80);
+          
+          // Token box border
+          ctx.strokeStyle = 'rgba(34, 197, 94, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(60, currentY, width - 120, 80);
+          
+          // Token symbol
+          ctx.fillStyle = '#4ade80';
+          ctx.font = 'bold 24px Arial, sans-serif';
+          ctx.fillText(token.symbol, 80, currentY + 30);
+          
+          // Token reason
+          if (token.reason) {
+            ctx.fillStyle = '#d1d5db';
+            ctx.font = '16px Arial, sans-serif';
+            const words = token.reason.split(' ');
+            let line = '';
+            let lineY = currentY + 55;
+            
+            for (let i = 0; i < words.length; i++) {
+              const testLine = line + words[i] + ' ';
+              const metrics = ctx.measureText(testLine);
+              const testWidth = metrics.width;
+              
+              if (testWidth > width - 200 && i > 0) {
+                ctx.fillText(line, 80, lineY);
+                line = words[i] + ' ';
+                lineY += 20;
+              } else {
+                line = testLine;
+              }
+            }
+            ctx.fillText(line, 80, lineY);
+            currentY += Math.max(80, lineY - currentY + 20);
+          } else {
+            currentY += 80;
+          }
+          
+          currentY += 20;
+        });
+        
+        currentY += 30;
+      }
+      
+      // Add footer
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '16px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Challenge the Axis Index composition', width / 2, height - 60);
+      ctx.fillText('Visit axis.finance to learn more', width / 2, height - 30);
+      
+      // Convert to image URL
       const imageUrl = canvas.toDataURL('image/png');
       setGeneratedImageUrl(imageUrl);
       
@@ -190,21 +287,7 @@ const ChallengePage: NextPage = () => {
     } catch (error) {
       console.error('Error generating image:', error);
       setIsDownloading(false);
-      
-      // More specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes('canvas')) {
-          alert('Canvas rendering failed. Please try again or refresh the page.');
-        } else if (error.message.includes('CORS')) {
-          alert('Image generation failed due to security restrictions. Please try again.');
-        } else if (error.message.includes('oklab') || error.message.includes('color function')) {
-          alert('Color parsing error detected. Please try again - this has been fixed.');
-        } else {
-          alert(`Error generating image: ${error.message}`);
-        }
-      } else {
-        alert('Error generating image. Please try again.');
-      }
+      alert(`Error generating image: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -385,51 +468,7 @@ const ChallengePage: NextPage = () => {
             </ModernButton>
           </div>
 
-          {/* Preview */}
-          <div 
-            ref={previewRef} 
-            className="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none"
-            style={{ visibility: 'hidden' }}
-          >
-            <div className="bg-black text-white p-8 rounded-2xl max-w-md mx-auto border border-gray-700/30">
-              <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold text-white mb-2">Axis Index Challenge</h1>
-                <p className="text-gray-400">By {twitterHandle}</p>
-              </div>
-              
-              {removedTokens.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-red-400 mb-3">Removed Tokens</h2>
-                  <div className="space-y-2">
-                    {removedTokens.map((token) => (
-                      <div key={token.id} className="p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                        <div className="font-bold text-red-400">{token.symbol}</div>
-                        {token.reason && <div className="text-sm text-gray-300">{token.reason}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {addedTokens.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-green-400 mb-3">Added Tokens</h2>
-                  <div className="space-y-2">
-                    {addedTokens.map((token) => (
-                      <div key={token.id} className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                        <div className="font-bold text-green-400">{token.symbol}</div>
-                        <div className="text-sm text-gray-300">{token.reason}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <div className="text-center text-sm text-gray-400">
-                Generated on {new Date().toLocaleDateString()}
-              </div>
-            </div>
-          </div>
+
         </div>
       </PageLayout>
 

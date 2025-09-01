@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import SidebarWalletButton from './SidebarWalletButton';
 
@@ -12,6 +12,7 @@ interface SidebarProps {
 
 const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navigationItems = [
     { id: 'home', label: 'Home', icon: '🏠' },
@@ -28,18 +29,46 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       window.location.href = '/challenge';
     } else {
       onTabChange(tabId);
+      setIsMobileOpen(false); // Close mobile menu when tab is selected
     }
   };
 
   return (
-    <motion.div 
-      className={`bg-black/80 backdrop-blur-xl border-r border-gray-700/30 h-screen fixed left-0 top-0 z-40 transition-all duration-300 ${
-        isCollapsed ? 'w-16' : 'w-64'
-      }`}
-      initial={{ x: -300 }}
-      animate={{ x: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-    >
+    <>
+      {/* Mobile Hamburger Button */}
+      <button
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800/80 backdrop-blur-xl border border-gray-700/30 rounded-lg text-white hover:bg-gray-700/80 transition-colors"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            onClick={() => setIsMobileOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.div 
+        className={`bg-black/80 backdrop-blur-xl border-r border-gray-700/30 h-screen fixed left-0 top-0 z-40 transition-all duration-300 ${
+          isCollapsed ? 'w-16' : 'w-64'
+        } ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+        initial={{ x: -300 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className="p-4 border-b border-gray-700/30">
@@ -114,15 +143,16 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
           </div>
         </div>
 
-        {/* Collapse Toggle */}
+        {/* Collapse Toggle - Hidden on mobile */}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute top-1/2 -right-3 w-6 h-6 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+          className="hidden lg:flex absolute top-1/2 -right-3 w-6 h-6 bg-gray-800 border border-gray-600 rounded-full items-center justify-center text-gray-400 hover:text-white transition-colors"
         >
           {isCollapsed ? '→' : '←'}
         </button>
       </div>
     </motion.div>
+    </>
   );
 };
 

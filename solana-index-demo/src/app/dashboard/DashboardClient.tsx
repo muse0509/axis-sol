@@ -125,23 +125,23 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
         title="Market Pulse Index"
         description="An equally weighted index designed to capture the true sentiment of the crypto market, moving beyond the bias of major assets."
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           {/* Wallet Bar */}
           <div className="flex justify-center">
             <WalletBar />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <motion.button
               onClick={() => setModalOpen(true)}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-green-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-green-500 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-green-600 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
             >
               Buy Index
             </motion.button>
             <motion.button
               onClick={() => setBurnOpen(true)}
-              className="px-8 py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-200 hover:scale-105"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white/10 text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-200 hover:scale-105 text-sm sm:text-base"
             >
               Burn Index
             </motion.button>
@@ -151,7 +151,7 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
           <div className="flex justify-center">
             <motion.a
               href="/portfolio"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+              className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 text-sm sm:text-base"
             >
               View Portfolio
             </motion.a>
@@ -166,8 +166,8 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
           </div>
 
           {/* Constituents Grid */}
-          <ModernCard className="p-8">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Index Constituents</h2>
+          <ModernCard className="p-4 sm:p-6 lg:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-center">Index Constituents</h2>
             <ConstituentsGrid 
               assets={assets}
               loading={loading}
@@ -175,7 +175,7 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
           </ModernCard>
 
           {/* Chart Section */}
-          <ModernCard className="p-8">
+          <ModernCard className="p-4 sm:p-6 lg:p-8">
             <ChartSection 
               echartsData={echartsData}
               events={events}
@@ -183,8 +183,8 @@ const DashboardClient = ({ initialLatestEntry, initialDailyChange, events, echar
           </ModernCard>
 
           {/* Event Timeline */}
-          <ModernCard className="p-8">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Market Events</h2>
+          <ModernCard className="p-4 sm:p-6 lg:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 text-center">Market Events</h2>
             <EventTimeline events={events} />
           </ModernCard>
         </div>

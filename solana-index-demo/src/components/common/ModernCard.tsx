@@ -20,7 +20,7 @@ const ModernCard = ({
   onClick 
 }: ModernCardProps) => {
   const baseClasses = `
-    relative rounded-lg p-4
+    relative rounded-lg p-3 sm:p-4
     ${gradient 
       ? dark 
         ? 'bg-gradient-to-br from-gray-800/50 to-gray-700/50' 

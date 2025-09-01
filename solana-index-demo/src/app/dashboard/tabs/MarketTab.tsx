@@ -146,41 +146,41 @@ const MarketTab = ({}: MarketTabProps) => {
   return (
     <div className="space-y-4">
       {/* Market Overview - Compact */}
-      <ModernCard className="p-4" gradient>
-        <GridLayout cols={3} gap="md">
-          <div className="text-center p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-lg mb-1">💰</div>
-            <div className="text-lg font-bold text-white">{formatLargeNumber(totalMarketCap)}</div>
+      <ModernCard className="p-3 sm:p-4" gradient>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
+            <div className="text-base sm:text-lg mb-1">💰</div>
+            <div className="text-sm sm:text-lg font-bold text-white">{formatLargeNumber(totalMarketCap)}</div>
             <div className="text-white/70 text-xs">Market Cap</div>
           </div>
           
-          <div className="text-center p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-lg mb-1">📊</div>
-            <div className={`text-lg font-bold ${averageChange >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+          <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
+            <div className="text-base sm:text-lg mb-1">📊</div>
+            <div className={`text-sm sm:text-lg font-bold ${averageChange >= 0 ? 'text-green-300' : 'text-red-300'}`}>
               {averageChange >= 0 ? '+' : ''}{averageChange.toFixed(2)}%
             </div>
             <div className="text-white/70 text-xs">24h Change</div>
           </div>
           
-          <div className="text-center p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-lg mb-1">🪙</div>
-            <div className="text-lg font-bold text-white">{marketData.length}</div>
+          <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
+            <div className="text-base sm:text-lg mb-1">🪙</div>
+            <div className="text-sm sm:text-lg font-bold text-white">{marketData.length}</div>
             <div className="text-white/70 text-xs">Assets</div>
           </div>
-        </GridLayout>
+        </div>
       </ModernCard>
 
       {/* Token List - Compact */}
-      <ModernCard className="p-4">
+      <ModernCard className="p-3 sm:p-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-white/20">
-                              <th className="text-left py-2 px-3 text-white/70 font-medium">Token</th>
-              <th className="text-right py-2 px-3 text-white/70 font-medium">Allocation</th>
-              <th className="text-right py-2 px-3 text-white/70 font-medium">Price</th>
-              <th className="text-right py-2 px-3 text-white/70 font-medium">24h Change</th>
-              <th className="text-right py-2 px-3 text-white/70 font-medium">Market Cap</th>
+                <th className="text-left py-2 px-2 sm:px-3 text-white/70 font-medium">Token</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium hidden sm:table-cell">Allocation</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium">Price</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium">24h Change</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium hidden lg:table-cell">Market Cap</th>
               </tr>
             </thead>
             <tbody>
@@ -189,9 +189,9 @@ const MarketTab = ({}: MarketTabProps) => {
                   key={token.symbol}
                   className="border-b border-white/10 hover:bg-white/5"
                 >
-                  <td className="py-2 px-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-6 h-6 relative">
+                  <td className="py-2 px-2 sm:px-3">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 relative flex-shrink-0">
                         <Image
                           src={token.imageUrl}
                           alt={token.symbol}
@@ -200,15 +200,15 @@ const MarketTab = ({}: MarketTabProps) => {
                           sizes="24px"
                         />
                       </div>
-                      <div>
-                                          <div className="font-semibold text-white">{token.symbol}</div>
-                  <div className="text-white/70 text-xs">{token.name}</div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-white text-xs sm:text-sm truncate">{token.symbol}</div>
+                        <div className="text-white/70 text-xs truncate hidden sm:block">{token.name}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="text-right py-2 px-3">
-                    <div className="flex items-center justify-end space-x-2">
-                      <div className="w-10 bg-white/20 rounded-full h-1">
+                  <td className="text-right py-2 px-2 sm:px-3 hidden sm:table-cell">
+                    <div className="flex items-center justify-end space-x-1 sm:space-x-2">
+                      <div className="w-8 sm:w-10 bg-white/20 rounded-full h-1">
                         <div 
                           className="bg-blue-500 h-1 rounded-full"
                           style={{ width: `${(token.allocation / 20) * 100}%` }}
@@ -217,15 +217,15 @@ const MarketTab = ({}: MarketTabProps) => {
                       <span className="text-white font-medium text-xs">{token.allocation}%</span>
                     </div>
                   </td>
-                  <td className="text-right py-2 px-3 text-white font-medium text-xs">
+                  <td className="text-right py-2 px-2 sm:px-3 text-white font-medium text-xs">
                     {formatPrice(token.price)}
                   </td>
-                  <td className={`text-right py-2 px-3 font-medium text-xs ${
+                  <td className={`text-right py-2 px-2 sm:px-3 font-medium text-xs ${
                     token.change24h >= 0 ? 'text-green-300' : 'text-red-300'
                   }`}>
                     {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
                   </td>
-                  <td className="text-right py-2 px-3 text-white text-xs">
+                  <td className="text-right py-2 px-2 sm:px-3 text-white text-xs hidden lg:table-cell">
                     {formatLargeNumber(token.marketCap)}
                   </td>
                 </tr>
