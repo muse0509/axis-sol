@@ -136,7 +136,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
               >
-                https://axis-protocol.com
+                https://axis-protocol.xyz
               </motion.div>
             )}
           </div>

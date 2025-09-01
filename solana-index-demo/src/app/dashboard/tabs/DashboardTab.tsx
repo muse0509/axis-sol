@@ -3,11 +3,21 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ModernCard, GridLayout, ModernButton } from '../../../components/common';
+import Image from 'next/image';
 
 const IndexValueCard = dynamic(() => import('../../../components/dashboard/IndexValueCard'), { ssr: false });
-const ConstituentsGrid = dynamic(() => import('../../../components/dashboard/ConstituentsGrid'), { ssr: false });
 const ChartSection = dynamic(() => import('../../../components/dashboard/ChartSection'), { ssr: false });
-const EventTimeline = dynamic(() => import('../../../components/dashboard/EventTimeline'), { ssr: false });
+
+interface TokenData {
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number;
+  volume24h: number;
+  marketCap: number;
+  allocation: number;
+  imageUrl: string;
+}
 
 interface DashboardTabProps {
   initialLatestEntry: any;
@@ -17,13 +27,114 @@ interface DashboardTabProps {
   error?: string;
 }
 
+const sharedTokenData: TokenData[] = [
+  { 
+    symbol: 'BTC', 
+    name: 'Bitcoin', 
+    price: 43520.50, 
+    change24h: 2.5, 
+    volume24h: 15.2e9, 
+    marketCap: 850.5e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png'
+  },
+  { 
+    symbol: 'ETH', 
+    name: 'Ethereum', 
+    price: 2640.75, 
+    change24h: -1.2, 
+    volume24h: 8.5e9, 
+    marketCap: 317.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
+  },
+  { 
+    symbol: 'SOL', 
+    name: 'Solana', 
+    price: 98.45, 
+    change24h: 5.8, 
+    volume24h: 2.1e9, 
+    marketCap: 42.8e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/4128/large/solana.png'
+  },
+  { 
+    symbol: 'BNB', 
+    name: 'BNB', 
+    price: 305.20, 
+    change24h: 1.1, 
+    volume24h: 1.8e9, 
+    marketCap: 46.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png'
+  },
+  { 
+    symbol: 'XRP', 
+    name: 'Ripple', 
+    price: 0.6245, 
+    change24h: -0.8, 
+    volume24h: 1.2e9, 
+    marketCap: 33.5e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png'
+  },
+  { 
+    symbol: 'ADA', 
+    name: 'Cardano', 
+    price: 0.4825, 
+    change24h: 3.2, 
+    volume24h: 890e6, 
+    marketCap: 17.1e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/975/large/cardano.png'
+  },
+  { 
+    symbol: 'DOGE', 
+    name: 'Dogecoin', 
+    price: 0.0845, 
+    change24h: -2.1, 
+    volume24h: 650e6, 
+    marketCap: 12.1e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png'
+  },
+  { 
+    symbol: 'AVAX', 
+    name: 'Avalanche', 
+    price: 35.67, 
+    change24h: 4.5, 
+    volume24h: 520e6, 
+    marketCap: 13.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png'
+  },
+  { 
+    symbol: 'TRX', 
+    name: 'Tron', 
+    price: 0.1045, 
+    change24h: 1.8, 
+    volume24h: 380e6, 
+    marketCap: 9.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png'
+  },
+  { 
+    symbol: 'SUI', 
+    name: 'Sui', 
+    price: 1.85, 
+    change24h: 7.2, 
+    volume24h: 240e6, 
+    marketCap: 4.8e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/26375/large/sui_asset.jpeg'
+  },
+];
+
 const DashboardTab = ({ 
   initialLatestEntry, 
   echartsData, 
-  initialDailyChange, 
-  events 
+  initialDailyChange
 }: DashboardTabProps) => {
-  const [activeSection, setActiveSection] = useState<'index' | 'axis'>('index');
 
   const tokenomics = [
     { label: 'Total Supply', value: '100M', icon: '🪙' },
@@ -38,25 +149,47 @@ const DashboardTab = ({
     { label: 'Your Stake', value: '0 AXIS', icon: '👤' },
   ];
 
-  const renderAxisContent = () => (
-    <div className="space-y-4">
-      {/* Token Overview */}
-      <ModernCard className="p-4 text-center" gradient>
-        <div className="text-3xl mb-2">⚡</div>
-        <h2 className="text-xl font-bold text-white mb-3">$AXIS Token</h2>
-        
-        <div className="flex justify-center space-x-4">
-          <ModernButton variant="primary" size="sm" gradient>
-            Get AXIS
-          </ModernButton>
-        </div>
-      </ModernCard>
+  const formatPrice = (price: number) => {
+    if (price >= 1000) return `$${price.toLocaleString()}`;
+    if (price >= 1) return `$${price.toFixed(2)}`;
+    return `$${price.toFixed(4)}`;
+  };
 
-      {/* Tokenomics */}
-      <ModernCard className="p-4">
+  const formatLargeNumber = (num: number) => {
+    if (num >= 1e12) return `$${(num / 1e12).toFixed(1)}T`;
+    if (num >= 1e9) return `$${(num / 1e9).toFixed(1)}B`;
+    if (num >= 1e6) return `$${(num / 1e6).toFixed(1)}M`;
+    return `$${num.toLocaleString()}`;
+  };
+
+  if (!initialLatestEntry || !echartsData?.length) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-400 text-lg">No data available</p>
+      </div>
+    );
+  }
+
+  const latestClose = echartsData.at(-1)![2] as number;
+  const baseOpen = echartsData[0][1] as number;
+  const fallbackIdx = baseOpen ? (latestClose / baseOpen) * 100 : 0;
+  const displayedIdx = fallbackIdx;
+
+  return (
+    <div className="space-y-4">
+      {/* Index Value Card - Top */}
+      <div className="flex justify-center">
+        <IndexValueCard 
+          indexValue={displayedIdx}
+          dailyChange={initialDailyChange}
+        />
+      </div>
+
+      {/* Tokenomics Section */}
+      <ModernCard className="p-4" gradient>
         <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">📈</span>
-          <span>Tokenomics</span>
+          <span className="text-xl">⚡</span>
+          <span>AXIS Tokenomics</span>
         </h3>
         
         <GridLayout cols={4} gap="md">
@@ -91,142 +224,83 @@ const DashboardTab = ({
         </GridLayout>
       </ModernCard>
 
-      {/* Governance */}
+      {/* Token Constituents - Market Style */}
       <ModernCard className="p-4">
-        <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">🗳️</span>
-          <span>Governance</span>
+        <h3 className="text-lg font-bold text-white mb-4 text-center flex items-center justify-center space-x-2">
+          <span className="text-xl">🪙</span>
+          <span>Index Constituents</span>
         </h3>
         
-        <div className="space-y-2">
-          {[
-            {
-              title: 'Add MATIC to Index',
-              status: 'active',
-              votes: { for: 1250000, against: 340000 },
-            },
-            {
-              title: 'Rebalancing Frequency',
-              status: 'passed',
-              votes: { for: 2100000, against: 180000 },
-            },
-          ].map((proposal) => (
-            <div
-              key={proposal.title}
-              className="p-3 bg-white/10 rounded border border-white/20"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h5 className="font-semibold text-white text-sm">{proposal.title}</h5>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  proposal.status === 'active' ? 'bg-green-500/20 text-green-300' :
-                  'bg-blue-500/20 text-blue-300'
-                }`}>
-                  {proposal.status}
-                </span>
-              </div>
-              
-              {proposal.status === 'active' && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-green-300">For: {proposal.votes.for.toLocaleString()}</span>
-                    <span className="text-red-300">Against: {proposal.votes.against.toLocaleString()}</span>
-                  </div>
-                  <div className="w-full bg-white/20 rounded-full h-1.5">
-                    <div 
-                      className="bg-green-500 h-1.5 rounded-full"
-                      style={{ 
-                        width: `${(proposal.votes.for / (proposal.votes.for + proposal.votes.against)) * 100}%` 
-                      }}
-                    />
-                  </div>
-                  <div className="flex space-x-2 mt-2">
-                    <ModernButton variant="primary" size="sm" className="flex-1 text-xs">Vote For</ModernButton>
-                    <ModernButton variant="outline" size="sm" className="flex-1 text-xs">Vote Against</ModernButton>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-white/20">
+                <th className="text-left py-2 px-2 sm:px-3 text-white/70 font-medium">Token</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium hidden sm:table-cell">Allocation</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium">Price</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium">24h Change</th>
+                <th className="text-right py-2 px-2 sm:px-3 text-white/70 font-medium hidden lg:table-cell">Market Cap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sharedTokenData.map((token) => (
+                <tr
+                  key={token.symbol}
+                  className="border-b border-white/10 hover:bg-white/5"
+                >
+                  <td className="py-2 px-2 sm:px-3">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 relative flex-shrink-0">
+                        <Image
+                          src={token.imageUrl}
+                          alt={token.symbol}
+                          fill
+                          className="object-contain"
+                          sizes="24px"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-white text-xs sm:text-sm truncate">{token.symbol}</div>
+                        <div className="text-white/70 text-xs truncate hidden sm:block">{token.name}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-right py-2 px-2 sm:px-3 hidden sm:table-cell">
+                    <div className="flex items-center justify-end space-x-1 sm:space-x-2">
+                      <div className="w-8 sm:w-10 bg-white/20 rounded-full h-1">
+                        <div 
+                          className="bg-blue-500 h-1 rounded-full"
+                          style={{ width: `${(token.allocation / 10) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-white font-medium text-xs">{token.allocation}%</span>
+                    </div>
+                  </td>
+                  <td className="text-right py-2 px-2 sm:px-3 text-white font-medium text-xs">
+                    {formatPrice(token.price)}
+                  </td>
+                  <td className={`text-right py-2 px-2 sm:px-3 font-medium text-xs ${
+                    token.change24h >= 0 ? 'text-green-300' : 'text-red-300'
+                  }`}>
+                    {token.change24h >= 0 ? '+' : ''}{token.change24h.toFixed(2)}%
+                  </td>
+                  <td className="text-right py-2 px-2 sm:px-3 text-white text-xs hidden lg:table-cell">
+                    {formatLargeNumber(token.marketCap)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </ModernCard>
-    </div>
-  );
 
-
-
-  if (!initialLatestEntry || !echartsData?.length) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-400 text-lg">No data available</p>
-      </div>
-    );
-  }
-
-  const latestClose = echartsData.at(-1)![2] as number;
-  const baseOpen = echartsData[0][1] as number;
-  const fallbackIdx = baseOpen ? (latestClose / baseOpen) * 100 : 0;
-  const displayedIdx = fallbackIdx;
-
-  return (
-    <div className="space-y-4">
-      {/* Section Tabs */}
-      <div className="flex justify-center">
-        <div className="flex bg-white/10 rounded-lg p-1 border border-white/20">
-          {[
-            { key: 'index', label: 'Index', icon: '📈' },
-            { key: 'axis', label: 'AXIS', icon: '⚡' },
-          ].map((section) => (
-            <button
-              key={section.key}
-              onClick={() => setActiveSection(section.key as any)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded text-sm font-medium transition-colors ${
-                activeSection === section.key
-                  ? 'bg-white/20 text-white border border-white/30'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <span className="text-sm">{section.icon}</span>
-              <span>{section.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Section Content */}
-      {activeSection === 'index' ? (
-        <>
-      {/* Index Value Card */}
-      <div className="flex justify-center">
-        <IndexValueCard 
-          indexValue={displayedIdx}
-          dailyChange={initialDailyChange}
-        />
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Constituents Grid */}
-        <ModernCard className="p-3 sm:p-4" gradient>
-              <ConstituentsGrid />
-        </ModernCard>
-
-        {/* Chart Section */}
-        <ModernCard className="p-3 sm:p-4" dark>
-          <ChartSection 
-            echartsData={echartsData}
-            events={events}
-          />
-        </ModernCard>
-      </div>
-
-      {/* Event Timeline - Compact */}
+      {/* Chart Section */}
       <ModernCard className="p-3 sm:p-4" dark>
-        <EventTimeline events={events} />
+        <ChartSection 
+          echartsData={echartsData}
+          events={[]}
+        />
       </ModernCard>
-        </>
-      ) : (
-        renderAxisContent()
-      )}
     </div>
   );
 };

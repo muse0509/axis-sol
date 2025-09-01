@@ -23,109 +23,111 @@ interface MarketTabProps {
   error?: string;
 }
 
+const sharedMarketData: MarketData[] = [
+  { 
+    symbol: 'BTC', 
+    name: 'Bitcoin', 
+    price: 43520.50, 
+    change24h: 2.5, 
+    volume24h: 15.2e9, 
+    marketCap: 850.5e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png'
+  },
+  { 
+    symbol: 'ETH', 
+    name: 'Ethereum', 
+    price: 2640.75, 
+    change24h: -1.2, 
+    volume24h: 8.5e9, 
+    marketCap: 317.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
+  },
+  { 
+    symbol: 'SOL', 
+    name: 'Solana', 
+    price: 98.45, 
+    change24h: 5.8, 
+    volume24h: 2.1e9, 
+    marketCap: 42.8e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/4128/large/solana.png'
+  },
+  { 
+    symbol: 'BNB', 
+    name: 'BNB', 
+    price: 305.20, 
+    change24h: 1.1, 
+    volume24h: 1.8e9, 
+    marketCap: 46.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png'
+  },
+  { 
+    symbol: 'XRP', 
+    name: 'Ripple', 
+    price: 0.6245, 
+    change24h: -0.8, 
+    volume24h: 1.2e9, 
+    marketCap: 33.5e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png'
+  },
+  { 
+    symbol: 'ADA', 
+    name: 'Cardano', 
+    price: 0.4825, 
+    change24h: 3.2, 
+    volume24h: 890e6, 
+    marketCap: 17.1e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/975/large/cardano.png'
+  },
+  { 
+    symbol: 'DOGE', 
+    name: 'Dogecoin', 
+    price: 0.0845, 
+    change24h: -2.1, 
+    volume24h: 650e6, 
+    marketCap: 12.1e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png'
+  },
+  { 
+    symbol: 'AVAX', 
+    name: 'Avalanche', 
+    price: 35.67, 
+    change24h: 4.5, 
+    volume24h: 520e6, 
+    marketCap: 13.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png'
+  },
+  { 
+    symbol: 'TRX', 
+    name: 'Tron', 
+    price: 0.1045, 
+    change24h: 1.8, 
+    volume24h: 380e6, 
+    marketCap: 9.2e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png'
+  },
+  { 
+    symbol: 'SUI', 
+    name: 'Sui', 
+    price: 1.85, 
+    change24h: 7.2, 
+    volume24h: 240e6, 
+    marketCap: 4.8e9, 
+    allocation: 10,
+    imageUrl: 'https://assets.coingecko.com/coins/images/26375/large/sui_asset.jpeg'
+  },
+];
+
 const MarketTab = ({}: MarketTabProps) => {
-  const [marketData, setMarketData] = useState<MarketData[]>([
-    { 
-      symbol: 'BTC', 
-      name: 'Bitcoin', 
-      price: 43520.50, 
-      change24h: 2.5, 
-      volume24h: 15.2e9, 
-      marketCap: 850.5e9, 
-      allocation: 20,
-      imageUrl: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png'
-    },
-    { 
-      symbol: 'ETH', 
-      name: 'Ethereum', 
-      price: 2640.75, 
-      change24h: -1.2, 
-      volume24h: 8.5e9, 
-      marketCap: 317.2e9, 
-      allocation: 18,
-      imageUrl: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
-    },
-    { 
-      symbol: 'SOL', 
-      name: 'Solana', 
-      price: 98.45, 
-      change24h: 5.8, 
-      volume24h: 2.1e9, 
-      marketCap: 42.8e9, 
-      allocation: 15,
-      imageUrl: 'https://assets.coingecko.com/coins/images/4128/large/solana.png'
-    },
-    { 
-      symbol: 'BNB', 
-      name: 'BNB', 
-      price: 305.20, 
-      change24h: 1.1, 
-      volume24h: 1.8e9, 
-      marketCap: 46.2e9, 
-      allocation: 12,
-      imageUrl: 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png'
-    },
-    { 
-      symbol: 'XRP', 
-      name: 'Ripple', 
-      price: 0.6245, 
-      change24h: -0.8, 
-      volume24h: 1.2e9, 
-      marketCap: 33.5e9, 
-      allocation: 10,
-      imageUrl: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png'
-    },
-    { 
-      symbol: 'ADA', 
-      name: 'Cardano', 
-      price: 0.4825, 
-      change24h: 3.2, 
-      volume24h: 890e6, 
-      marketCap: 17.1e9, 
-      allocation: 8,
-      imageUrl: 'https://assets.coingecko.com/coins/images/975/large/cardano.png'
-    },
-    { 
-      symbol: 'DOGE', 
-      name: 'Dogecoin', 
-      price: 0.0845, 
-      change24h: -2.1, 
-      volume24h: 650e6, 
-      marketCap: 12.1e9, 
-      allocation: 7,
-      imageUrl: 'https://assets.coingecko.com/coins/images/5/large/dogecoin.png'
-    },
-    { 
-      symbol: 'AVAX', 
-      name: 'Avalanche', 
-      price: 35.67, 
-      change24h: 4.5, 
-      volume24h: 520e6, 
-      marketCap: 13.2e9, 
-      allocation: 5,
-      imageUrl: 'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png'
-    },
-    { 
-      symbol: 'TRX', 
-      name: 'Tron', 
-      price: 0.1045, 
-      change24h: 1.8, 
-      volume24h: 380e6, 
-      marketCap: 9.2e9, 
-      allocation: 3,
-      imageUrl: 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png'
-    },
-    { 
-      symbol: 'SUI', 
-      name: 'Sui', 
-      price: 1.85, 
-      change24h: 7.2, 
-      volume24h: 240e6, 
-      marketCap: 4.8e9, 
-      allocation: 2,
-      imageUrl: 'https://assets.coingecko.com/coins/images/26375/large/sui_asset.jpeg'
-    },
-  ]);
+  const [marketData, setMarketData] = useState<MarketData[]>(sharedMarketData);
 
   const formatPrice = (price: number) => {
     if (price >= 1000) return `$${price.toLocaleString()}`;
