@@ -2,7 +2,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useCallback, useRef, useState, useEffect } from 'react'
-import html2canvas from 'html2canvas'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiDownload, FiPlus, FiX } from 'react-icons/fi'
 import { FaXTwitter } from 'react-icons/fa6'
@@ -104,6 +103,9 @@ const ChallengePage: NextPage = () => {
     if (!previewRef.current) return;
     
     try {
+      // Dynamically import html2canvas to avoid SSR issues
+      const html2canvas = (await import('html2canvas')).default;
+      
       // Temporarily show the preview element for html2canvas
       const previewElement = previewRef.current;
       const originalDisplay = previewElement.style.display;

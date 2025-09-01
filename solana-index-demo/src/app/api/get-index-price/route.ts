@@ -22,8 +22,7 @@ export async function GET(request: NextRequest) {
       .from('index_history')
       .select('index_value')
       .order('created_at', { ascending: false })
-      .limit(1)
-      .offset(1)
+      .range(1, 1)
       .single();
 
     let dailyChange: number | null = null;

@@ -13,10 +13,10 @@ import { putPending, markPaid, markFailed } from '@/lib/settlementStore'
 
 // ----- env & const -----
 const AUTH = process.env.HELIUS_WEBHOOK_TOKEN || '' // e.g. "Bearer dev-abc123xyz"
-const USDC_DEV_MINT = new PublicKey(process.env.USDC_DEV_MINT!)
-const TREASURY_USDC_ATA = new PublicKey(process.env.TREASURY_USDC_ATA!.trim())
-const AXIS_MINT_2022    = new PublicKey(process.env.AXIS_MINT_2022!)
-const AXIS_DEC          = parseInt(process.env.AXIS_DECIMALS || '9', 10)
+const USDC_DEV_MINT = process.env.USDC_DEV_MINT ? new PublicKey(process.env.USDC_DEV_MINT) : null
+const TREASURY_USDC_ATA = process.env.TREASURY_USDC_ATA ? new PublicKey(process.env.TREASURY_USDC_ATA.trim()) : null
+const AXIS_MINT_2022 = process.env.AXIS_MINT_2022 ? new PublicKey(process.env.AXIS_MINT_2022) : null
+const AXIS_DEC = parseInt(process.env.AXIS_DECIMALS || '9', 10)
 const PYTH_PRICE_IDS: string[] = JSON.parse(process.env.PYTH_PRICE_IDS || '[]')
 
 // ----- logging helper -----
@@ -59,6 +59,16 @@ async function fetchIndexValue(): Promise<number> {
 // ----- helpers: ensure ATAs & transfers -----
 // AXIS(Token-2022) -> user
 async function transferAxisToUser(userOwner: PublicKey, axisUiAmount: number) {
+  if (!connection) {
+    throw new Error('Solana connection not available')
+  }
+  if (!TREASURY_OWNER) {
+    throw new Error('TREASURY_OWNER not available')
+  }
+  if (!AXIS_MINT_2022) {
+    throw new Error('AXIS_MINT_2022 not available')
+  }
+  
   const signer = loadTreasurySigner()
   const src = (await getOrCreateAssociatedTokenAccount(
     connection, signer, AXIS_MINT_2022, TREASURY_OWNER, false, 'confirmed', undefined, TOKEN_2022_PROGRAM_ID
@@ -83,6 +93,16 @@ async function transferAxisToUser(userOwner: PublicKey, axisUiAmount: number) {
 
 // USDC(legacy SPL) -> user
 async function transferUsdcToUser(userOwner: PublicKey, usdcUiAmount: number) {
+  if (!connection) {
+    throw new Error('Solana connection not available')
+  }
+  if (!TREASURY_USDC_ATA) {
+    throw new Error('TREASURY_USDC_ATA not available')
+  }
+  if (!USDC_DEV_MINT) {
+    throw new Error('USDC_DEV_MINT not available')
+  }
+  
   const signer = loadTreasurySigner()
   const src = TREASURY_USDC_ATA
   const dst = (await getOrCreateAssociatedTokenAccount(
@@ -107,6 +127,8 @@ async function transferUsdcToUser(userOwner: PublicKey, usdcUiAmount: number) {
 type Ev = any
 
 function scanUsdcDeposit(ev: Ev) {
+  if (!TREASURY_OWNER || !USDC_DEV_MINT || !TREASURY_USDC_ATA) return null
+  
   // 1) tokenTransfers を優先（fromUserAccount / toUserAccount が楽）:contentReference[oaicite:5]{index=5}
   const tts = Array.isArray(ev?.tokenTransfers) ? ev.tokenTransfers : []
   for (const t of tts) {
@@ -129,6 +151,8 @@ function scanUsdcDeposit(ev: Ev) {
 }
 
 function scanAxisDeposit(ev: Ev) {
+  if (!TREASURY_OWNER || !AXIS_MINT_2022) return null
+  
   // AXIS(Token-2022) が Treasury に入ったら Burn とみなす。tokenTransfers を優先。
   const tts = Array.isArray(ev?.tokenTransfers) ? ev.tokenTransfers : []
   for (const t of tts) {
@@ -144,10 +168,10 @@ function scanAxisDeposit(ev: Ev) {
 export async function POST(request: NextRequest) {
   // 起動時ログ
   L({ lvl:'info', msg:'config.loaded', conf: {
-    hasAuth: !!AUTH, USDC_DEV_MINT: USDC_DEV_MINT.toBase58(),
-    TREASURY_USDC_ATA: TREASURY_USDC_ATA.toBase58(),
-    AXIS_MINT_2022: AXIS_MINT_2022.toBase58(), AXIS_DEC, pythIds: PYTH_PRICE_IDS.length,
-    TREASURY_OWNER: TREASURY_OWNER.toBase58(),
+    hasAuth: !!AUTH, USDC_DEV_MINT: USDC_DEV_MINT?.toBase58() || 'not-set',
+    TREASURY_USDC_ATA: TREASURY_USDC_ATA?.toBase58() || 'not-set',
+    AXIS_MINT_2022: AXIS_MINT_2022?.toBase58() || 'not-set', AXIS_DEC, pythIds: PYTH_PRICE_IDS.length,
+    TREASURY_OWNER: TREASURY_OWNER?.toBase58() || 'not-set',
   }})
 
   const gotAuth = String(request.headers.get('authorization') || '')
