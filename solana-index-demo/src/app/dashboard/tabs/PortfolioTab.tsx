@@ -6,7 +6,6 @@ import { ModernCard, GridLayout } from '../../../components/common';
 import Image from 'next/image';
 
 const PortfolioStats = dynamic(() => import('../../../components/portfolio/PortfolioStats'), { ssr: false });
-const TokenAllocation = dynamic(() => import('../../../components/portfolio/TokenAllocation'), { ssr: false });
 
 interface TokenData {
   symbol: string;
@@ -167,15 +166,6 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
           totalChange={portfolioData.totalChange}
           mintDate={portfolioData.mintDate}
         />
-      </ModernCard>
-
-      {/* Allocation Chart */}
-      <ModernCard className="p-4">
-        <h3 className="text-lg font-bold text-white mb-3 flex items-center space-x-2">
-          <span className="text-xl">🥧</span>
-          <span>Allocation</span>
-        </h3>
-        <TokenAllocation tokens={portfolioData.tokens} />
       </ModernCard>
 
       {/* Token Details with Additional Info */}
