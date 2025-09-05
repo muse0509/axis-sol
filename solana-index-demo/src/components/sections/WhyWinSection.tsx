@@ -2,23 +2,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, Rocket, Zap } from 'lucide-react';
+import { Card } from '../common';
 
 const WhyWinSection = () => {
   const advantages = [
     { 
       icon: CheckCircle, 
-      title: 'Proven, Professional Methodology', 
-      description: "Our first index mirrors the NASDAQ-100's successful model: a basket of top assets by market cap, equally weighted and rebalanced quarterly. A clear, robust strategy that avoids unproven complexity." 
+      title: 'Proven Methodology', 
+      description: "NASDAQ-100 model: top assets by market cap, equally weighted, quarterly rebalancing." 
     },
     { 
       icon: Rocket, 
-      title: 'Strategic First-Mover on Solana', 
-      description: 'We are giving Solana a core financial primitive it lacks, positioning it as the premier chain for finance. This is a bet on Solana becoming the future of finance, driven by deep, personal passion.' 
+      title: 'First-Mover Advantage', 
+      description: 'Core financial primitive Solana lacks. Betting on Solana becoming the future of finance.' 
     },
     { 
       icon: Zap, 
-      title: 'A Deflationary Economic Engine', 
-      description: 'Our "Buyback & Burn" mechanism creates a direct link between our fund\'s AUM growth and the value of our governance token ($AXIS), creating a powerful, deflationary flywheel that rewards long-term holders.' 
+      title: 'Deflationary Engine', 
+      description: 'Buyback & Burn mechanism links AUM growth to $AXIS value, creating a deflationary flywheel.' 
     }
   ];
 
@@ -27,7 +28,7 @@ const WhyWinSection = () => {
       <div className="text-center mb-16">
         <h2 className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold mb-6">Why We Win</h2>
         <p className="text-gray-400 max-w-[800px] mx-auto leading-7 text-[clamp(1rem,4vw,1.1rem)]">
-          Our competitive advantage is built on a professional methodology, strategic vision, and sustainable economics.
+          Professional methodology, strategic vision, and sustainable economics.
         </p>
       </div>
       
@@ -35,21 +36,20 @@ const WhyWinSection = () => {
         {advantages.map((advantage, index) => (
           <motion.div
             key={index}
-            className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
           >
-            <div className="card-body text-center">
-              <div className="avatar placeholder mb-4">
-                <div className="bg-primary/20 text-primary rounded-full w-16 h-16">
+            <Card className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="bg-blue-500/20 text-blue-500 rounded-full w-16 h-16 flex items-center justify-center">
                   <advantage.icon className="w-8 h-8" />
                 </div>
               </div>
               <h3 className="card-title text-xl mb-4">{advantage.title}</h3>
               <p className="text-gray-400 leading-relaxed">{advantage.description}</p>
-            </div>
+            </Card>
           </motion.div>
         ))}
       </div>

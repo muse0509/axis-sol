@@ -6,9 +6,8 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { Toaster } from 'react-hot-toast'
-import SmoothScroller from '../components/Lenis'
+import SmoothScroller from '../components/crypto/Lenis'
 
-import '@solana/wallet-adapter-react-ui/styles.css'
 
 type Props = { children: React.ReactNode }
 

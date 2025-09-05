@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
 import { AnimatePresence } from 'framer-motion';
 // Components
-import { Header } from '../components/common/Header';
-import { Background } from '../components/Background';
-import { Modal } from '../components/Modal';
+import { Header, Background, Button, Card } from '../components/common';
+import { Modal } from '../components/modals/Modal';
 import { Footer } from '../components/common/Footer';
 import {
   Section,
@@ -13,6 +12,7 @@ import {
   WhyWinSection,
   ProductSection,
   TractionSection,
+  StatsSection,
   RoadmapSection,
   TeamSection,
   WaitlistSection,
@@ -38,6 +38,7 @@ const AxisLandingPage: NextPage = () => {
     { id: 'why-win', component: WhyWinSection },
     { id: 'product', component: ProductSection },
     { id: 'traction', component: TractionSection },
+    { id: 'stats', component: StatsSection },
     { id: 'roadmap', component: RoadmapSection },
     { id: 'team', component: TeamSection },
     { id: 'waitlist', component: () => <WaitlistSection setModalState={setModalState} /> },
@@ -45,6 +46,15 @@ const AxisLandingPage: NextPage = () => {
   ];
 
   useEffect(() => {
+    // Check if user has seen the intro before
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    
+    if (hasSeenIntro) {
+      // Skip loading screen if user has seen it before
+      setIsLoading(false);
+      return;
+    }
+
     let index = 0;
     const timer = setInterval(() => {
       if (index < fullText.length) {
@@ -52,11 +62,21 @@ const AxisLandingPage: NextPage = () => {
         index++;
       } else {
         clearInterval(timer);
-        setTimeout(() => setIsLoading(false), 1200);
+        setTimeout(() => {
+          setIsLoading(false);
+          sessionStorage.setItem('hasSeenIntro', 'true');
+        }, 1000);
       }
-    }, 120);
+    }, 100);
+
     return () => clearInterval(timer);
-  }, [fullText]);
+  }, []); // Remove fullText dependency to prevent re-running
+
+  // Function to skip the intro
+  const skipIntro = () => {
+    setIsLoading(false);
+    sessionStorage.setItem('hasSeenIntro', 'true');
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
@@ -75,7 +95,11 @@ const AxisLandingPage: NextPage = () => {
       />
       
       <AnimatePresence>
-        {isLoading && <LoadingScreen typewriterText={typewriterText} />}
+        {isLoading && (
+          <div onClick={skipIntro} className="cursor-pointer">
+            <LoadingScreen typewriterText={typewriterText} />
+          </div>
+        )}
       </AnimatePresence>
 
       {!isLoading && (

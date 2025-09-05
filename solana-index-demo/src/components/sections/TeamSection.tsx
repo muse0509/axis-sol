@@ -2,13 +2,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { Card, Button } from '../common';
 
 const TeamSection = () => {
   const teamMembers = [
     { 
       name: "Yusuke Kikuta", 
       role: "Founder", 
-      bio: "A founder with a rare combination of obsessive focus, proven technical execution, and extreme learning agility. A self-taught engineer who transitioned from a 13-year career in music to independently building a successful freelance blockchain development career. This obsessive focus and resilience are our ultimate competitive advantages.", 
+      bio: "Self-taught engineer with 13-year music career background. Built successful freelance blockchain development career. Obsessive focus and resilience are our competitive advantages.", 
       image: "/muse.jpg", 
       link: "https://x.com/muse_0509", 
       isSuperTeam: true 
@@ -18,7 +19,7 @@ const TeamSection = () => {
   return (
     <div>
       <div className="text-center mb-16">
-        <h2 className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold mb-6">Why Me? A Founder-Led Bet</h2>
+        <h2 className="text-[clamp(2.5rem,8vw,3.5rem)] font-bold mb-6">Founder</h2>
         <p className="text-gray-400 max-w-[800px] mx-auto leading-7 text-[clamp(1rem,4vw,1.1rem)]">
           Early-stage investing is a bet on the founder. I will out-learn, out-build, and out-execute any competitor.
         </p>
@@ -28,13 +29,13 @@ const TeamSection = () => {
         {teamMembers.map((member, index) => (
           <motion.div
             key={member.name}
-            className="card bg-base-200 shadow-xl border border-base-300 w-80"
+            className="w-80"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
           >
-            <div className="card-body text-center">
+            <Card className="text-center">
               <div className="avatar mb-6">
                 <div className="w-32 h-32 rounded-full relative">
                   <Image 
@@ -51,7 +52,7 @@ const TeamSection = () => {
                         alt="SuperTeam Badge" 
                         width={48} 
                         height={48} 
-                        className="rounded-full bg-base-300 p-1" 
+                        className="rounded-full bg-gray-800 p-1" 
                       />
                     </div>
                   )}
@@ -59,20 +60,20 @@ const TeamSection = () => {
               </div>
               
               <h3 className="card-title text-xl mb-1">{member.name}</h3>
-              <p className="text-secondary mb-4">{member.role}</p>
+              <p className="text-blue-500 mb-4">{member.role}</p>
               <p className="text-gray-400 leading-relaxed text-sm">{member.bio}</p>
               
               <div className="card-actions justify-center mt-6">
-                <a 
-                  className="btn btn-primary btn-sm" 
+                <Button 
                   href={member.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                  variant="outline"
+                  size="sm"
+                  external
                 >
                   X account
-                </a>
+                </Button>
               </div>
-            </div>
+            </Card>
           </motion.div>
         ))}
       </div>

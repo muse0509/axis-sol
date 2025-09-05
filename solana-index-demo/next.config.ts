@@ -1,4 +1,8 @@
 import type { NextConfig } from 'next'
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+// Initialize OpenNext for Cloudflare compatibility
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -7,6 +11,17 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     '0351cfe3887d.ngrok-free.app',
   ],
+
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.coingecko.com',
+        port: '',
+        pathname: '/coins/images/**',
+      },
+    ],
+  },
 
   webpack: (config: any, { isServer }: { isServer: boolean }) => {
     if (!isServer) {
