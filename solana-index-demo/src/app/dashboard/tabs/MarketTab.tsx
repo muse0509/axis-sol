@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ModernCard, GridLayout } from '../../../components/common';
 import Image from 'next/image';
+import { Coins, BarChart3 } from 'lucide-react';
 
 interface MarketData {
   symbol: string;
@@ -151,13 +152,13 @@ const MarketTab = ({}: MarketTabProps) => {
       <ModernCard className="p-3 sm:p-4" gradient>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-base sm:text-lg mb-1">💰</div>
+            <Coins className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1" />
             <div className="text-sm sm:text-lg font-bold text-white">{formatLargeNumber(totalMarketCap)}</div>
             <div className="text-white/70 text-xs">Market Cap</div>
           </div>
           
           <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-base sm:text-lg mb-1">📊</div>
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1" />
             <div className={`text-sm sm:text-lg font-bold ${averageChange >= 0 ? 'text-green-300' : 'text-red-300'}`}>
               {averageChange >= 0 ? '+' : ''}{averageChange.toFixed(2)}%
             </div>
@@ -165,7 +166,7 @@ const MarketTab = ({}: MarketTabProps) => {
           </div>
           
           <div className="text-center p-2 sm:p-3 bg-white/10 rounded border border-white/20">
-            <div className="text-base sm:text-lg mb-1">🪙</div>
+            <Coins className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1" />
             <div className="text-sm sm:text-lg font-bold text-white">{marketData.length}</div>
             <div className="text-white/70 text-xs">Assets</div>
           </div>

@@ -20,7 +20,7 @@ const sectionVariants: Variants = {
 export default function EventTimeline({ events }: EventTimelineProps) {
   return (
     <motion.div 
-      className="w-full max-w-[1000px] mb-12" 
+      className="w-full mb-12"
       variants={sectionVariants} 
       initial="hidden" 
       whileInView="visible" 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ModernCard, ModernButton } from '../../../components/common';
+import { Target, Coins, XCircle, PlusCircle, RefreshCcw } from 'lucide-react';
 
 interface ChallengeTabProps {
   initialLatestEntry: any;
@@ -37,7 +38,7 @@ const ChallengeTab = ({}: ChallengeTabProps) => {
         transition={{ delay: 0.1 }}
       >
         <ModernCard className="p-6 text-center" gradient>
-          <div className="text-4xl mb-3">🎯</div>
+          <Target className="w-10 h-10 mx-auto mb-3" />
           <h2 className="text-2xl font-bold text-white mb-4">Axis Index Challenge</h2>
           <p className="text-gray-400 mb-6">Remove up to 3 tokens and add up to 3 new ones</p>
           
@@ -60,7 +61,7 @@ const ChallengeTab = ({}: ChallengeTabProps) => {
       >
         <ModernCard className="p-6">
           <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
-            <span className="text-xl">🪙</span>
+            <Coins className="w-5 h-5" />
             <span>Current Index</span>
           </h3>
           
@@ -92,7 +93,7 @@ const ChallengeTab = ({}: ChallengeTabProps) => {
         >
           <ModernCard className="p-6">
             <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
-              <span className="text-xl">❌</span>
+              <XCircle className="w-5 h-5 text-red-400" />
               <span>Removed Tokens</span>
             </h3>
             
@@ -109,7 +110,7 @@ const ChallengeTab = ({}: ChallengeTabProps) => {
                     onClick={() => handleRevertRemove(symbol)}
                     className="text-red-400 hover:text-white transition-colors"
                   >
-                    ↺
+                    <RefreshCcw className="w-4 h-4" />
                   </button>
                 </motion.div>
               ))}
@@ -126,7 +127,7 @@ const ChallengeTab = ({}: ChallengeTabProps) => {
       >
         <ModernCard className="p-6">
           <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
-            <span className="text-xl">➕</span>
+            <PlusCircle className="w-5 h-5" />
             <span>Add New Tokens</span>
           </h3>
           

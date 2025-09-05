@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { Home, Coins, BarChart3, Zap, Briefcase, Target, ChevronLeft, ChevronRight } from 'lucide-react';
 import SidebarWalletButton from './SidebarWalletButton';
 
 interface SidebarProps {
@@ -15,12 +16,12 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navigationItems = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'mint', label: 'Mint', icon: '🪙' },
-    { id: 'market', label: 'Market', icon: '📊' },
-    { id: 'dashboard', label: 'Index', icon: '⚡' },
-    { id: 'portfolio', label: 'Portfolio', icon: '💼' },
-    { id: 'challenge', label: 'Challenge', icon: '🎯', external: true },
+    { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
+    { id: 'mint', label: 'Mint', icon: <Coins className="w-5 h-5" /> },
+    { id: 'market', label: 'Market', icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 'dashboard', label: 'Index', icon: <Zap className="w-5 h-5" /> },
+    { id: 'portfolio', label: 'Portfolio', icon: <Briefcase className="w-5 h-5" /> },
+    { id: 'challenge', label: 'Challenge', icon: <Target className="w-5 h-5" />, external: true },
   ];
 
   const handleTabClick = (tabId: string, external?: boolean) => {
@@ -88,7 +89,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
               >
-                AXIS
               </motion.span>
             )}
           </div>
@@ -147,7 +147,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="hidden lg:flex absolute top-1/2 -right-3 w-6 h-6 bg-gray-800 border border-gray-600 rounded-full items-center justify-center text-gray-400 hover:text-white transition-colors"
         >
-          {isCollapsed ? '→' : '←'}
+          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
     </motion.div>

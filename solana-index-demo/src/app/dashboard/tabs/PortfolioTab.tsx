@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ModernCard, GridLayout } from '../../../components/common';
 import Image from 'next/image';
+import { Briefcase, ClipboardList, BarChart3, Coins, Flame, RefreshCcw } from 'lucide-react';
 
 const PortfolioStats = dynamic(() => import('../../../components/portfolio/PortfolioStats'), { ssr: false });
 
@@ -141,7 +142,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
   if (error || !portfolioData) {
     return (
       <div className="text-center py-8">
-        <div className="text-4xl mb-3">💼</div>
+        <Briefcase className="w-10 h-10 mx-auto mb-3" />
         <h3 className="text-xl font-bold text-gray-900 mb-3">No Portfolio Found</h3>
         <p className="text-gray-600 text-lg mb-6">
           {error || 'Connect your wallet and mint some tokens to see your portfolio'}
@@ -158,7 +159,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
       {/* Portfolio Stats - Compact */}
       <ModernCard className="p-4" gradient>
         <h2 className="text-xl font-bold text-white mb-4 text-center flex items-center justify-center space-x-2">
-          <span className="text-2xl">💼</span>
+          <Briefcase className="w-5 h-5" />
           <span>Portfolio Overview</span>
         </h2>
         <PortfolioStats 
@@ -171,7 +172,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
       {/* Token Details with Additional Info */}
       <ModernCard className="p-4">
         <h3 className="text-xl font-bold text-white mb-4 text-center flex items-center justify-center space-x-2">
-          <span className="text-2xl">📋</span>
+          <ClipboardList className="w-5 h-5" />
           <span>Token Details</span>
         </h3>
         
@@ -258,7 +259,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
       {/* Portfolio Status */}
       <ModernCard className="p-4">
         <h3 className="text-lg font-bold text-white mb-4 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">📊</span>
+          <BarChart3 className="w-5 h-5" />
           <span>Portfolio Status</span>
         </h3>
         
@@ -267,7 +268,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
           <div className="p-3 bg-white/10 rounded border border-white/20">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
-                <span className="text-lg">🪙</span>
+                <Coins className="w-4 h-4" />
                 <span className="text-sm font-semibold text-white">Mint</span>
               </div>
               <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
@@ -283,7 +284,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
           <div className="p-3 bg-white/10 rounded border border-white/20">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
-                <span className="text-lg">🔥</span>
+                <Flame className="w-4 h-4 text-red-400" />
                 <span className="text-sm font-semibold text-white">Burn</span>
               </div>
               <span className="px-2 py-1 bg-red-500/20 text-red-300 rounded-full text-xs font-medium">
@@ -299,7 +300,7 @@ const PortfolioTab = ({}: PortfolioTabProps) => {
           <div className="p-3 bg-white/10 rounded border border-white/20">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
-                <span className="text-lg">🔄</span>
+                <RefreshCcw className="w-4 h-4" />
                 <span className="text-sm font-semibold text-white">Rebalancing</span>
               </div>
               <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">

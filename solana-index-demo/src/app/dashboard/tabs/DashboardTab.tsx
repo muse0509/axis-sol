@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ModernCard, GridLayout, ModernButton } from '../../../components/common';
 import Image from 'next/image';
+import { Zap, Coins, RefreshCcw, Landmark, Lock, User, BarChart3 } from 'lucide-react';
 
 const IndexValueCard = dynamic(() => import('../../../components/dashboard/IndexValueCard'), { ssr: false });
 const ChartSection = dynamic(() => import('../../../components/dashboard/ChartSection'), { ssr: false });
@@ -137,16 +138,16 @@ const DashboardTab = ({
 }: DashboardTabProps) => {
 
   const tokenomics = [
-    { label: 'Total Supply', value: '100M', icon: '🪙' },
-    { label: 'Circulating', value: '25M', icon: '🔄' },
-    { label: 'Market Cap', value: '$12.5M', icon: '💰' },
-    { label: 'Treasury', value: '15M', icon: '🏛️' },
+    { label: 'Total Supply', value: '100M', icon: <Coins className="w-4 h-4 mx-auto" /> },
+    { label: 'Circulating', value: '25M', icon: <RefreshCcw className="w-4 h-4 mx-auto" /> },
+    { label: 'Market Cap', value: '$12.5M', icon: <BarChart3 className="w-4 h-4 mx-auto" /> },
+    { label: 'Treasury', value: '15M', icon: <Landmark className="w-4 h-4 mx-auto" /> },
   ];
 
   const stakingStats = [
-    { label: 'Total Staked', value: '8.5M AXIS', icon: '🔒' },
-    { label: 'APY', value: '12.5%', icon: '📈' },
-    { label: 'Your Stake', value: '0 AXIS', icon: '👤' },
+    { label: 'Total Staked', value: '8.5M AXIS', icon: <Lock className="w-4 h-4 mx-auto" /> },
+    { label: 'APY', value: '12.5%', icon: <BarChart3 className="w-4 h-4 mx-auto" /> },
+    { label: 'Your Stake', value: '0 AXIS', icon: <User className="w-4 h-4 mx-auto" /> },
   ];
 
   const formatPrice = (price: number) => {
@@ -188,7 +189,7 @@ const DashboardTab = ({
       {/* Tokenomics Section */}
       <ModernCard className="p-4" gradient>
         <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">⚡</span>
+          <Zap className="w-5 h-5" />
           <span>AXIS Tokenomics</span>
         </h3>
         
@@ -209,7 +210,7 @@ const DashboardTab = ({
       {/* Staking Stats */}
       <ModernCard className="p-4">
         <h3 className="text-lg font-bold text-white mb-3 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">🔒</span>
+          <Lock className="w-5 h-5" />
           <span>Staking</span>
         </h3>
         
@@ -227,7 +228,7 @@ const DashboardTab = ({
       {/* Token Constituents - Market Style */}
       <ModernCard className="p-4">
         <h3 className="text-lg font-bold text-white mb-4 text-center flex items-center justify-center space-x-2">
-          <span className="text-xl">🪙</span>
+          <Coins className="w-5 h-5" />
           <span>Index Constituents</span>
         </h3>
         

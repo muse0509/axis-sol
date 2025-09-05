@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ModernCard, ModernButton, GridLayout } from '../../../components/common';
 import { useIndexPrice } from '../../../hooks/useIndexPrice';
+import { Coins, BarChart3, Wallet, Heart, ArrowRight } from 'lucide-react';
 
 const WalletBar = dynamic(() => import('../../../components/crypto/WalletBar'), { ssr: false });
 
@@ -21,7 +22,7 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
 
   const featureCards = [
     {
-      icon: '🪙',
+      icon: <Coins className="w-6 h-6 mx-auto text-orange-400" />,
       title: 'Mint Index',
       subtitle: 'Buy AXIS Tokens',
       description: 'Deposit USDC to mint AXIS tokens at current index price',
@@ -33,7 +34,7 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
       }
     },
     {
-      icon: '📊',
+      icon: <BarChart3 className="w-6 h-6 mx-auto text-blue-400" />,
       title: 'View Market',
       subtitle: 'Market Data',
       description: 'Explore real-time market data and index performance',
@@ -45,7 +46,7 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
       }
     },
     {
-      icon: '💼',
+      icon: <Wallet className="w-6 h-6 mx-auto text-emerald-400" />,
       title: 'Portfolio',
       subtitle: 'Your Holdings',
       description: 'Track your AXIS token holdings and performance',
@@ -115,7 +116,7 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
               <p className="text-gray-300 text-xs mb-3 sm:mb-4">{card.description}</p>
               <div className="flex items-center justify-center text-orange-400 text-xs sm:text-sm">
                 <span>Explore</span>
-                <span className="ml-1">→</span>
+                <ArrowRight className="ml-1 w-4 h-4" />
               </div>
             </div>
           </ModernCard>
@@ -126,11 +127,11 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-red-400">❤️</span>
+            <Heart className="w-4 h-4 text-red-400" fill="#ef4444" />
             <h2 className="text-lg sm:text-xl font-semibold text-white">Your Favorites</h2>
           </div>
           <button className="text-orange-400 text-xs sm:text-sm hover:text-orange-300 transition-colors">
-            Discover more →
+            Discover more <ArrowRight className="inline w-4 h-4 ml-1 align-middle" />
           </button>
         </div>
 
@@ -164,17 +165,17 @@ const HomeTab = ({ echartsData }: HomeTabProps) => {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <ModernCard className="p-3 sm:p-4 text-center" gradient>
-          <div className="text-xl sm:text-2xl mb-2">💰</div>
+          <Coins className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2" />
           <div className="text-base sm:text-lg font-bold text-white">${latestClose.toFixed(4)}</div>
           <div className="text-white/70 text-xs sm:text-sm">Current Index Price</div>
         </ModernCard>
         <ModernCard className="p-3 sm:p-4 text-center" gradient>
-          <div className="text-xl sm:text-2xl mb-2">🪙</div>
+          <Coins className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2" />
           <div className="text-base sm:text-lg font-bold text-white">1M</div>
           <div className="text-white/70 text-xs sm:text-sm">Total Supply</div>
         </ModernCard>
         <ModernCard className="p-3 sm:p-4 text-center" gradient>
-          <div className="text-xl sm:text-2xl mb-2">📊</div>
+          <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2" />
           <div className="text-base sm:text-lg font-bold text-white">$25.5M</div>
           <div className="text-white/70 text-xs sm:text-sm">Market Cap</div>
         </ModernCard>

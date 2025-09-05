@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ModernCard, ModernButton, GridLayout } from '../../../components/common';
 import { useIndexPrice } from '../../../hooks/useIndexPrice';
+import { Coins, Flame, BarChart3 } from 'lucide-react';
 
 const BuyModal = dynamic(() => import('../../../components/dashboard/Modal/BuyModal'), { ssr: false });
 const BurnModal = dynamic(() => import('../../../components/dashboard/Modal/BurnModal'), { ssr: false });
@@ -25,9 +26,9 @@ const MintTab = ({ echartsData }: MintTabProps) => {
   const latestClose = indexPriceData?.currentPrice ?? echartsData?.at(-1)?.[2] ?? 100;
 
   const mintStats = [
-    { label: 'Index Price', value: `$${latestClose.toFixed(4)}`, icon: '💰' },
-    { label: 'Total Supply', value: '1M', icon: '🪙' },
-    { label: 'Market Cap', value: '$25.5M', icon: '📊' },
+    { label: 'Index Price', value: `$${latestClose.toFixed(4)}`, icon: <Coins className="w-5 h-5 mx-auto" /> },
+    { label: 'Total Supply', value: '1M', icon: <Coins className="w-5 h-5 mx-auto" /> },
+    { label: 'Market Cap', value: '$25.5M', icon: <BarChart3 className="w-5 h-5 mx-auto" /> },
   ];
 
   return (
@@ -53,7 +54,7 @@ const MintTab = ({ echartsData }: MintTabProps) => {
         <GridLayout cols={2} gap="lg">
           {/* Mint Card */}
           <ModernCard className="p-6 text-center" gradient>
-            <div className="text-5xl mb-4">🪙</div>
+            <Coins className="w-10 h-10 mx-auto mb-4" />
                             <h2 className="text-2xl font-bold text-white mb-3">Mint Index Tokens</h2>
         <div className="text-3xl font-bold text-white mb-2">{mintStats[0].value}</div>
         <div className="text-white/70 text-sm mb-6">Current Index Price</div>
@@ -70,7 +71,7 @@ const MintTab = ({ echartsData }: MintTabProps) => {
 
           {/* Burn Card */}
           <ModernCard className="p-6 text-center" gradient>
-            <div className="text-5xl mb-4">🔥</div>
+            <Flame className="w-10 h-10 mx-auto mb-4 text-red-400" />
                             <h2 className="text-2xl font-bold text-white mb-3">Redeem Index Tokens</h2>
         <div className="text-3xl font-bold text-white mb-2">{mintStats[0].value}</div>
         <div className="text-white/70 text-sm mb-6">Current Index Price</div>

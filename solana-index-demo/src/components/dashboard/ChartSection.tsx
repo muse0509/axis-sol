@@ -38,7 +38,7 @@ export default function ChartSection({ echartsData, events }: ChartSectionProps)
   return (
     <DashboardCard 
       variants={sectionVariants}
-      className="w-full max-w-[1000px] p-4 md:p-8"
+      className="w-full p-4 md:p-8"
     >
       {echartsData && <EChartsChart data={echartsData} events={events} disableAnimation />}
     </DashboardCard>

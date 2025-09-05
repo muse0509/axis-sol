@@ -36,7 +36,7 @@ const defaultAssets: RealTimeAsset[] = [
 export default function ConstituentsGrid({ assets = defaultAssets, loading = false }: ConstituentsGridProps) {
   return (
     <motion.div 
-      className="w-full max-w-[1000px] mb-8 sm:mb-12" 
+      className="w-full mb-8 sm:mb-12"
       variants={sectionVariants} 
       initial="hidden" 
       whileInView="visible" 
